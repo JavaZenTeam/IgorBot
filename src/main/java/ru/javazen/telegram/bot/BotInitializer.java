@@ -3,10 +3,15 @@ package ru.javazen.telegram.bot;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
 
 public class BotInitializer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BotInitializer.class);
+
     private String token;
     private String hookUrl;
 
@@ -22,13 +27,12 @@ public class BotInitializer {
                 .get(ClientResponse.class);
         if (response.getStatus() == 200) {
             System.out.println("Success in setting WebHook");
+            LOGGER.info("WebHook is set");
         } else {
-            System.out.println("Error in setting WebHook");
+            LOGGER.error("Error when setting WebHook: " + response.getEntity(String.class));
         }
 
         client.destroy();
-
-        //TODO - logging
     }
 
     public void setToken(String token) {

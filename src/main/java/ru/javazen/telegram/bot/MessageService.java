@@ -6,12 +6,17 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.javazen.telegram.bot.entity.SendMessage;
 
 import javax.ws.rs.core.MediaType;
 
 //TODO
 public class MessageService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageService.class);
+
     private String token;
     private String hookUrl;
 
@@ -32,8 +37,7 @@ public class MessageService {
                 .post(ClientResponse.class);
 
         if (response.getStatus() != 200) {
-            System.out.println("error in sending message"); //TODO logging
-            System.out.println(response.getEntity(String.class));
+            LOGGER.warn("Error when sending messages: " + response.getEntity(String.class));
         }
 
         client.destroy();
