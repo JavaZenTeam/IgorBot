@@ -12,12 +12,12 @@ import javax.ws.rs.core.MediaType;
 
 //TODO
 public class MessageService {
+    private String token;
+    private String hookUrl;
 
     private final static String SEND_MESSAGE_METHOD = "sendMessage";
 
-    private final static BotConfig config = new BotConfig(); //TODO DI
-
-    public static void send(SendMessage message) {
+    public void send(SendMessage message) {
         ClientConfig clientConfig = new DefaultClientConfig();
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 
@@ -25,9 +25,9 @@ public class MessageService {
 
         WebResource service = client.resource("https://api.telegram.org/"); //TODO
 
-        ClientResponse response = service.path("bot" + config.getToken())
+        ClientResponse response = service.path("bot" + token)
                 .path(SEND_MESSAGE_METHOD)
-                .queryParam("url", config.getHookUrl())
+                .queryParam("url", hookUrl)
                 .entity(message, MediaType.APPLICATION_JSON_TYPE)
                 .post(ClientResponse.class);
 
@@ -37,5 +37,13 @@ public class MessageService {
         }
 
         client.destroy();
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public void setHookUrl(String hookUrl) {
+        this.hookUrl = hookUrl;
     }
 }

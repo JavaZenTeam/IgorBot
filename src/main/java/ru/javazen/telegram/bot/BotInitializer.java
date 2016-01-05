@@ -4,25 +4,20 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
 import javax.ws.rs.core.MediaType;
 
-@WebListener
-public class BotContextListener implements ServletContextListener {
+public class BotInitializer {
+    private String token;
+    private String hookUrl;
 
-    private BotConfig config = new BotConfig();
-
-    @Override
-    public void contextInitialized(ServletContextEvent servletContextEvent) {
+    public void init() {
         Client client = Client.create();
 
         WebResource service = client.resource("https://api.telegram.org/");
 
-        ClientResponse response = service.path("bot" + config.getToken())
+        ClientResponse response = service.path("bot" + token)
                 .path("setWebhook")
-                .queryParam("url", config.getHookUrl())
+                .queryParam("url", hookUrl)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get(ClientResponse.class);
         if (response.getStatus() == 200) {
@@ -36,8 +31,11 @@ public class BotContextListener implements ServletContextListener {
         //TODO - logging
     }
 
-    @Override
-    public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        //TODO - logging
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public void setHookUrl(String hookUrl) {
+        this.hookUrl = hookUrl;
     }
 }
