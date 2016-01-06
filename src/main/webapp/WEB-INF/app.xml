@@ -9,18 +9,10 @@
 
     <context:property-placeholder location="classpath:config.properties"/>
 
-    <bean id="messageService" class="ru.javazen.telegram.bot.MessageService">
-        <property name="token" value="${bot.token}"/>
-        <property name="hookUrl" value="${bot.hook_url}"/>
-    </bean>
+    <context:component-scan base-package="ru.javazen.telegram.bot.service"/>
 
-    <bean class="ru.javazen.telegram.bot.HookService">
-        <property name="messageService" ref="messageService"/>
-    </bean>
+    <bean class="ru.javazen.telegram.bot.AppConfig"/>
 
-    <bean class="ru.javazen.telegram.bot.BotInitializer" init-method="init">
-        <property name="token" value="${bot.token}"/>
-        <property name="hookUrl" value="${bot.hook_url}"/>
-    </bean>
+    <import resource="botConfig.xml"/>
 
 </beans>
