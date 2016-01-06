@@ -8,10 +8,12 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Random;
+
 @Configuration
 public class AppConfig {
 
-    @Bean
+    @Bean(destroyMethod = "destroy")
     Client client(){
         ClientConfig clientConfig = new DefaultClientConfig();
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -21,5 +23,10 @@ public class AppConfig {
     @Bean
     WebResource telegramWebResource(){
         return client().resource("https://api.telegram.org/");
+    }
+
+    @Bean
+    Random random(){
+        return new Random();
     }
 }

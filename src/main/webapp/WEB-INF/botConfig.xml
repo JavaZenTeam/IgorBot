@@ -16,7 +16,15 @@
                 <constructor-arg name="token" value="${bot.token}"/>
                 <property name="updateHandlers">
                     <list>
-                        <bean class="ru.javazen.telegram.bot.handler.Repeater"/>
+                        <bean class="ru.javazen.telegram.bot.handler.YesNoUnknownRandomAnswer">
+                            <property name="address" value="Игорь"/>
+                            <property name="yesAnswer" value="Да"/>
+                            <property name="noAnswer" value="Нет"/>
+                            <property name="unknownAnswer" value="Не знаю"/>
+                            <property name="yesRatio" value="5"/>
+                            <property name="noRatio" value="5"/>
+                            <property name="unknownRatio" value="1"/>
+                        </bean>
                         <bean class="ru.javazen.telegram.bot.handler.Repeater"/>
                     </list>
                 </property>
