@@ -1,7 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import ru.javazen.telegram.bot.entity.SendMessage;
 import ru.javazen.telegram.bot.entity.Update;
@@ -11,7 +10,6 @@ import ru.javazen.telegram.bot.method.TelegramMethod;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-@Component
 public class YesNoUnknownRandomAnswer implements UpdateHandler {
 
     @Autowired
