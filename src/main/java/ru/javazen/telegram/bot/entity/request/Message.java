@@ -22,6 +22,9 @@ public class Message {
     @JsonProperty("text")
     private String text;
 
+    @JsonProperty("reply_to_message")
+    private Message replyMessage;
+
     public long getMessageId() {
         return messageId;
     }
@@ -60,5 +63,13 @@ public class Message {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Message getReplyMessage() {
+        return replyMessage;
+    }
+
+    public void setReplyMessage(Message replyMessage) {
+        this.replyMessage = replyMessage;
     }
 }

@@ -20,6 +20,9 @@ public class SendMessage {
     @JsonProperty("text")
     private String text;
 
+    @JsonProperty("reply_to_message_id")
+    private Long replyMessageId;
+
     public long getChatId() {
         return chatId;
     }
@@ -34,5 +37,13 @@ public class SendMessage {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Long getReplyMessageId() {
+        return replyMessageId;
+    }
+
+    public void setReplyMessageId(Long replyMessageId) {
+        this.replyMessageId = replyMessageId;
     }
 }
