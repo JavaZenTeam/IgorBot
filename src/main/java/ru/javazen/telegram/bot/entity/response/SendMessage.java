@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot.entity;
+package ru.javazen.telegram.bot.entity.response;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
