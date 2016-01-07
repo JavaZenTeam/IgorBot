@@ -25,6 +25,7 @@
                             <property name="noRatio" value="5"/>
                             <property name="unknownRatio" value="1"/>
                         </bean>
+                        <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher"/>
                         <bean class="ru.javazen.telegram.bot.handler.Repeater"/>
                     </list>
                 </property>
