@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.javazen.telegram.bot.Bot;
-import ru.javazen.telegram.bot.entity.Update;
+import ru.javazen.telegram.bot.entity.request.Update;
 
 import javax.annotation.Resource;
 import javax.ws.rs.Consumes;

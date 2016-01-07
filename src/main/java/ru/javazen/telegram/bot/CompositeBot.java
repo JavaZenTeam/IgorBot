@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
-import ru.javazen.telegram.bot.entity.Update;
+import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
 import ru.javazen.telegram.bot.method.TelegramMethod;
 import ru.javazen.telegram.bot.service.TelegramService;

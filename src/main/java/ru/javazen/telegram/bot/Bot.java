@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot;
 
-import ru.javazen.telegram.bot.entity.Update;
+import ru.javazen.telegram.bot.entity.request.Update;
 
 public abstract class Bot {
     private String token;

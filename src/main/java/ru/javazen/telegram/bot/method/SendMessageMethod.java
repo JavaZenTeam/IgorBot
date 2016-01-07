@@ -2,7 +2,7 @@ package ru.javazen.telegram.bot.method;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import ru.javazen.telegram.bot.entity.SendMessage;
+import ru.javazen.telegram.bot.entity.response.SendMessage;
 
 import javax.ws.rs.core.MediaType;
 
