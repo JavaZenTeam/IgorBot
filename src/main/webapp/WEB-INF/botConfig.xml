@@ -9,9 +9,13 @@
             http://www.springframework.org/schema/util/spring-util.xsd
             ">
 
-    <bean id="randomAnswerModule" class="ru.javazen.telegram.bot.handler.RegexpFilter">
-        <property name="pattern" value="Игорь,.*\?"/>
-        <property name="innerHandler">
+    <bean id="randomAnswerModule"  class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="Игорь,.*\?"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.RandomAnswer">
                 <property name="answers">
                     <map>
@@ -21,32 +25,44 @@
                     </map>
                 </property>
             </bean>
-        </property>
+        </constructor-arg>
     </bean>
 
-    <bean id="replyLayoutSwitcherModule" class="ru.javazen.telegram.bot.handler.RegexpFilter">
-        <property name="pattern" value="п[оа][- ]?русс?к[ие].*"/>
-        <property name="innerHandler">
+    <bean id="replyLayoutSwitcherModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="п[оа][- ]?русс?к[ие].*"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher"/>
-        </property>
+        </constructor-arg>
     </bean>
 
-    <bean id="lowLevelJokesModule1" class="ru.javazen.telegram.bot.handler.RegexpFilter">
-        <property name="pattern" value=".*[еe]+[тt]\W*"/>
-        <property name="innerHandler">
+    <bean id="lowLevelJokesModule1" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value=".*[нhn][еe]+[тt][^A-Za-zА-Яа-я]*"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.SimpleAnswer">
                 <constructor-arg name="answer" value="Пидора ответ!"/>
             </bean>
-        </property>
+        </constructor-arg>
     </bean>
 
-    <bean id="lowLevelJokesModule2" class="ru.javazen.telegram.bot.handler.RegexpFilter">
-        <property name="pattern" value=".*([3з][0oо][0oо]|[иu][сc][тt][aаоo0])"/>
-        <property name="innerHandler">
+    <bean id="lowLevelJokesModule2" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value=".*([3з][0oо][0oо]|[иu][сc][тt][aаоo0])"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.SimpleAnswer">
                 <constructor-arg name="answer" value="Отсоси у тракториста!"/>
             </bean>
-        </property>
+        </constructor-arg>
     </bean>
 
     <util:map id="botMap" key-type="java.lang.String" value-type="ru.javazen.telegram.bot.Bot">
