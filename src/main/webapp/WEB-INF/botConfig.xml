@@ -31,7 +31,7 @@
     <bean id="replyLayoutSwitcherModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="п[оа][- ]?русс?к[ие].*"/>
+                <property name="pattern" value="(п[оа][- ]?р[ую][сз][сз]?[кг][ие].*|ru.*)"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
@@ -42,7 +42,7 @@
     <bean id="lowLevelJokesModule1" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value=".*[нhn][еe]+[тt][^A-Za-zА-Яа-я]*"/>
+                <property name="pattern" value="(.* |)[нhn] *[еe]+ *[тt][^?a-zа-я]*"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
