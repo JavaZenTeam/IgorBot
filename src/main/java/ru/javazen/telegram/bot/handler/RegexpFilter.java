@@ -1,5 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
+import org.springframework.util.Assert;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.method.TelegramMethod;
 
@@ -7,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class RegexpFilter implements UpdateHandler {
     private static final Pattern DEFAULT_PATTERN = Pattern.compile(".*");
-    private UpdateHandler innerHandler;
+    private UpdateHandler innerHandler = new DumbHandler();
     private Pattern pattern = DEFAULT_PATTERN;
 
     public TelegramMethod handle(Update update) {
@@ -22,6 +23,7 @@ public class RegexpFilter implements UpdateHandler {
     }
 
     public void setInnerHandler(UpdateHandler innerHandler) {
+        Assert.notNull(innerHandler, "innerHandler can not be null");
         this.innerHandler = innerHandler;
     }
 }

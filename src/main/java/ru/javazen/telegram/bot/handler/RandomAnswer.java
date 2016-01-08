@@ -7,6 +7,8 @@ import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.method.SendMessageMethod;
 import ru.javazen.telegram.bot.method.TelegramMethod;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -15,7 +17,7 @@ public class RandomAnswer implements UpdateHandler {
     @Autowired
     private Random random;
 
-    private Map<String, Integer> answers;
+    private Map<String, Integer> answers = Collections.emptyMap();
     private int sum;
 
     public TelegramMethod handle(Update update) {
@@ -45,6 +47,8 @@ public class RandomAnswer implements UpdateHandler {
     }
 
     public void setAnswers(Map<String, Integer> answers) {
+        Assert.notNull(answers, "answers can not be null");
+
         int newSum = 0;
         for (Integer ratio: answers.values()) {
             Assert.isTrue(ratio >= 0, "ratio of answer can not be negative");
