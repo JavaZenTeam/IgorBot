@@ -19,6 +19,7 @@ public class ReplyLayoutSwitcher  implements UpdateHandler {
         if (text == null) return null;
 
         if (!command.equalsIgnoreCase(text.trim())) return null;
+        if (update.getMessage().getReplyMessage() == null) return null;
 
         SendMessage message = new SendMessage();
 
