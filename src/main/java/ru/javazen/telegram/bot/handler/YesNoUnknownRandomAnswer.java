@@ -35,6 +35,7 @@ public class YesNoUnknownRandomAnswer implements UpdateHandler {
         String answer = solveAnswer(text);
 
         SendMessage message = new SendMessage();
+        message.setReplyMessageId(update.getMessage().getMessageId());
         message.setChatId(update.getMessage().getChat().getId());
         message.setText(answer);
         return new SendMessageMethod(message);
