@@ -9,6 +9,28 @@
             http://www.springframework.org/schema/util/spring-util.xsd
             ">
 
+    <bean id="randomAnswerModule" class="ru.javazen.telegram.bot.handler.RegexpFilter">
+        <property name="pattern" value="Игорь,.*\?"/>
+        <property name="innerHandler">
+            <bean class="ru.javazen.telegram.bot.handler.RandomAnswer">
+                <property name="answers">
+                    <map>
+                        <entry key="Да" value="4"/>
+                        <entry key="Нет" value="4"/>
+                        <entry key="Не знаю" value="1"/>
+                    </map>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="replyLayoutSwitcherModule" class="ru.javazen.telegram.bot.handler.RegexpFilter">
+        <property name="pattern" value="п[оа][- ]?русс?к[ие]"/>
+        <property name="innerHandler">
+            <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher"/>
+        </property>
+    </bean>
+
     <util:map id="botMap" key-type="java.lang.String" value-type="ru.javazen.telegram.bot.Bot">
 
         <entry key="${bot.name}">
@@ -16,16 +38,8 @@
                 <constructor-arg name="token" value="${bot.token}"/>
                 <property name="updateHandlers">
                     <list>
-                        <bean class="ru.javazen.telegram.bot.handler.YesNoUnknownRandomAnswer">
-                            <property name="address" value="Игорь"/>
-                            <property name="yesAnswer" value="Да"/>
-                            <property name="noAnswer" value="Нет"/>
-                            <property name="unknownAnswer" value="Не знаю"/>
-                            <property name="yesRatio" value="5"/>
-                            <property name="noRatio" value="5"/>
-                            <property name="unknownRatio" value="1"/>
-                        </bean>
-                        <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher"/>
+                        <ref bean="replyLayoutSwitcherModule"/>
+                        <ref bean="randomAnswerModule"/>
                     </list>
                 </property>
             </bean>
