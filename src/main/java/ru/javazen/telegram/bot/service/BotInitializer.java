@@ -37,10 +37,10 @@ public class BotInitializer {
         SetWebHookMethod method = new SetWebHookMethod(callbackUrl + name);
         boolean result = telegramService.execute(method, bot.getToken());
         if (result) {
-            LOGGER.info("Successfully init bot {0}", name);
+            LOGGER.info("Successfully init bot {}", name);
             bot.onStart();
         } else {
-            LOGGER.error("Failed to init bot {0}", name);
+            LOGGER.error("Failed to init bot {}", name);
         }
     }
 }
