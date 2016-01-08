@@ -25,9 +25,27 @@
     </bean>
 
     <bean id="replyLayoutSwitcherModule" class="ru.javazen.telegram.bot.handler.RegexpFilter">
-        <property name="pattern" value="п[оа][- ]?русс?к[ие]"/>
+        <property name="pattern" value="п[оа][- ]?русс?к[ие].*"/>
         <property name="innerHandler">
             <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher"/>
+        </property>
+    </bean>
+
+    <bean id="lowLevelJokesModule1" class="ru.javazen.telegram.bot.handler.RegexpFilter">
+        <property name="pattern" value=".*[еe]+[тt]\W*"/>
+        <property name="innerHandler">
+            <bean class="ru.javazen.telegram.bot.handler.SimpleAnswer">
+                <constructor-arg name="answer" value="Пидора ответ!"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="lowLevelJokesModule2" class="ru.javazen.telegram.bot.handler.RegexpFilter">
+        <property name="pattern" value=".*([3з][0oо][0oо]|[иu][сc][тt][aаоo0])"/>
+        <property name="innerHandler">
+            <bean class="ru.javazen.telegram.bot.handler.SimpleAnswer">
+                <constructor-arg name="answer" value="Отсоси у тракториста!"/>
+            </bean>
         </property>
     </bean>
 
@@ -38,6 +56,8 @@
                 <constructor-arg name="token" value="${bot.token}"/>
                 <property name="updateHandlers">
                     <list>
+                        <ref bean="lowLevelJokesModule1"/>
+                        <ref bean="lowLevelJokesModule2"/>
                         <ref bean="replyLayoutSwitcherModule"/>
                         <ref bean="randomAnswerModule"/>
                     </list>
