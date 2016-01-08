@@ -2,9 +2,8 @@ package ru.javazen.telegram.bot.handler;
 
 import org.springframework.util.Assert;
 import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.entity.response.SendMessage;
-import ru.javazen.telegram.bot.method.SendMessageMethod;
 import ru.javazen.telegram.bot.method.TelegramMethod;
+import ru.javazen.telegram.bot.service.MessageHelper;
 
 public class SimpleAnswer implements UpdateHandler{
     private String answer;
@@ -16,9 +15,6 @@ public class SimpleAnswer implements UpdateHandler{
 
     @Override
     public TelegramMethod handle(Update update) {
-        SendMessage message = new SendMessage();
-        message.setChatId(update.getMessage().getChat().getId());
-        message.setText(answer);
-        return new SendMessageMethod(message);
+        return MessageHelper.answer(update.getMessage(), answer);
     }
 }

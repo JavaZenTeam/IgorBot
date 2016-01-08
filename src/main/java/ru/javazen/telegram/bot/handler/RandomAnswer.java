@@ -2,13 +2,11 @@ package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import ru.javazen.telegram.bot.entity.response.SendMessage;
 import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.method.SendMessageMethod;
 import ru.javazen.telegram.bot.method.TelegramMethod;
+import ru.javazen.telegram.bot.service.MessageHelper;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -27,11 +25,7 @@ public class RandomAnswer implements UpdateHandler {
         String answer = solveAnswer(text);
         if (answer == null) return null;
 
-        SendMessage message = new SendMessage();
-        message.setReplyMessageId(update.getMessage().getMessageId());
-        message.setChatId(update.getMessage().getChat().getId());
-        message.setText(answer);
-        return new SendMessageMethod(message);
+        return MessageHelper.answerWithReply(update.getMessage(), answer);
     }
 
     private String solveAnswer(String text){

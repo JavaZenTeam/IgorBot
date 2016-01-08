@@ -1,18 +1,13 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.entity.response.SendMessage;
 import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.method.SendMessageMethod;
 import ru.javazen.telegram.bot.method.TelegramMethod;
+import ru.javazen.telegram.bot.service.MessageHelper;
 
 public class Repeater implements UpdateHandler {
     public TelegramMethod handle(Update update) {
         String text = update.getMessage().getText();
         if (text == null) return null;
-
-        SendMessage message = new SendMessage();
-        message.setChatId(update.getMessage().getChat().getId());
-        message.setText(text);
-        return new SendMessageMethod(message);
+        return MessageHelper.answer(update.getMessage(), text);
     }
 }
