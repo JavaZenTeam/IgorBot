@@ -12,7 +12,7 @@
     <bean id="randomAnswerModule"  class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="Игорь,.*\?"/>
+                <property name="pattern" value="и+го+рь,.*\?"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
@@ -20,8 +20,12 @@
                 <property name="answers">
                     <map>
                         <entry key="Да" value="4"/>
-                        <entry key="Нет" value="4"/>
-                        <entry key="Не знаю" value="1"/>
+                        <entry key="Ага" value="2"/>
+                        <entry key="+" value="1"/>
+                        <entry key="Нет" value="6"/>
+                        <entry key="-" value="1"/>
+                        <entry key="Не знаю" value="2"/>
+                        <entry key="хз" value="1"/>
                     </map>
                 </property>
             </bean>
@@ -55,7 +59,7 @@
     <bean id="lowLevelJokesModule2" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value=".*([3з][0oо][0oо]|[иu][сc][тt][aаоo0])"/>
+                <property name="pattern" value=".*([3з][0oо][0oо]|[тt][рp][иu][сc][тt][aаоo0])"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
