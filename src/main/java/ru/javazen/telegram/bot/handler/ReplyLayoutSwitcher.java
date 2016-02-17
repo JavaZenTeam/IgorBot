@@ -7,8 +7,8 @@ import ru.javazen.telegram.bot.service.MessageHelper;
 
 public class ReplyLayoutSwitcher implements UpdateHandler {
 
-    private final static char[] RUS_CHARS = "йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё\"№;%:?".toCharArray();
-    private final static char[] ENG_CHARS = "qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM<>?~@#$%^&".toCharArray();
+    private String sourceCharSet = "";
+    private String targetChatSet = "";
 
     public TelegramMethod handle(Update update) {
         String text = update.getMessage().getText();
@@ -19,9 +19,17 @@ public class ReplyLayoutSwitcher implements UpdateHandler {
         return MessageHelper.answerWithReply(replyMessage, result);
     }
 
-    private static String switchLayout(String text) {
-        for (int i=0; i<RUS_CHARS.length && i<ENG_CHARS.length; i++) {
-            text = text.replace(ENG_CHARS[i], RUS_CHARS[i]);
+    public void setSourceCharSet(String sourceCharSet) {
+        this.sourceCharSet = sourceCharSet;
+    }
+
+    public void setTargetChatSet(String targetChatSet) {
+        this.targetChatSet = targetChatSet;
+    }
+
+    private String switchLayout(String text) {
+        for (int i = 0; i< sourceCharSet.length() && i< targetChatSet.length(); i++) {
+            text = text.replace(sourceCharSet.charAt(i), targetChatSet.charAt(i));
         }
         return text;
     }

@@ -32,14 +32,40 @@
         </constructor-arg>
     </bean>
 
-    <bean id="replyLayoutSwitcherModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+    <bean id="rusCharSet" class="java.lang.String">
+        <constructor-arg value="йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё&quot;№;%:?"/>
+    </bean>
+
+    <bean id="engCharSet" class="java.lang.String">
+        <constructor-arg value="qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:&quot;ZXCVBNM&lt;&gt;?~@#$%^&amp;"
+        />
+    </bean>
+
+    <bean id="replyLayoutSwitcherModuleRus" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
                 <property name="pattern" value="(п[оа][- ]?р[ую][сз][сз]?[кг][ие].*|ru.*)"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
-            <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher"/>
+            <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher">
+                <property name="sourceCharSet" ref="engCharSet"/>
+                <property name="targetChatSet" ref="rusCharSet"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="replyLayoutSwitcherModuleEng" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="([иае]нгл*|eng.*)"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher">
+                <property name="sourceCharSet" ref="rusCharSet"/>
+                <property name="targetChatSet" ref="engCharSet"/>
+            </bean>
         </constructor-arg>
     </bean>
 
@@ -78,7 +104,8 @@
                     <list>
                         <ref bean="lowLevelJokesModule1"/>
                         <ref bean="lowLevelJokesModule2"/>
-                        <ref bean="replyLayoutSwitcherModule"/>
+                        <ref bean="replyLayoutSwitcherModuleRus"/>
+                        <ref bean="replyLayoutSwitcherModuleEng"/>
                         <ref bean="randomAnswerModule"/>
                     </list>
                 </property>
