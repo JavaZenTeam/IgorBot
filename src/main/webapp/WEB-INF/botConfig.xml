@@ -95,6 +95,10 @@
         </constructor-arg>
     </bean>
 
+    <bean id="repeaterAdvanced" class="ru.javazen.telegram.bot.handler.RepeaterAdvanced">
+        <property name="pattern" value="и+го+рь, ск[ао]ж[иы] (.+)"/>
+    </bean>
+
     <util:map id="botMap" key-type="java.lang.String" value-type="ru.javazen.telegram.bot.Bot">
 
         <entry key="${bot.name}">
@@ -106,6 +110,7 @@
                         <ref bean="lowLevelJokesModule2"/>
                         <ref bean="replyLayoutSwitcherModuleRus"/>
                         <ref bean="replyLayoutSwitcherModuleEng"/>
+                        <ref bean="repeaterAdvanced"/>
                         <ref bean="randomAnswerModule"/>
                     </list>
                 </property>
