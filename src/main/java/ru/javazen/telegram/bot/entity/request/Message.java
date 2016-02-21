@@ -72,4 +72,16 @@ public class Message {
     public void setReplyMessage(Message replyMessage) {
         this.replyMessage = replyMessage;
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "messageId=" + messageId +
+                ", from=" + from +
+                ", date=" + date +
+                ", chat=" + chat +
+                ", text='" + text + '\'' +
+                ", replyMessage=" + replyMessage +
+                '}';
+    }
 }
