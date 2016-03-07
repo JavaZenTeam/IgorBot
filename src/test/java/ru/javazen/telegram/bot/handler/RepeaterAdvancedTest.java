@@ -21,13 +21,14 @@ public class RepeaterAdvancedTest {
                 { "say hello", "hello" },
                 { "say hello world", "hello world" },
                 { "111", null },
+                {"say ", null },
         });
     }
 
     @BeforeClass
     public static void setUp() throws Exception {
         repeater = new RepeaterAdvanced();
-        repeater.setPattern("say (.*)");
+        repeater.setPattern("say (.+)");
     }
 
     public RepeaterAdvancedTest(String inputText, String expectedAnswer) {
