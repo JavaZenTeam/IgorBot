@@ -32,6 +32,13 @@
         </constructor-arg>
     </bean>
 
+    <bean id="hashBasedChoiceMaker" class="ru.javazen.telegram.bot.handler.ChoiceMaker">
+        <property name="pattern" value="и+го+рь, (.+) или (.+)\?"/>
+        <property name="comparator">
+            <bean class="ru.javazen.telegram.bot.HashCodeComparator"/>
+        </property>
+    </bean>
+
     <bean id="rusCharSet" class="java.lang.String">
         <constructor-arg value="йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё&quot;№;%:?"/>
     </bean>
@@ -123,6 +130,7 @@
                         <ref bean="replyLayoutSwitcherModuleRus"/>
                         <ref bean="replyLayoutSwitcherModuleEng"/>
                         <ref bean="repeaterAdvanced"/>
+                        <ref bean="hashBasedChoiceMaker"/>
                         <ref bean="randomAnswerModule"/>
                     </list>
                 </property>
