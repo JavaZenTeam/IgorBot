@@ -25,6 +25,9 @@ public class Message {
     @JsonProperty("reply_to_message")
     private Message replyMessage;
 
+    @JsonProperty("sticker")
+    Sticker sticker;
+
     public long getMessageId() {
         return messageId;
     }
@@ -73,6 +76,14 @@ public class Message {
         this.replyMessage = replyMessage;
     }
 
+    public Sticker getSticker() {
+        return sticker;
+    }
+
+    public void setSticker(Sticker sticker) {
+        this.sticker = sticker;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
@@ -82,6 +93,7 @@ public class Message {
                 ", chat=" + chat +
                 ", text='" + text + '\'' +
                 ", replyMessage=" + replyMessage +
+                ", sticker=" + sticker +
                 '}';
     }
 }

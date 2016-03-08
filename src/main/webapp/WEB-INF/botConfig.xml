@@ -117,6 +117,24 @@
         </constructor-arg>
     </bean>
 
+    <bean id="getStickerByIdModule" class="ru.javazen.telegram.bot.handler.GetStickerById">
+        <property name="pattern" value="/sticker (.+)"/>
+    </bean>
+
+    <bean id="randomFacePalmModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
+                <property name="probability" value="0.01"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.SimpleStickerSender">
+                <!-- Face palm by Denis Zaichenko -->
+                <property name="sticker" value="BQADAgADVwADYI4MB8LNksbDCpV9Ag"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <util:map id="botMap" key-type="java.lang.String" value-type="ru.javazen.telegram.bot.Bot">
 
         <entry key="${bot.name}">
@@ -132,6 +150,8 @@
                         <ref bean="repeaterAdvanced"/>
                         <ref bean="hashBasedChoiceMaker"/>
                         <ref bean="randomAnswerModule"/>
+                        <ref bean="getStickerByIdModule"/>
+                        <ref bean="randomFacePalmModule"/>
                     </list>
                 </property>
             </bean>
