@@ -128,6 +128,13 @@
         </constructor-arg>
     </bean>
 
+    <bean id="chatBridgeWithDenis" class="ru.javazen.telegram.bot.handler.ChatBridge">
+        <!--Chat with normal people-->
+        <property name="firstChat" value="-1001045629601" />
+        <!--Chat with Denis-->
+        <property name="secondChat" value="-1001038770422" />
+    </bean>
+
     <bean id="getStickerByIdModule" class="ru.javazen.telegram.bot.handler.GetStickerById">
         <property name="pattern" value="/sticker (.+)"/>
     </bean>
@@ -168,8 +175,6 @@
                     <list>
                         <ref bean="scheduler"/>
                         <ref bean="updateInfoProvider"/>
-                        <ref bean="lowLevelJokesModule1"/>
-                        <ref bean="lowLevelJokesModule2"/>
                         <ref bean="replyLayoutSwitcherModuleRus"/>
                         <ref bean="replyLayoutSwitcherModuleEng"/>
                         <ref bean="repeaterAdvanced"/>
@@ -177,7 +182,9 @@
                         <ref bean="hashBasedChoiceMaker"/>
                         <ref bean="randomAnswerModule"/>
                         <ref bean="getStickerByIdModule"/>
-                        <ref bean="randomFacePalmModule"/>
+                        <!--<ref bean="randomFacePalmModule"/>
+                        <ref bean="lowLevelJokesModule1"/>
+                        <ref bean="lowLevelJokesModule2"/>-->
                     </list>
                 </property>
             </bean>
