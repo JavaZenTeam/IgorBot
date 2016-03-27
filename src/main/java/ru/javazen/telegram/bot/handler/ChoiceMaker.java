@@ -1,8 +1,10 @@
 package ru.javazen.telegram.bot.handler;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.method.TelegramMethod;
 import ru.javazen.telegram.bot.service.MessageHelper;
+import ru.javazen.telegram.bot.service.TelegramService;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -13,6 +15,8 @@ public class ChoiceMaker implements UpdateHandler{
     private Pattern pattern = DEFAULT_PATTERN;
     private Comparator<String> comparator;
 
+    @Autowired
+    private TelegramService telegramService;
 
     public void setPattern(String pattern) {
         this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
@@ -22,11 +26,16 @@ public class ChoiceMaker implements UpdateHandler{
         this.comparator = comparator;
     }
 
-    public TelegramMethod handle(Update update) {
+    @Override
+    public boolean handle(Update update, String token) {
         String text = update.getMessage().getText();
-        if (text == null) return null;
+        if (text == null) return false;
         String choice = processText(text);
-        return choice == null ? null : MessageHelper.answer(update.getMessage(), choice);
+        if(choice != null) {
+            telegramService.execute(MessageHelper.answer(update.getMessage(), choice), token);
+            return true;
+        }
+        return false;
     }
 
     public String processText(String text) {

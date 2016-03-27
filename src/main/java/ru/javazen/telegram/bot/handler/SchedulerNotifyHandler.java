@@ -22,7 +22,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     //TODO !!!!
     @Override
     public boolean handle(final Update update,final String token) {
-        long userId = update.getMessage().getFrom().getId();
+        final long userId = update.getMessage().getFrom().getId();
 
         //userTasks.computeIfAbsent(userId, num -> 0);
         if (!userTasks.containsKey(userId)) {
@@ -33,7 +33,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
             telegramService.execute(MessageHelper.answerWithReply(update.getMessage(), "Превышено количество тасок"), token);
             return true;
         }
-        Parameters parameters;
+        final Parameters parameters;
         try {
             parameters = parseParameters(update.getMessage().getText());
         } catch (RuntimeException e) {

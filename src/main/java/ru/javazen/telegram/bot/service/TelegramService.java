@@ -18,16 +18,16 @@ public class TelegramService {
     private WebResource telegramWebResource;
 
     public boolean execute(TelegramMethod method, String token){
-        LOGGER.debug("Start execute method {0}", method);
+        LOGGER.debug("Start execute method {}", method);
 
         WebResource temp = telegramWebResource.path("bot" + token);
         ClientResponse response = method.execute(temp);
 
         boolean result = response.getStatus() == ClientResponse.Status.OK.getStatusCode();
         if (result) {
-            LOGGER.debug("Successfully execute method {0}", method);
+            LOGGER.debug("Successfully execute method {}", method);
         } else {
-            LOGGER.warn("Failed to execute method {0}. Cause: {1}", method, response.getEntity(String.class));
+            LOGGER.warn("Failed to execute method {}. Cause: {}", method, response.getEntity(String.class));
         }
         return result;
     }

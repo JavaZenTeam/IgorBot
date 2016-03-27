@@ -109,7 +109,7 @@
     <bean id="updateInfoProvider" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="/info( .*/)"/>
+                <property name="pattern" value="/info(| .*)"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
