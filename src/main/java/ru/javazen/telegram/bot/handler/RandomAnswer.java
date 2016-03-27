@@ -5,6 +5,7 @@ import org.springframework.util.Assert;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.method.TelegramMethod;
 import ru.javazen.telegram.bot.service.MessageHelper;
+import ru.javazen.telegram.bot.service.TelegramService;
 
 import java.util.Collections;
 import java.util.Map;
@@ -15,17 +16,22 @@ public class RandomAnswer implements UpdateHandler {
     @Autowired
     private Random random;
 
+    @Autowired
+    private TelegramService telegramService;
+
     private Map<String, Integer> answers = Collections.emptyMap();
     private int sum;
 
-    public TelegramMethod handle(Update update) {
+    @Override
+    public boolean handle(Update update, String token) {
         String text = update.getMessage().getText();
-        if (text == null) return null;
+        if (text == null) return false;
 
         String answer = solveAnswer(text);
-        if (answer == null) return null;
+        if (answer == null) return false;
 
-        return MessageHelper.answerWithReply(update.getMessage(), answer);
+        telegramService.execute(MessageHelper.answerWithReply(update.getMessage(), answer), token);
+        return true;
     }
 
     private String solveAnswer(String text){

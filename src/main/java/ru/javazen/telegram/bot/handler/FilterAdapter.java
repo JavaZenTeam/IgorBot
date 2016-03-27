@@ -16,8 +16,9 @@ public class FilterAdapter implements UpdateHandler {
         this.handler = handler;
     }
 
-    public TelegramMethod handle(Update update) {
-        if (!filter.check(update)) return null;
-        return handler.handle(update);
+    @Override
+    public boolean handle(Update update, String token) {
+        if (!filter.check(update)) return false;
+        return handler.handle(update, token);
     }
 }

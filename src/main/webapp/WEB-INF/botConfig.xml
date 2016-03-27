@@ -109,7 +109,7 @@
     <bean id="updateInfoProvider" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="/info(| .*)"/>
+                <property name="pattern" value="/info( .*/)"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
@@ -135,6 +135,19 @@
         </constructor-arg>
     </bean>
 
+
+
+    <bean id="scheduler" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="и+го+рь, ск[ао]ж[иы] через (.+)"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.SchedulerNotifyHandler" />
+        </constructor-arg>
+    </bean>
+
     <util:map id="botMap" key-type="java.lang.String" value-type="ru.javazen.telegram.bot.Bot">
 
         <entry key="${bot.name}">
@@ -142,6 +155,7 @@
                 <constructor-arg name="token" value="${bot.token}"/>
                 <property name="updateHandlers">
                     <list>
+                        <ref bean="scheduler"/>
                         <ref bean="updateInfoProvider"/>
                         <ref bean="lowLevelJokesModule1"/>
                         <ref bean="lowLevelJokesModule2"/>

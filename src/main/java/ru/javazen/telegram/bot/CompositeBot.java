@@ -14,9 +14,6 @@ import java.util.Collection;
 public class CompositeBot extends Bot {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeBot.class);
 
-    @Autowired
-    private TelegramService telegramService;
-
     private Collection<UpdateHandler> updateHandlers;
 
     public CompositeBot(String token) {
@@ -37,18 +34,8 @@ public class CompositeBot extends Bot {
 
     public void onUpdate(Update update) {
         for (UpdateHandler handler : getUpdateHandlers()){
-            TelegramMethod result = handler.handle(update);
-            if (result == null) continue;
-
-            boolean success = telegramService.execute(result, getToken());
-            if (success){
-                LOGGER.debug("Successfully handle update and send something");
-            }
-            else {
-                LOGGER.error("Failed to handle update");
-            }
-            return;
+            if (handler.handle(update, getToken())) return;
         }
-        LOGGER.debug("This update is not handled: {0}", update);
+        LOGGER.debug("This update is not handled: {}", update);
     }
 }
