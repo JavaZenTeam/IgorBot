@@ -117,6 +117,17 @@
         </constructor-arg>
     </bean>
 
+    <bean id="forwardMessageBridge" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="/forward_to (.+)"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.MessageForwardBridge"/>
+        </constructor-arg>
+    </bean>
+
     <bean id="getStickerByIdModule" class="ru.javazen.telegram.bot.handler.GetStickerById">
         <property name="pattern" value="/sticker (.+)"/>
     </bean>
@@ -162,6 +173,7 @@
                         <ref bean="replyLayoutSwitcherModuleRus"/>
                         <ref bean="replyLayoutSwitcherModuleEng"/>
                         <ref bean="repeaterAdvanced"/>
+                        <ref bean="forwardMessageBridge"/>
                         <ref bean="hashBasedChoiceMaker"/>
                         <ref bean="randomAnswerModule"/>
                         <ref bean="getStickerByIdModule"/>
