@@ -9,6 +9,8 @@ import ru.javazen.telegram.bot.service.TelegramService;
 
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SchedulerNotifyHandler implements UpdateHandler {
 
@@ -16,32 +18,49 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
     private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
 
+    private String validationPattern;
+
+    private int daysLimit, tasksLimit;
+
     @Autowired
     private TelegramService telegramService;
 
-    //TODO !!!!
     @Override
     public boolean handle(final Update update,final String token) {
+        String message = update.getMessage().getText();
+
         final long userId = update.getMessage().getFrom().getId();
-
-        //userTasks.computeIfAbsent(userId, num -> 0);
-        if (!userTasks.containsKey(userId)) {
-            userTasks.put(userId, 0);
-        }
-
-        if (userTasks.get(userId) > 10) {
-            telegramService.execute(MessageHelper.answerWithReply(update.getMessage(), "Превышено количество тасок"), token);
-            return true;
-        }
         final Parameters parameters;
+
+        Pattern pattern = Pattern.compile(validationPattern);
+        Matcher matcher = pattern.matcher(message);
+
+        if(matcher.matches()) {
+            message = message.substring(0, matcher.end()).trim();
+        } else {
+            return false;
+        }
+
         try {
-            parameters = parseParameters(update.getMessage().getText());
+            parameters = parseParameters(message);
         } catch (RuntimeException e) {
             return false;
         }
 
-        if (parameters.getDate().compareTo(new Date(new Date().getTime() + 1000 * 60 * 60 * 24 + 1)) > 0) {
-            telegramService.execute(MessageHelper.answerWithReply(update.getMessage(), "Запрещено устанавливать таску более чем на сутки"), token);
+        //userTasks.computeIfAbsent(userId, num -> 0);
+        if (!userTasks.containsKey(userId)) {
+            userTasks.put(userId, 1);
+        }
+
+        if (userTasks.get(userId) > tasksLimit) {
+            telegramService.execute(MessageHelper.answerWithReply(update.getMessage(), "Я столько не запомню(("), token);
+            return true;
+        }
+
+        Calendar calendar = new GregorianCalendar();
+        calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
+        if (parameters.getDate().compareTo(calendar.getTime()) > 0) {
+            telegramService.execute(MessageHelper.answerWithReply(update.getMessage(), "Так долго я помнить не смогу, сорри"), token);
             return true;
         }
         //userTasks.computeIfPresent(userId, (key, val) -> val+1);
@@ -59,36 +78,56 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         return true;
     }
 
-    //TODO
     private Parameters parseParameters(String message) {
-        String tail = message.substring(message.indexOf("через") + "через".length());
-        long delayAsMillis = 0;
+        String regexp = /* 1 */"(\\d* ?(?:л|лет|г|год|года) )?" +
+                        /* 2 */"(\\d* ?(?:м|мес|месяц|месяца|месяцев) )?" +
+                        /* 3 */"(\\d* ?(?:н|нед|недель|неделю|недели) )?" +
+                        /* 4 */"(\\d* ?(?:д|дн|дней|дня|день) )?" +
+                        /* 5 */"(\\d* ?(?:ч|час|часа|часов) )?" +
+                        /* 6 */"(\\d* ?(?:м|мин|минуту|минуты|минут) )?" +
+                        /* 7 */"(\\d* ?(?:с|сек|секунду|секунды|секунд) )?" +
+                        /* 8 */"(.*)";
+
+        int[] timeUnits = {
+                0,
+                /* 1 */Calendar.YEAR,
+                /* 2 */Calendar.MONTH,
+                /* 3 */Calendar.WEEK_OF_YEAR,
+                /* 4 */Calendar.DAY_OF_YEAR,
+                /* 5 */Calendar.HOUR,
+                /* 6 */Calendar.MINUTE,
+                /* 7 */Calendar.SECOND
+        };
+
+        Pattern pattern = Pattern.compile(regexp);
+        Matcher matcher = pattern.matcher(message);
+
+        GregorianCalendar calendar = new GregorianCalendar();
         String returnMessage = null;
         Parameters parameters = new Parameters();
 
-        List<String> units = Arrays.asList("сек", "мин", "час");
-        for(String unit : units) {
-            if (tail.contains(unit)) {
-                returnMessage = tail.substring(tail.indexOf(unit) + unit.length());
+        if(matcher.matches()) {
+            String time;
+            int value;
 
-                String time = tail.substring(0, tail.indexOf(unit));
-
-                switch (unit) {
-                    case "сек":
-                        delayAsMillis = Long.parseLong(time.trim()) * 1000;
-                        break;
-                    case "мин":
-                        delayAsMillis = Long.parseLong(time.trim()) * 1000 * 60;
-                        break;
-                    case "час":
-                        delayAsMillis = Long.parseLong(time.trim()) * 1000 * 60 * 60;
-                        break;
+            for (int i = 1; i < timeUnits.length; i++) {
+                if (!matcher.group(i).isEmpty())
+                {
+                    time = matcher.group(i).replaceAll("\\D", "");
+                    if (time != null && !time.isEmpty()) value = Integer.parseInt(time);
+                    else value = 1;
+                    calendar.add(timeUnits[i], value);
                 }
             }
         }
 
+        returnMessage = matcher.group(matcher.groupCount());
+        if (returnMessage == null || returnMessage.isEmpty()) {
+            throw new IllegalArgumentException("Message is empty");
+        }
+
         parameters.setMessage(returnMessage);
-        parameters.setDate(new Date(new Date().getTime() + delayAsMillis));
+        parameters.setDate(calendar.getTime());
 
         return parameters;
     }
@@ -99,6 +138,19 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
     public void setTaskScheduler(TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
+    }
+
+    public void setDaysLimit(int daysLimit) {
+        this.daysLimit = daysLimit;
+    }
+
+    public void setTasksLimit(int tasksLimit)
+    {
+        this.tasksLimit = tasksLimit;
+    }
+
+    public void setValidationPattern(String pattern) {
+        this.validationPattern = pattern;
     }
 
     private static class Parameters {
