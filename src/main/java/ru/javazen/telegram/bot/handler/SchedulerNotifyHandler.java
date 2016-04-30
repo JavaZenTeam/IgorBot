@@ -28,15 +28,18 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     @Override
     public boolean handle(final Update update,final String token) {
         String message = update.getMessage().getText();
+        if (message == null || message.isEmpty()) {
+            return false;
+        }
 
         final long userId = update.getMessage().getFrom().getId();
         final Parameters parameters;
 
-        Pattern pattern = Pattern.compile(validationPattern);
+        Pattern pattern = Pattern.compile(validationPattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
         Matcher matcher = pattern.matcher(message);
 
-        if(matcher.matches()) {
-            message = message.substring(0, matcher.end()).trim();
+        if (matcher.matches()) {
+            message = matcher.group(1);
         } else {
             return false;
         }
@@ -99,11 +102,12 @@ public class SchedulerNotifyHandler implements UpdateHandler {
                 /* 7 */Calendar.SECOND
         };
 
-        Pattern pattern = Pattern.compile(regexp);
+        Pattern pattern = Pattern.compile(regexp, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
         Matcher matcher = pattern.matcher(message);
 
         GregorianCalendar calendar = new GregorianCalendar();
         String returnMessage = null;
+        boolean calendarChanged = false;
         Parameters parameters = new Parameters();
 
         if(matcher.matches()) {
@@ -111,11 +115,12 @@ public class SchedulerNotifyHandler implements UpdateHandler {
             int value;
 
             for (int i = 1; i < timeUnits.length; i++) {
-                if (!matcher.group(i).isEmpty())
+                if (matcher.group(i) != null && !matcher.group(i).isEmpty())
                 {
                     time = matcher.group(i).replaceAll("\\D", "");
                     if (time != null && !time.isEmpty()) value = Integer.parseInt(time);
                     else value = 1;
+                    calendarChanged = true;
                     calendar.add(timeUnits[i], value);
                 }
             }
@@ -124,6 +129,10 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         returnMessage = matcher.group(matcher.groupCount());
         if (returnMessage == null || returnMessage.isEmpty()) {
             throw new IllegalArgumentException("Message is empty");
+        }
+
+        if (!calendarChanged) {
+            throw new IllegalArgumentException("No time span specified");
         }
 
         parameters.setMessage(returnMessage);
