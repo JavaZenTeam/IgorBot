@@ -154,7 +154,7 @@
     </bean>
 
     <bean id="scheduler" class="ru.javazen.telegram.bot.handler.SchedulerNotifyHandler">
-        <property name="validationPattern" value="и+го+рь, ск[ао]ж[иы] че?р[еи]?з"/>
+        <property name="validationPattern" value="и+го+рь, ск[ао]ж[иы] че?р[еи]?з (.+)"/>
         <property name="daysLimit" value="500"/>
         <property name="tasksLimit" value="30"/>
     </bean>
