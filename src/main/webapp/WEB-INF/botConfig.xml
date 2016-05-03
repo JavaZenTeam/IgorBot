@@ -33,7 +33,7 @@
     </bean>
 
     <bean id="hashBasedChoiceMaker" class="ru.javazen.telegram.bot.handler.ChoiceMaker">
-        <property name="pattern" value="и+го+рь, (.+) или (.+)\?"/>
+        <property name="pattern" value="и+го+рь,\s?(.+)\sили\s(.+)\?"/>
         <property name="comparator">
             <bean class="ru.javazen.telegram.bot.HashCodeComparator"/>
         </property>
@@ -103,7 +103,7 @@
     </bean>
 
     <bean id="repeaterAdvanced" class="ru.javazen.telegram.bot.handler.RepeaterAdvanced">
-        <property name="pattern" value="и+го+рь, ск[ао]ж[иы] (.+)"/>
+        <property name="pattern" value="и+го+рь,\s?ск[ао]ж[иы] (.+)"/>
     </bean>
 
     <bean id="updateInfoProvider" class="ru.javazen.telegram.bot.handler.FilterAdapter">
@@ -154,7 +154,7 @@
     </bean>
 
     <bean id="scheduler" class="ru.javazen.telegram.bot.handler.SchedulerNotifyHandler">
-        <property name="validationPattern" value="и+го+рь, ск[ао]ж[иы] че?р[еи]?з (.+)"/>
+        <property name="validationPattern" value="и+го+рь,\s?ск[ао]ж[иы] че?р[еи]?з (.+)"/>
         <property name="daysLimit" value="500"/>
         <property name="tasksLimit" value="30"/>
     </bean>

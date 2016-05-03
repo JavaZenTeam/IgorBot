@@ -35,7 +35,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         final long userId = update.getMessage().getFrom().getId();
         final Parameters parameters;
 
-        Pattern pattern = Pattern.compile(validationPattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+        Pattern pattern = Pattern.compile(validationPattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
         Matcher matcher = pattern.matcher(message);
 
         if (matcher.matches()) {
@@ -83,7 +83,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
     private Parameters parseParameters(String message) {
         String regexp = /* 1 */"(\\d* ?(?:л|лет|г|год|года) )?" +
-                        /* 2 */"(\\d* ?(?:м|мес|месяц|месяца|месяцев) )?" +
+                        /* 2 */"(\\d* ?(?:мес|месяц|месяца|месяцев) )?" +
                         /* 3 */"(\\d* ?(?:н|нед|недель|неделю|недели) )?" +
                         /* 4 */"(\\d* ?(?:д|дн|дней|дня|день) )?" +
                         /* 5 */"(\\d* ?(?:ч|час|часа|часов) )?" +
