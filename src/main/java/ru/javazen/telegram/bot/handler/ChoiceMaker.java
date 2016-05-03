@@ -19,7 +19,7 @@ public class ChoiceMaker implements UpdateHandler{
     private TelegramService telegramService;
 
     public void setPattern(String pattern) {
-        this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+        this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
     }
 
     public void setComparator(Comparator<String> comparator) {

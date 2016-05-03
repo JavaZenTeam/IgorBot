@@ -18,7 +18,7 @@ public class RepeaterAdvanced implements UpdateHandler{
     private Pattern pattern = DEFAULT_PATTERN;
 
     public void setPattern(String pattern) {
-        this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+        this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
     }
 
     @Override
