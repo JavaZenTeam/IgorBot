@@ -25,6 +25,9 @@ public class Message {
     @JsonProperty("reply_to_message")
     private Message replyMessage;
 
+    @JsonProperty("pinned_message")
+    private Message pinnedMessage;
+
     @JsonProperty("sticker")
     Sticker sticker;
 
@@ -84,6 +87,14 @@ public class Message {
         this.sticker = sticker;
     }
 
+    public Message getPinnedMessage() {
+        return pinnedMessage;
+    }
+
+    public void setPinnedMessage(Message pinnedMessage) {
+        this.pinnedMessage = pinnedMessage;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
@@ -93,7 +104,10 @@ public class Message {
                 ", chat=" + chat +
                 ", text='" + text + '\'' +
                 ", replyMessage=" + replyMessage +
+                ", pinnedMessage=" + pinnedMessage +
                 ", sticker=" + sticker +
                 '}';
     }
+
+
 }
