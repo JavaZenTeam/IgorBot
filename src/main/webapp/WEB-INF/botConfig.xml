@@ -153,6 +153,10 @@
         </constructor-arg>
     </bean>
 
+    <bean id="pinnedForwarder" class="ru.javazen.telegram.bot.handler.PinnedForwarder">
+        <property name="storeChatId" value="-1001066106029"/>
+    </bean>
+
     <bean id="scheduler" class="ru.javazen.telegram.bot.handler.SchedulerNotifyHandler">
         <property name="validationPattern" value="и+го+рь,\s?ск[ао]ж[иы] че?р[еи]?з (.+)"/>
         <property name="daysLimit" value="500"/>
@@ -166,6 +170,7 @@
                 <constructor-arg name="token" value="${bot.token}"/>
                 <property name="updateHandlers">
                     <list>
+                        <ref bean="pinnedForwarder"/>
                         <ref bean="scheduler"/>
                         <ref bean="updateInfoProvider"/>
                         <ref bean="replyLayoutSwitcherModuleRus"/>
