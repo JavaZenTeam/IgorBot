@@ -27,11 +27,17 @@ public class CallbackService {
     @Consumes(MediaType.APPLICATION_JSON)
     public void callback(@PathParam("botName") String botName, Update update) {
 
-        LOGGER.debug("Start callback bot {0}", botName);
+        LOGGER.debug("Start callback bot {}", botName);
+        LOGGER.debug("Update body: {}", update);
 
+        //TODO If the message has been changed, the message is null (from bot API 2.1)
+        if (update.getMessage() == null) {
+            LOGGER.error("Message in Update is not valid: {}", update);
+            return;
+        }
         Bot bot = botMap.get(botName);
         if (bot == null) {
-            LOGGER.warn("Bot with name={0} doesn't exist", botName);
+            LOGGER.warn("Bot with name={} doesn't exist", botName);
             return;
         }
 
