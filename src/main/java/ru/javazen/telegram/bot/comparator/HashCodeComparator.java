@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot;
+package ru.javazen.telegram.bot.comparator;
 
 import java.util.Comparator;
 

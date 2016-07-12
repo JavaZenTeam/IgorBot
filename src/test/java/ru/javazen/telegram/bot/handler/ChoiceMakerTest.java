@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import ru.javazen.telegram.bot.HashCodeComparator;
+import ru.javazen.telegram.bot.comparator.RandomComparator;
 
 import java.util.*;
 
@@ -34,7 +34,7 @@ public class ChoiceMakerTest {
     @BeforeClass
     public static void setUp() throws Exception {
         chooser = new ChoiceMaker();
-        comparator = new HashCodeComparator();
+        comparator = new RandomComparator();
         chooser.setPattern("(.+) or (.+)");
         chooser.setComparator(comparator);
     }
