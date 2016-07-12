@@ -24,6 +24,10 @@
       <param-value>ru.javazen.telegram.bot</param-value>
     </init-param>
     <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>ru.javazen.telegram.bot.RSApplication</param-value>
+    </init-param>
+    <init-param>
       <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
       <param-value>true</param-value>
     </init-param>
