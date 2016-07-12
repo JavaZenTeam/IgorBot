@@ -32,10 +32,10 @@
         </constructor-arg>
     </bean>
 
-    <bean id="hashBasedChoiceMaker" class="ru.javazen.telegram.bot.handler.ChoiceMaker">
+    <bean id="choiceMaker" class="ru.javazen.telegram.bot.handler.ChoiceMaker">
         <property name="pattern" value="и+го+рь,\s?(.+)\sили\s(.+)\?"/>
         <property name="comparator">
-            <bean class="ru.javazen.telegram.bot.HashCodeComparator"/>
+            <bean class="ru.javazen.telegram.bot.comparator.RandomComparator"/>
         </property>
     </bean>
 
@@ -177,12 +177,12 @@
                         <ref bean="replyLayoutSwitcherModuleEng"/>
                         <ref bean="repeaterAdvanced"/>
                         <ref bean="forwardMessageBridge"/>
-                        <ref bean="hashBasedChoiceMaker"/>
+                        <ref bean="choiceMaker"/>
                         <ref bean="randomAnswerModule"/>
                         <ref bean="getStickerByIdModule"/>
-                        <!--<ref bean="randomFacePalmModule"/>
-                        <ref bean="lowLevelJokesModule1"/>
-                        <ref bean="lowLevelJokesModule2"/>-->
+                        <!--<ref bean="randomFacePalmModule"/>-->
+                        <!--<ref bean="lowLevelJokesModule1"/>-->
+                        <!--<ref bean="lowLevelJokesModule2"/>-->
                     </list>
                 </property>
             </bean>
