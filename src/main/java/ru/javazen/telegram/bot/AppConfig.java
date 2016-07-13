@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 
-import java.security.SecureRandom;
 import java.util.Random;
 
 @Configuration
@@ -29,7 +28,7 @@ public class AppConfig {
 
     @Bean
     Random random(){
-        return new SecureRandom();
+        return new Random();
     }
 
     @Bean
