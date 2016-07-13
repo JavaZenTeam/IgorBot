@@ -3,7 +3,6 @@ package ru.javazen.telegram.bot.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.method.TelegramMethod;
 import ru.javazen.telegram.bot.service.MessageHelper;
 import ru.javazen.telegram.bot.service.TelegramService;
 
@@ -35,7 +34,7 @@ public class RandomAnswer implements UpdateHandler {
     }
 
     private String solveAnswer(String text){
-        random.setSeed(text.hashCode());
+        random.setSeed(text.toLowerCase().hashCode());
         int rand = random.nextInt(sum);
         for (Map.Entry<String, Integer> entry : answers.entrySet()) {
             if (rand < entry.getValue()){
