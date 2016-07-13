@@ -1,19 +1,27 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import ru.javazen.telegram.bot.AppConfig;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @RunWith(Parameterized.class)
+@ContextConfiguration(classes = {AppConfig.class})
 public class ChoiceMakerTest {
 
-    private static ChoiceMaker chooser;
-    private static Comparator<String> comparator;
+    @Autowired
+    private RandomComparator comparator;
+    private ChoiceMaker chooser;
     private List<String> options;
 
     @Parameterized.Parameters
@@ -31,10 +39,9 @@ public class ChoiceMakerTest {
         });
     }
 
-    @BeforeClass
-    public static void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         chooser = new ChoiceMaker();
-        comparator = new RandomComparator();
         chooser.setPattern("(.+) or (.+)");
         chooser.setComparator(comparator);
     }
