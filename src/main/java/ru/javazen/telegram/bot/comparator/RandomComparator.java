@@ -1,18 +1,21 @@
 package ru.javazen.telegram.bot.comparator;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Comparator;
 import java.util.Random;
 
 public class RandomComparator implements Comparator<String> {
-    private static final Random RANDOM = new Random();
+    @Autowired
+    private Random random;
 
     @Override
     public int compare(String o1, String o2) {
-        RANDOM.setSeed(o1.toLowerCase().hashCode());
-        int i1 = RANDOM.nextInt();
+        random.setSeed(o1.toLowerCase().hashCode());
+        int i1 = random.nextInt();
 
-        RANDOM.setSeed(o2.toLowerCase().hashCode());
-        int i2 = RANDOM.nextInt();
+        random.setSeed(o2.toLowerCase().hashCode());
+        int i2 = random.nextInt();
 
         return Integer.compare(i1, i2);
     }

@@ -7,7 +7,9 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.javazen.telegram.bot.comparator.RandomComparator;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
 @Configuration
@@ -27,6 +29,11 @@ public class AppConfig {
 
     @Bean
     Random random(){
-        return new Random();
+        return new SecureRandom();
+    }
+
+    @Bean
+    RandomComparator randomComparator(){
+        return new RandomComparator();
     }
 }
