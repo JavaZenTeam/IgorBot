@@ -33,10 +33,9 @@
     </bean>
 
     <bean id="choiceMaker" class="ru.javazen.telegram.bot.handler.ChoiceMaker">
-        <property name="pattern" value="и+го+рь,\s?(.+)\sили\s(.+)\?"/>
-        <property name="comparator">
-            <bean class="ru.javazen.telegram.bot.comparator.RandomComparator"/>
-        </property>
+        <property name="pattern" value="и+го+рь,\s*(?&lt;options&gt;.+\s+или\s+.+)\?"/>
+        <property name="comparator" ref="randomComparator"/>
+        <property name="splitPattern" value="\s*(,|или)\s*"/>
     </bean>
 
     <bean id="rusCharSet" class="java.lang.String">
