@@ -38,6 +38,10 @@
         <property name="splitPattern" value="\s*(,|или)\s*"/>
     </bean>
 
+    <bean id="choiceMakerWithContext" class="ru.javazen.telegram.bot.handler.ChoiceMakerWithContext" parent="choiceMaker">
+        <property name="pattern" value="и+го+рь,\s*(?&lt;context&gt;.+):\s*(?&lt;options&gt;.+\s+или\s+.+)\?"/>
+    </bean>
+
     <bean id="rusCharSet" class="java.lang.String">
         <constructor-arg value="йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё&quot;№;%:?"/>
     </bean>
@@ -176,6 +180,7 @@
                         <ref bean="replyLayoutSwitcherModuleEng"/>
                         <ref bean="repeaterAdvanced"/>
                         <ref bean="forwardMessageBridge"/>
+                        <ref bean="choiceMakerWithContext"/>
                         <ref bean="choiceMaker"/>
                         <ref bean="randomAnswerModule"/>
                         <ref bean="getStickerByIdModule"/>
