@@ -42,8 +42,9 @@ public class ChoiceMakerTest {
     @Before
     public void setUp() throws Exception {
         chooser = new ChoiceMaker();
-        chooser.setPattern("(.+) or (.+)");
+        chooser.setPattern("\\s*(?<options>.+\\s+or\\s+.+)");
         chooser.setComparator(comparator);
+        chooser.setSplitPattern("\\s*(,|or)\\s*");
     }
 
     public ChoiceMakerTest(List<String> options) {
