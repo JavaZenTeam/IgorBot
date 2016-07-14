@@ -19,6 +19,7 @@ public class ChoiceMaker implements UpdateHandler{
     private Pattern pattern;
     private String splitPattern;
     private Comparator<String> comparator;
+    private List<String> options;
 
     @Autowired
     private TelegramService telegramService;
@@ -58,11 +59,16 @@ public class ChoiceMaker implements UpdateHandler{
         Matcher matcher = pattern.matcher(text);
         if (!matcher.matches()) return null;
 
-        String optionsGroup = matcher.group(OPTIONS_GROUP_NAME);
-        if (optionsGroup == null) return null;
+        parseParameters(matcher);
 
-        List<String> options = Arrays.asList(optionsGroup.split(splitPattern));
+        if (options == null) return null;
         return Collections.max(options, getComparator());
+    }
+
+    protected void parseParameters(Matcher matcher) {
+        String optionsGroup = matcher.group(OPTIONS_GROUP_NAME);
+        if (optionsGroup == null) return;
+        options = Arrays.asList(optionsGroup.split(splitPattern));
     }
 }
 
