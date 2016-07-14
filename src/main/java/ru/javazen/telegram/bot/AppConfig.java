@@ -15,24 +15,24 @@ import java.util.Random;
 public class AppConfig {
 
     @Bean(destroyMethod = "destroy")
-    Client client(){
+    public Client client(){
         ClientConfig clientConfig = new DefaultClientConfig();
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
         return Client.create(clientConfig);
     }
 
     @Bean
-    WebResource telegramWebResource(){
+    public WebResource telegramWebResource(){
         return client().resource("https://api.telegram.org/");
     }
 
     @Bean
-    Random random(){
+    public Random random(){
         return new Random();
     }
 
     @Bean
-    RandomComparator randomComparator(){
+    public RandomComparator randomComparator(){
         return new RandomComparator();
     }
 }
