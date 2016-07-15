@@ -61,7 +61,7 @@ public class ChoiceMaker implements UpdateHandler{
 
         parseParameters(matcher);
 
-        if (options == null) return null;
+        if (options == null || options.isEmpty()) return null;
         return Collections.max(options, getComparator());
     }
 
