@@ -39,7 +39,7 @@
     </bean>
 
     <bean id="choiceMakerWithContext" class="ru.javazen.telegram.bot.handler.ChoiceMakerWithContext" parent="choiceMaker">
-        <property name="pattern" value="и+го+рь,\s*(?&lt;context&gt;.+):\s*(?&lt;options&gt;.+\s+или\s+.+)\?"/>
+        <property name="pattern" value="и+го+рь,\s*(?&lt;context&gt;.+?):\s*(?&lt;options&gt;.+\s+или\s+.+)\?"/>
     </bean>
 
     <bean id="rusCharSet" class="java.lang.String">
