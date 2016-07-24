@@ -106,7 +106,7 @@
     </bean>
 
     <bean id="repeaterAdvanced" class="ru.javazen.telegram.bot.handler.RepeaterAdvanced">
-        <property name="pattern" value="и+го+рь,\s?ск[ао]ж[иы] (.+)"/>
+        <property name="pattern" value="и+го+рь,\s*ск[ао]ж[иы] (.+)"/>
     </bean>
 
     <bean id="updateInfoProvider" class="ru.javazen.telegram.bot.handler.FilterAdapter">
