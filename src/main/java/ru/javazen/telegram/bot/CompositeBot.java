@@ -44,8 +44,10 @@ public class CompositeBot extends Bot {
         } catch (Exception e){
             LOGGER.error("Error on handling update", e);
             if (supportChatId != null){
-                String message = String.format("Error!\n%s\n%s", e, e.getStackTrace()[0]);
-                getService().sendMessage(new SendMessage(supportChatId, message));
+                String message = String.format("*Error!*\n%s\n```%s```", e, e.getStackTrace()[0]);
+                SendMessage msg = new SendMessage(supportChatId, message);
+                msg.setParseMode(Constants.PARSE_MODE_MARKDOWN);
+                getService().sendMessage(msg);
             }
         }
     }
