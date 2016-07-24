@@ -7,18 +7,19 @@ import com.sun.jersey.api.client.WebResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
 import ru.javazen.telegram.bot.entity.request.Message;
 import ru.javazen.telegram.bot.entity.request.User;
 import ru.javazen.telegram.bot.entity.response.ForwardMessage;
 import ru.javazen.telegram.bot.entity.response.SendMessage;
 import ru.javazen.telegram.bot.entity.response.SendSticker;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.core.MediaType;
+import java.util.Arrays;
 
-@Service
-@Scope(scopeName = "prototype")
+import static javax.ws.rs.core.Response.Status.Family.CLIENT_ERROR;
+import static javax.ws.rs.core.Response.Status.Family.SERVER_ERROR;
+
 public class TelegramBotServiceImpl implements TelegramBotService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TelegramBotServiceImpl.class);
     private static final String TELEGRAM_URL = "https://api.telegram.org/";
@@ -26,8 +27,14 @@ public class TelegramBotServiceImpl implements TelegramBotService {
     @Autowired
     private Client client;
     private WebResource webResource;
+    private String token;
 
     public TelegramBotServiceImpl(String token) {
+        this.token = token;
+    }
+
+    @PostConstruct
+    private void init(){
         webResource = client.resource(TELEGRAM_URL).path("bot" + token);
     }
 
@@ -39,7 +46,6 @@ public class TelegramBotServiceImpl implements TelegramBotService {
                 .queryParam("url", url)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .post(ClientResponse.class);
-        assertResponse(response);
     }
 
     @Override
@@ -49,7 +55,6 @@ public class TelegramBotServiceImpl implements TelegramBotService {
                 .path("getMe")
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get(ClientResponse.class);
-        assertResponse(response);
         return response.getEntity(new GenericType<User>(User.class));
     }
 
@@ -57,7 +62,6 @@ public class TelegramBotServiceImpl implements TelegramBotService {
     public Message sendMessage(SendMessage message) {
         LOGGER.debug("sendMessage: {}", message);
         ClientResponse response = callMethod("sendMessage", message);
-        assertResponse(response);
         return response.getEntity(new GenericType<Message>(Message.class));
     }
 
@@ -65,7 +69,6 @@ public class TelegramBotServiceImpl implements TelegramBotService {
     public Message forwardMessage(ForwardMessage message) {
         LOGGER.debug("forwardMessage: {}", message);
         ClientResponse response = callMethod("forwardMessage", message);
-        assertResponse(response);
         return response.getEntity(new GenericType<Message>(Message.class));
     }
 
@@ -73,20 +76,24 @@ public class TelegramBotServiceImpl implements TelegramBotService {
     public Message sendSticker(SendSticker sticker) {
         LOGGER.debug("sendSticker: {}", sticker);
         ClientResponse response = callMethod("sendSticker", sticker);
-        assertResponse(response);
         return response.getEntity(new GenericType<Message>(Message.class));
     }
 
-    private void assertResponse(ClientResponse response) {
-        if (response.getStatus() == ClientResponse.Status.OK.getStatusCode()){
-            throw new RuntimeException(response.toString());
-        }
-    }
-
     private ClientResponse callMethod(String method, Object entity) {
-        return webResource.path(method)
+        ClientResponse response = webResource.path(method)
                 .entity(entity, MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .post(ClientResponse.class);
+
+        assertResponse(method, response);
+        return response;
+    }
+
+    private void assertResponse(String method, ClientResponse response) {
+        if (Arrays.asList(CLIENT_ERROR, SERVER_ERROR).contains(response.getClientResponseStatus().getFamily())){
+            String msg = String.format("Calling of Method '%s' returns a response status of %s",
+                    method, response.getClientResponseStatus());
+            throw new RuntimeException(msg);
+        }
     }
 }

@@ -1,9 +1,9 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.util.Assert;
+import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.filter.Filter;
-import ru.javazen.telegram.bot.method.TelegramMethod;
 
 public class FilterAdapter implements UpdateHandler {
     private Filter filter;
@@ -17,8 +17,7 @@ public class FilterAdapter implements UpdateHandler {
     }
 
     @Override
-    public boolean handle(Update update, String token) {
-        if (!filter.check(update)) return false;
-        return handler.handle(update, token);
+    public boolean handle(Update update, Bot bot) {
+        return filter.check(update) && handler.handle(update, bot);
     }
 }
