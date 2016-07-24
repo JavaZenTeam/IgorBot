@@ -1,16 +1,15 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
+import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.service.MessageHelper;
-import ru.javazen.telegram.bot.service.TelegramService;
 
 import java.util.*;
-import java.util.concurrent.ScheduledFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static ru.javazen.telegram.bot.service.MessageHelper.answer;
 
 public class SchedulerNotifyHandler implements UpdateHandler {
 
@@ -22,11 +21,8 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
     private int daysLimit, tasksLimit;
 
-    @Autowired
-    private TelegramService telegramService;
-
     @Override
-    public boolean handle(final Update update,final String token) {
+    public boolean handle(final Update update, final Bot bot) {
         String message = update.getMessage().getText();
         if (message == null || message.isEmpty()) {
             return false;
@@ -56,14 +52,14 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         }
 
         if (userTasks.get(userId) > tasksLimit) {
-            telegramService.execute(MessageHelper.answerWithReply(update.getMessage(), "Я столько не запомню(("), token);
+            bot.getService().sendMessage(answer(update.getMessage(), "Я столько не запомню((", true));
             return true;
         }
 
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
         if (parameters.getDate().compareTo(calendar.getTime()) > 0) {
-            telegramService.execute(MessageHelper.answerWithReply(update.getMessage(), "Так долго я помнить не смогу, сорри"), token);
+            bot.getService().sendMessage(answer(update.getMessage(), "Так долго я помнить не смогу, сорри", true));
             return true;
         }
         //userTasks.computeIfPresent(userId, (key, val) -> val+1);
@@ -75,7 +71,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
             public void run() {
                 //userTasks.computeIfPresent(userId, (key, val) -> val-1);
                 userTasks.put(userId, userTasks.get(userId) - 1);
-                telegramService.execute(MessageHelper.answerWithReply(update.getMessage(), parameters.getMessage()), token);
+                bot.getService().sendMessage(answer(update.getMessage(), parameters.getMessage(), true));
         }}, parameters.getDate());
 
         return true;

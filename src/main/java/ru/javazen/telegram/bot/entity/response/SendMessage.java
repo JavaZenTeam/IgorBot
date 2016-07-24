@@ -46,4 +46,6 @@ public class SendMessage {
     public void setReplyMessageId(Long replyMessageId) {
         this.replyMessageId = replyMessageId;
     }
+
+
 }

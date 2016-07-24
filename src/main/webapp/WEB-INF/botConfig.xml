@@ -60,7 +60,7 @@
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher">
                 <property name="sourceCharSet" ref="engCharSet"/>
-                <property name="targetChatSet" ref="rusCharSet"/>
+                <property name="targetCharSet" ref="rusCharSet"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -74,7 +74,7 @@
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.ReplyLayoutSwitcher">
                 <property name="sourceCharSet" ref="rusCharSet"/>
-                <property name="targetChatSet" ref="engCharSet"/>
+                <property name="targetCharSet" ref="engCharSet"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -170,7 +170,12 @@
 
         <entry key="${bot.name}">
             <bean class="ru.javazen.telegram.bot.CompositeBot">
-                <constructor-arg name="token" value="${bot.token}"/>
+                <constructor-arg name="service">
+                    <bean class="ru.javazen.telegram.bot.service.TelegramBotServiceImpl">
+                        <constructor-arg name="token" value="${bot.token}"/>
+                    </bean>
+                </constructor-arg>
+                <property name="supportChatId" value="-1001063148517"/>
                 <property name="updateHandlers">
                     <list>
                         <ref bean="pinnedForwarder"/>

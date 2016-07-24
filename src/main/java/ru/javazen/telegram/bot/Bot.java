@@ -1,19 +1,19 @@
 package ru.javazen.telegram.bot;
 
 import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.service.TelegramBotService;
 
 public abstract class Bot {
-    private String token;
+    private TelegramBotService service;
 
     public abstract void onStart();
     public abstract void onUpdate(Update update);
 
-    public Bot(String token) {
-        this.token = token;
+    public Bot(TelegramBotService service) {
+        this.service = service;
     }
 
-    public String getToken() {
-        return token;
+    public TelegramBotService getService() {
+        return service;
     }
-
 }

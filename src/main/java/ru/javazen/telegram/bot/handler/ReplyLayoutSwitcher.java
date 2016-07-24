@@ -1,28 +1,23 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Message;
 import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.method.TelegramMethod;
 import ru.javazen.telegram.bot.service.MessageHelper;
-import ru.javazen.telegram.bot.service.TelegramService;
 
 public class ReplyLayoutSwitcher implements UpdateHandler {
 
-    @Autowired
-    private TelegramService telegramService;
-
     private String sourceCharSet = "";
-    private String targetChatSet = "";
+    private String targetCharSet = "";
 
     @Override
-    public boolean handle(Update update, String token) {
+    public boolean handle(Update update, Bot bot) {
         String text = update.getMessage().getText();
         Message replyMessage = update.getMessage().getReplyMessage();
         if (text == null || replyMessage == null || replyMessage.getText() == null) return false;
 
         String result = switchLayout(replyMessage.getText());
-        telegramService.execute(MessageHelper.answerWithReply(replyMessage, result), token);
+        bot.getService().sendMessage(MessageHelper.answer(replyMessage, result, true));
         return true;
     }
 
@@ -30,13 +25,13 @@ public class ReplyLayoutSwitcher implements UpdateHandler {
         this.sourceCharSet = sourceCharSet;
     }
 
-    public void setTargetChatSet(String targetChatSet) {
-        this.targetChatSet = targetChatSet;
+    public void setTargetCharSet(String targetCharSet) {
+        this.targetCharSet = targetCharSet;
     }
 
     private String switchLayout(String text) {
-        for (int i = 0; i< sourceCharSet.length() && i< targetChatSet.length(); i++) {
-            text = text.replace(sourceCharSet.charAt(i), targetChatSet.charAt(i));
+        for (int i = 0; i< sourceCharSet.length() && i< targetCharSet.length(); i++) {
+            text = text.replace(sourceCharSet.charAt(i), targetCharSet.charAt(i));
         }
         return text;
     }

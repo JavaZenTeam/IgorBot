@@ -1,22 +1,17 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.entity.response.ForwardMessage;
-import ru.javazen.telegram.bot.method.ForwardMessageMethod;
-import ru.javazen.telegram.bot.service.TelegramService;
 
 public class ChatBridge implements UpdateHandler {
-
-    @Autowired
-    private TelegramService telegramService;
 
     private long firstChat;
 
     private long secondChat;
 
     @Override
-    public boolean handle(Update update, String token) {
+    public boolean handle(Update update, Bot bot) {
 
         if (update.getMessage().getChat().getId() != firstChat
                 && update.getMessage().getChat().getId() != secondChat) return false;
@@ -28,7 +23,7 @@ public class ChatBridge implements UpdateHandler {
         forwardMessage.setMessageId(update.getMessage().getMessageId());
 
         forwardMessage.setChatId(Long.toString(chatTo));
-        telegramService.execute(new ForwardMessageMethod(forwardMessage), token);
+        bot.getService().forwardMessage(forwardMessage);
 
         return false;
     }

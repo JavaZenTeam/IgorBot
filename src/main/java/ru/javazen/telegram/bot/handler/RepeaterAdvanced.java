@@ -1,18 +1,13 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.method.TelegramMethod;
 import ru.javazen.telegram.bot.service.MessageHelper;
-import ru.javazen.telegram.bot.service.TelegramService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RepeaterAdvanced implements UpdateHandler{
-
-    @Autowired
-    private TelegramService telegramService;
 
     private static final Pattern DEFAULT_PATTERN = Pattern.compile("/repeat (.*)");
     private Pattern pattern = DEFAULT_PATTERN;
@@ -22,14 +17,14 @@ public class RepeaterAdvanced implements UpdateHandler{
     }
 
     @Override
-    public boolean handle(Update update, String token) {
+    public boolean handle(Update update, Bot bot) {
         String text = update.getMessage().getText();
         if (text == null) return false;
 
         String answer = solveAnswer(text);
         if (answer == null) return false;
 
-        telegramService.execute(MessageHelper.answer(update.getMessage(), answer), token);
+        bot.getService().sendMessage(MessageHelper.answer(update.getMessage(), text));
         return true;
     }
 
