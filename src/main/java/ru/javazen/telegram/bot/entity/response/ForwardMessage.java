@@ -1,7 +1,9 @@
 package ru.javazen.telegram.bot.entity.response;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 public class ForwardMessage {
 
     @JsonProperty("chat_id")

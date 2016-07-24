@@ -29,7 +29,7 @@ public class Message {
     private Message pinnedMessage;
 
     @JsonProperty("sticker")
-    Sticker sticker;
+    private Sticker sticker;
 
     public long getMessageId() {
         return messageId;

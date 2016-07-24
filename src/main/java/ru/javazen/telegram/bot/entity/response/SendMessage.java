@@ -1,10 +1,9 @@
 package ru.javazen.telegram.bot.entity.response;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 public class SendMessage {
 
     public SendMessage() { };
@@ -19,6 +18,9 @@ public class SendMessage {
 
     @JsonProperty("text")
     private String text;
+
+    @JsonProperty("parse_mode")
+    private String parseMode;
 
     @JsonProperty("reply_to_message_id")
     private Long replyMessageId;
@@ -37,6 +39,14 @@ public class SendMessage {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getParseMode() {
+        return parseMode;
+    }
+
+    public void setParseMode(String parseMode) {
+        this.parseMode = parseMode;
     }
 
     public Long getReplyMessageId() {
