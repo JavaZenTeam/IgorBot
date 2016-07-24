@@ -90,9 +90,9 @@ public class TelegramBotServiceImpl implements TelegramBotService {
     }
 
     private void assertResponse(String method, ClientResponse response) {
-        if (Arrays.asList(CLIENT_ERROR, SERVER_ERROR).contains(response.getClientResponseStatus().getFamily())){
-            String msg = String.format("Calling of Method '%s' returns a response status of %s",
-                    method, response.getClientResponseStatus());
+        if (Arrays.asList(CLIENT_ERROR, SERVER_ERROR).contains(response.getStatusInfo().getFamily())){
+            String msg = String.format("Calling of Method '%s' returns a response status %s",
+                    method, response.getStatus());
             throw new RuntimeException(msg);
         }
     }
