@@ -2,11 +2,9 @@ package ru.javazen.telegram.bot.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.javazen.telegram.bot.Bot;
-import ru.javazen.telegram.bot.method.SetWebHookMethod;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -22,9 +20,6 @@ public class BotInitializer {
     @Resource(name = "botMap")
     private Map<String, Bot> bots;
 
-    @Autowired
-    private TelegramService telegramService;
-
     @PostConstruct
     public void initBots(){
         LOGGER.debug("Start init bots");
@@ -34,13 +29,7 @@ public class BotInitializer {
     }
 
     private void initBot(String name, Bot bot){
-        SetWebHookMethod method = new SetWebHookMethod(callbackUrl + name);
-        boolean result = telegramService.execute(method, bot.getToken());
-        if (result) {
-            LOGGER.info("Successfully init bot {}", name);
-            bot.onStart();
-        } else {
-            LOGGER.error("Failed to init bot {}", name);
-        }
+        bot.getService().setWebHook(callbackUrl + name);
+        bot.onStart();
     }
 }

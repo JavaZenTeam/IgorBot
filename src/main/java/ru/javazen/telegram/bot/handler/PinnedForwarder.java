@@ -1,11 +1,9 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Message;
+import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.entity.response.ForwardMessage;
-import ru.javazen.telegram.bot.method.ForwardMessageMethod;
-import ru.javazen.telegram.bot.service.TelegramService;
 
 /**
  * Created by egor on 18.05.2016.
@@ -14,12 +12,9 @@ import ru.javazen.telegram.bot.service.TelegramService;
 
 public class PinnedForwarder implements UpdateHandler {
 
-    @Autowired
-    private TelegramService telegramService;
-
     private String storeChatId;
 
-    public boolean handle(Update update, String token) {
+    public boolean handle(Update update, Bot bot) {
         Message pinnedMessage = update.getMessage().getPinnedMessage();
         if (pinnedMessage == null) return false;
 
@@ -27,7 +22,7 @@ public class PinnedForwarder implements UpdateHandler {
         forwardMessage.setFromChatId(Long.toString(update.getMessage().getChat().getId()));
         forwardMessage.setMessageId(update.getMessage().getPinnedMessage().getMessageId());
         forwardMessage.setChatId(storeChatId);
-        telegramService.execute(new ForwardMessageMethod(forwardMessage), token);
+        bot.getService().forwardMessage(forwardMessage);
 
         return true;
     }
