@@ -24,7 +24,7 @@ public class RepeaterAdvanced implements UpdateHandler{
         String answer = solveAnswer(text);
         if (answer == null) return false;
 
-        bot.getService().sendMessage(MessageHelper.answer(update.getMessage(), text));
+        bot.getService().sendMessage(MessageHelper.answer(update.getMessage(), answer));
         return true;
     }
 
