@@ -79,20 +79,29 @@
         </constructor-arg>
     </bean>
 
-    <bean id="lowLevelJokesModule1" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+    <bean id="gayAnswerDetector" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
                 <property name="pattern" value="[^?a-zа-я]*[нhn][еe][тt][^?a-zа-я]*"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
-            <bean class="ru.javazen.telegram.bot.handler.SimpleAnswer">
-                <constructor-arg name="answer" value="Пидора ответ!"/>
+            <bean class="ru.javazen.telegram.bot.handler.FilterAdapter">
+                <constructor-arg name="filter">
+                    <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
+                        <property name="probability" value="0.5"/>
+                    </bean>
+                </constructor-arg>
+                <constructor-arg name="handler">
+                    <bean class="ru.javazen.telegram.bot.handler.SimpleAnswer">
+                        <constructor-arg name="answer" value="Пидора ответ!"/>
+                    </bean>
+                </constructor-arg>
             </bean>
         </constructor-arg>
     </bean>
 
-    <bean id="lowLevelJokesModule2" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+    <bean id="agitatorOfSuckingTractorDriverStuff" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
                 <property name="pattern" value=".*([3з][0oо][0oо]|[тt][рp][иu][сc][тt][aаоo0])"/>
@@ -190,8 +199,8 @@
                         <ref bean="randomAnswerModule"/>
                         <ref bean="getStickerByIdModule"/>
                         <!--<ref bean="randomFacePalmModule"/>-->
-                        <!--<ref bean="lowLevelJokesModule1"/>-->
-                        <!--<ref bean="lowLevelJokesModule2"/>-->
+                        <ref bean="gayAnswerDetector"/>
+                        <ref bean="agitatorOfSuckingTractorDriverStuff"/>
                     </list>
                 </property>
             </bean>
