@@ -8,7 +8,7 @@ import ru.javazen.telegram.bot.entity.response.SendMessage;
 
 import java.io.IOException;
 
-import static ru.javazen.telegram.bot.Constants.PARSE_MODE_MARKDOWN;
+import static ru.javazen.telegram.bot.entity.Constants.PARSE_MODE_MARKDOWN;
 
 public class UpdateInfoProvider implements UpdateHandler {
 

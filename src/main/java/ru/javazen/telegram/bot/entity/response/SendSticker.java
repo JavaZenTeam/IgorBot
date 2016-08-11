@@ -14,16 +14,16 @@ public class SendSticker {
     }
 
     @JsonProperty("chat_id")
-    long chatId;
+    private long chatId;
 
     @JsonProperty("sticker")
-    String sticker;
+    private String sticker;
 
     @JsonProperty("disable_notification")
-    Boolean disableNotification;
+    private Boolean disableNotification;
 
     @JsonProperty("reply_to_message_id")
-    Long replyMessageId;
+    private Long replyMessageId;
 
     public long getChatId() {
         return chatId;
