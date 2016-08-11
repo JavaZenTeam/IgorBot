@@ -6,16 +6,16 @@ import org.codehaus.jackson.annotate.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Sticker {
     @JsonProperty("file_id")
-    String fileId;
+    private String fileId;
 
     @JsonProperty("width")
-    int	width;
+    private int	width;
 
     @JsonProperty("height")
-    int	height;
+    private int	height;
 
     @JsonProperty("file_size")
-    Integer fileSize;
+    private Integer fileSize;
 
     public String getFileId() {
         return fileId;

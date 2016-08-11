@@ -2,6 +2,7 @@ package ru.javazen.telegram.bot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.javazen.telegram.bot.entity.Constants;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.entity.response.SendMessage;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
@@ -10,14 +11,15 @@ import ru.javazen.telegram.bot.service.TelegramBotService;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class CompositeBot extends Bot {
+public class CompositeBot implements Bot {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeBot.class);
 
+    private TelegramBotService service;
     private Collection<UpdateHandler> updateHandlers = new ArrayList<>();
     private Long supportChatId;
 
     public CompositeBot(TelegramBotService service) {
-        super(service);
+        this.service = service;
     }
 
     public void setUpdateHandlers(Collection<UpdateHandler> updateHandlers) {
@@ -50,5 +52,9 @@ public class CompositeBot extends Bot {
                 getService().sendMessage(msg);
             }
         }
+    }
+
+    public TelegramBotService getService() {
+        return service;
     }
 }
