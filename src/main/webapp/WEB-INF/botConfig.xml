@@ -9,7 +9,7 @@
             http://www.springframework.org/schema/util/spring-util.xsd
             ">
 
-    <bean id="randomAnswerModule"  class="ru.javazen.telegram.bot.handler.FilterAdapter">
+    <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
                 <property name="pattern" value="и+го+рь,.*\?"/>
@@ -26,6 +26,27 @@
                         <entry key="-" value="1"/>
                         <entry key="Не знаю" value="2"/>
                         <entry key="хз" value="1"/>
+                    </map>
+                </property>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="doNotKnowAnswerModule"  class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="и+го+рь,\s*(когда|где|куда|откуда|кто|как|как\w{2}|насколько|сколько|почему|отчего)\s.*\?"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.RandomAnswer">
+                <property name="answers">
+                    <map>
+                        <entry key="Не знаю" value="8"/>
+                        <entry key="хз" value="3"/>
+                        <entry key="Мне нужно уточнить в офисе" value="1"/>
+                        <entry key="42" value="1"/>
+                        <entry key="ДА НЕ ЗНАЮ Я! ЧЕ ДОЕБАЛСЯ?!" value="1"/>
                     </map>
                 </property>
             </bean>
@@ -196,7 +217,8 @@
                         <ref bean="forwardMessageBridge"/>
                         <ref bean="choiceMakerWithContext"/>
                         <ref bean="choiceMaker"/>
-                        <ref bean="randomAnswerModule"/>
+                        <ref bean="doNotKnowAnswerModule"/>
+                        <ref bean="randomYesNoAnswerModule"/>
                         <ref bean="getStickerByIdModule"/>
                         <!--<ref bean="randomFacePalmModule"/>-->
                         <ref bean="gayAnswerDetector"/>
