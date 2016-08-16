@@ -5,22 +5,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import ru.javazen.telegram.bot.AppConfig;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @RunWith(Parameterized.class)
-@ContextConfiguration(classes = {AppConfig.class})
 public class ChoiceMakerTest {
 
-    @Autowired
-    private RandomComparator comparator;
+    private Comparator<String> comparator = new RandomComparator(new Random());
     private ChoiceMaker chooser;
     private List<String> options;
 
