@@ -33,7 +33,7 @@ public class AppConfig {
 
     @Bean
     public RandomComparator randomComparator(){
-        return new RandomComparator();
+        return new RandomComparator(random());
     }
 
     @Bean
