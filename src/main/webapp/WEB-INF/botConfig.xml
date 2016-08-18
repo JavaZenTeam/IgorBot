@@ -9,6 +9,8 @@
             http://www.springframework.org/schema/util/spring-util.xsd
             ">
 
+    <import resource="processors.xml"/>
+    
     <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
@@ -17,6 +19,7 @@
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.RandomAnswer">
+                <property name="preprocessors" ref="preprocessors"/>
                 <property name="answers">
                     <map>
                         <entry key="Да" value="4"/>
@@ -57,6 +60,7 @@
         <property name="pattern" value="и+го+рь,\s*(?&lt;options&gt;.+\s+или\s+.+)\?"/>
         <property name="comparator" ref="randomComparator"/>
         <property name="splitPattern" value="\s*(,|\sили)\s+"/>
+        <property name="preprocessors" ref="preprocessors"/>
     </bean>
 
     <bean id="choiceMakerWithContext" class="ru.javazen.telegram.bot.handler.ChoiceMakerWithContext" parent="choiceMaker">

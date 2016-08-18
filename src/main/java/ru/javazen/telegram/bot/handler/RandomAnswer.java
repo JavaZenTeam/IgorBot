@@ -7,8 +7,10 @@ import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.service.MessageHelper;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.BiFunction;
 
 public class RandomAnswer implements UpdateHandler {
 
@@ -16,12 +18,19 @@ public class RandomAnswer implements UpdateHandler {
     private Random random;
 
     private Map<String, Integer> answers = Collections.emptyMap();
+    private List<BiFunction<Update, String, String>> preprocessors;
     private int sum;
 
     @Override
     public boolean handle(Update update, Bot bot) {
         String text = update.getMessage().getText();
         if (text == null) return false;
+
+        if (preprocessors != null && !preprocessors.isEmpty()){
+            for (BiFunction<Update, String, String> preprocessor : preprocessors) {
+                text = preprocessor.apply(update, text);
+            }
+        }
 
         String answer = solveAnswer(text);
         if (answer == null) return false;
@@ -52,5 +61,9 @@ public class RandomAnswer implements UpdateHandler {
         }
         sum = newSum;
         this.answers = answers;
+    }
+
+    public void setPreprocessors(List<BiFunction<Update, String, String>> preprocessors) {
+        this.preprocessors = preprocessors;
     }
 }
