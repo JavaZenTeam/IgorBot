@@ -5,12 +5,11 @@ import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.service.MessageHelper;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ChoiceMaker implements UpdateHandler{
     private static final String OPTIONS_GROUP_NAME = "options";
@@ -19,6 +18,11 @@ public class ChoiceMaker implements UpdateHandler{
     private String splitPattern;
     private Comparator<String> comparator;
     private List<String> options;
+    private List<BiFunction<Update, String, String>> preprocessors;
+
+    public void setPreprocessors(List<BiFunction<Update, String, String>> preprocessors) {
+        this.preprocessors = preprocessors;
+    }
 
     @Required
     public void setPattern(String pattern) {
@@ -43,22 +47,42 @@ public class ChoiceMaker implements UpdateHandler{
     public boolean handle(Update update, Bot bot) {
         String text = update.getMessage().getText();
         if (text == null) return false;
-        String choice = processText(text);
-        if(choice != null) {
-            bot.getService().sendMessage(MessageHelper.answer(update.getMessage(), choice));
-            return true;
-        }
-        return false;
-    }
 
-    public String processText(String text) {
         Matcher matcher = pattern.matcher(text);
-        if (!matcher.matches()) return null;
+        if (!matcher.matches()) return false;
 
         parseParameters(matcher);
+        String choice = makeChoice(update);
 
+        if (choice == null) return false;
+
+        bot.getService().sendMessage(MessageHelper.answer(update.getMessage(), choice));
+        return true;
+    }
+
+    private String makeChoice(Update update) {
         if (options == null || options.isEmpty()) return null;
-        return Collections.max(options, getComparator());
+
+        if (preprocessors == null || preprocessors.isEmpty()){
+            return Collections.max(options, getComparator());
+        }
+
+        Map<String, String> processedOptions = options.stream()
+                .collect(Collectors.toMap(
+                        o -> processOption(o, update),
+                        o -> o,
+                        (o1, o2) -> o1
+                ));
+
+        String choice = Collections.max(processedOptions.keySet(), getComparator());
+        return processedOptions.get(choice);
+    }
+
+    private String processOption(String option, Update update){
+        for (BiFunction<Update, String, String> preprocessor : preprocessors) {
+            option = preprocessor.apply(update, option);
+        }
+        return option;
     }
 
     protected void parseParameters(Matcher matcher) {
