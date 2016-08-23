@@ -51,7 +51,7 @@ public class ChoiceMaker implements UpdateHandler{
         Matcher matcher = pattern.matcher(text);
         if (!matcher.matches()) return false;
 
-        parseParameters(matcher);
+        parseParameters(update, matcher);
         String choice = makeChoice(update);
 
         if (choice == null) return false;
@@ -69,7 +69,7 @@ public class ChoiceMaker implements UpdateHandler{
 
         Map<String, String> processedOptions = options.stream()
                 .collect(Collectors.toMap(
-                        o -> processOption(o, update),
+                        o -> process(o, update),
                         o -> o,
                         (o1, o2) -> o1
                 ));
@@ -78,14 +78,14 @@ public class ChoiceMaker implements UpdateHandler{
         return processedOptions.get(choice);
     }
 
-    private String processOption(String option, Update update){
+    protected String process(String string, Update update){
         for (BiFunction<Update, String, String> preprocessor : preprocessors) {
-            option = preprocessor.apply(update, option);
+            string = preprocessor.apply(update, string);
         }
-        return option;
+        return string;
     }
 
-    protected void parseParameters(Matcher matcher) {
+    protected void parseParameters(Update update, Matcher matcher) {
         String optionsGroup = matcher.group(OPTIONS_GROUP_NAME);
         if (optionsGroup == null) return;
         options = Arrays.asList(optionsGroup.split(splitPattern));
