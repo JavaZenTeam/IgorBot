@@ -10,6 +10,7 @@
             ">
 
     <import resource="processors.xml"/>
+    <import resource="songs.xml"/>
     
     <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
@@ -200,6 +201,17 @@
         <property name="tasksLimit" value="30"/>
     </bean>
 
+    <bean id="songSingerModule" class="ru.javazen.telegram.bot.handler.InstanceForChatController">
+        <lookup-method name="newInstance" bean="songSinger"/>
+    </bean>
+    <bean id="songSinger" class="ru.javazen.telegram.bot.handler.SongSinger" scope="prototype">
+        <constructor-arg name="repository" ref="songRepository"/>
+    </bean>
+    <bean id="songRepository" class="ru.javazen.telegram.bot.service.SongRepositoryImpl">
+        <constructor-arg name="encoder" ref="songEncoder"/>
+        <constructor-arg name="songs" ref="songs"/>
+    </bean>
+
     <util:map id="botMap" key-type="java.lang.String" value-type="ru.javazen.telegram.bot.Bot">
 
         <entry key="${bot.name}">
@@ -227,6 +239,7 @@
                         <!--<ref bean="randomFacePalmModule"/>-->
                         <ref bean="gayAnswerDetector"/>
                         <ref bean="agitatorOfSuckingTractorDriverStuff"/>
+                        <ref bean="songSingerModule"/>
                     </list>
                 </property>
             </bean>

@@ -4,6 +4,8 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
+import net.sf.junidecode.Junidecode;
+import org.apache.commons.codec.language.Metaphone;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
@@ -14,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 
 import java.util.Random;
+import java.util.function.Function;
 
 @Configuration
 public class AppConfig {
@@ -49,5 +52,17 @@ public class AppConfig {
                         .withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
         );
         return mapper;
+    }
+
+    @Bean
+    public Metaphone metaphone(){
+        Metaphone metaphone = new Metaphone();
+        metaphone.setMaxCodeLen(30);
+        return metaphone;
+    }
+
+    @Bean
+    public Function<String, String> songEncoder(){
+        return s -> metaphone().encode(Junidecode.unidecode(s));
     }
 }
