@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <util:list id="songs" value-type="java.util.List">
+        <!--Пика-->
+        <!--Патимейкер-->
+        <list>
+            <value>Сучка</value>
+            <value>Сучка эй</value>
+
+            <value>Хэй, baby, брекеты</value>
+            <value>Косичка, миниюбка, кепка</value>
+            <value>Этот трек не для тверка</value>
+            <value>Да и похрен</value>
+            <value>Дискотека</value>
+            <value>Дискотека</value>
+            <value>Дискотека, дискотека</value>
+            <value>Дискотека</value>
+            <value>Это дискотека века</value>
+            <value>Хэй</value>
+            <value>DJ</value>
+            <value>Хэй</value>
+            <value>битмейкер</value>
+            <value>Хэй</value>
+            <value>уличный дэнсер</value>
+            <value>Шк шк</value>
+            <value>Шейкер, шейкер</value>
+            <value>Хэй</value>
+            <value>патимейкер</value>
+            <value>Хэй</value>
+            <value>патимейкер</value>
+            <value>Хэй</value>
+            <value>патимейкер</value>
+            <value>Хэй</value>
+            <value>патимейкер</value>
+            <value>Хэй</value>
+            <value>патимейкер</value>
+
+            <value>Йога, ноги на угли</value>
+            <value>Зимой на ноги уги</value>
+            <value>Мы танцуем буги-вуги</value>
+            <value>Под ай люли-люли</value>
+            <value>Дикий Маугли, джунгли</value>
+            <value>Сам свои гугли в Google</value>
+            <value>Матрёшки - куклы в кукле</value>
+            <value>Этот день дубль в дубле</value>
+            <value>Разделились на команды</value>
+            <value>Пока мы дули дули</value>
+            <value>Они крутят факи, дули</value>
+            <value>Ха-ха, они продули</value>
+            <value>До свидули</value>
+            <value>До свидули</value>
+            <value>До свидули, до свидули</value>
+            <value>Дули</value>
+            <value>Да сведу ли, дули</value>
+        </list>
+
+        <!--Время и Стекло-->
+        <!--Имя 505-->
+        <list>
+            <value>А, может быть, забудем всё и сбежим?</value>
+            <value>У нас одна любовь и одна только жизнь</value>
+            <value>А, может быть, забудем всё и сбежим</value>
+            <value>Навсегдаааа</value>
+
+            <value>Забуду имя любимое моё</value>
+            <value>Твоё именно имя, любимое моё</value>
+            <value>И непобедимая любовь моя</value>
+            <value>Моё именно имя, любимое твоё</value>
+            <value>Моё любимое имя, любимое моё</value>
+            <value>Твоё именно имя, любимое моё</value>
+            <value>И непобедимая любовь моя</value>
+            <value>Моё именно имя, любимое твоё</value>
+            <value>Моё любимое</value>
+
+            <value>Я опять и опять</value>
+            <value>Попытаюсь расставить все точки</value>
+            <value>Попытаюсь понять</value>
+            <value>Или даже принять заморочки</value>
+            <value>Пятьсот пять, пятьсот пять</value>
+            <value>Расставался с тобой я тысяч раз</value>
+            <value>Но опять и опять.</value>
+            <value>Попытаюсь на сердце я высечь</value>
+
+            <value>Имя любимое моё</value>
+            <value>Твоё именно имя, любимое моё</value>
+            <value>И непобедимая любовь моя</value>
+            <value>Моё именно имя, любимое твоё</value>
+            <value>Моё любимое имя, любимое моё</value>
+            <value>Твоё именно имя, любимое моё</value>
+            <value>И непобедимая любовь моя</value>
+            <value>Моё именно имя, любимое твоё</value>
+            <value>Моё любимое</value>
+
+            <value>А, может быть, забудем всё и сбежим?</value>
+            <value>У нас одна любовь и одна только жизнь</value>
+            <value>А, может быть, забудем всё и сбежим</value>
+            <value>Навсегда</value>
+
+            <value>Забуду имя любимое моё</value>
+            <value>Твоё именно имя, любимое моё</value>
+            <value>И непобедимая любовь моя</value>
+            <value>Моё именно имя, любимое твоё</value>
+            <value>Моё любимое имя, любимое моё</value>
+            <value>Твоё именно имя, любимое моё</value>
+            <value>И непобедимая любовь моя</value>
+            <value>Моё именно имя, любимое твоё</value>
+            <value>Моё любимое</value>
+        </list>
+
+        <!--Хлеб-->
+        <!--Чай Сахар-->
+        <list>
+            <value>я открываю холодильник</value>
+            <value>там есть колбаса</value>
+            <value>открываю хлебницу</value>
+            <value>беру два куска</value>
+            <value>бутер, бутер</value>
+            <value>бутер готов, детка</value>
+            <value>ем аккуратно</value>
+            <value>за столом и над тарелкой</value>
+            <value>в комнате ждут мои пацаны</value>
+            <value>у всех есть майки и штаны</value>
+            <value>кто-то пришел в куртке</value>
+            <value>кто-то пришел в толстовке</value>
+            <value>уже не так холодно</value>
+            <value>можно гулять без куртки</value>
+            <value>я предложил им бутеры</value>
+            <value>они сказали: "нет"</value>
+            <value>каждый дома плотно пообедал на обед</value>
+            <value>предложил чай с сахаром и нарезал лимоны</value>
+            <value>чай стали пить все</value>
+            <value>Кирюха выпил два стакана!</value>
+
+            <value>чай! сахар!</value>
+            <value>чай! сахар!</value>
+            <value>чай! сахар!</value>
+            <value>(можно предложить конфетки)</value>
+            <value>чай! сахар!</value>
+            <value>чай! сахар!</value>
+            <value>чай! сахар!</value>
+            <value>(бутеры готовы детка)</value>
+
+            <value>гулять на улице с пацанами круто</value>
+            <value>в теньке холодно, но на солнце супер-пупер</value>
+            <value>супер-пупер</value>
+            <value>супер-дупер</value>
+            <value>тупер-мупер</value>
+            <value>шмупер-вупер</value>
+            <value>чикен-кукен</value>
+            <value>лукен-тукен</value>
+            <value>фукен-цукен</value>
+            <value>шимба-бумба</value>
+            <value>гулять на улице с пацанами круто</value>
+            <value>в теньке холодно, но на солнце супер-пупер</value>
+
+            <value>мы видели, как слиплись собаки</value>
+            <value>гуляли долго, и никто из нас не замерз</value>
+            <value>через несколько минут разлиплись собаки</value>
+            <value>а наш секрет, что каждый пододел термобелье</value>
+
+            <value>чай! сахар!</value>
+            <value>чай! сахар!</value>
+            <value>чай! сахар!</value>
+            <value>(можно предложить конфетки)</value>
+            <value>чай! сахар!</value>
+            <value>чай! сахар!</value>
+            <value>чай! сахар!</value>
+            <value>(бутеры готовы детка)</value>
+
+            <value>что? что? что?</value>
+            <value>что? что? что?</value>
+            <value>(можно предложить конфетки)</value>
+            <value>что? что? что?</value>
+            <value>ХЛЕБ!</value>
+            <value>(бутеры готовы детка)</value>
+        </list>
+    </util:list>
+</beans>
