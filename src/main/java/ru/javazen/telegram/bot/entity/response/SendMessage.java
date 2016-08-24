@@ -6,7 +6,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 public class SendMessage {
 
-    public SendMessage() { };
+    public SendMessage() {
+    }
 
     public SendMessage(long chatId, String text) {
         this.chatId = chatId;
@@ -20,7 +21,7 @@ public class SendMessage {
     private String text;
 
     @JsonProperty("parse_mode")
-    private String parseMode;
+    private ParseMode parseMode;
 
     @JsonProperty("reply_to_message_id")
     private Long replyMessageId;
@@ -41,11 +42,11 @@ public class SendMessage {
         this.text = text;
     }
 
-    public String getParseMode() {
+    public ParseMode getParseMode() {
         return parseMode;
     }
 
-    public void setParseMode(String parseMode) {
+    public void setParseMode(ParseMode parseMode) {
         this.parseMode = parseMode;
     }
 

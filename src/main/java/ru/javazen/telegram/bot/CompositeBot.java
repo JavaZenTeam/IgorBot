@@ -2,8 +2,8 @@ package ru.javazen.telegram.bot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.javazen.telegram.bot.entity.Constants;
 import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.entity.response.ParseMode;
 import ru.javazen.telegram.bot.entity.response.SendMessage;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
 import ru.javazen.telegram.bot.service.TelegramBotService;
@@ -48,7 +48,7 @@ public class CompositeBot implements Bot {
             if (supportChatId != null){
                 String message = String.format("*Error!*\n%s\n```%s```", e, e.getStackTrace()[0]);
                 SendMessage msg = new SendMessage(supportChatId, message);
-                msg.setParseMode(Constants.PARSE_MODE_MARKDOWN);
+                msg.setParseMode(ParseMode.MARKDOWN);
                 getService().sendMessage(msg);
             }
         }
