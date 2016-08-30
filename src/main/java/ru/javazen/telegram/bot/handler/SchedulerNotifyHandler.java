@@ -62,17 +62,14 @@ public class SchedulerNotifyHandler implements UpdateHandler {
             bot.getService().sendMessage(answer(update.getMessage(), "Так долго я помнить не смогу, сорри", true));
             return true;
         }
-        //userTasks.computeIfPresent(userId, (key, val) -> val+1);
-        userTasks.put(userId, userTasks.get(userId) + 1);
 
-        //todo j8
-        taskScheduler.schedule(new Runnable() {
-            @Override
-            public void run() {
-                //userTasks.computeIfPresent(userId, (key, val) -> val-1);
-                userTasks.put(userId, userTasks.get(userId) - 1);
+        userTasks.computeIfPresent(userId, (key, val) -> val + 1);
+        bot.getService().sendMessage(answer(update.getMessage(), "Окей"));
+
+        taskScheduler.schedule(() -> {
+                userTasks.computeIfPresent(userId, (key, val) -> val - 1);
                 bot.getService().sendMessage(answer(update.getMessage(), parameters.getMessage(), true));
-        }}, parameters.getDate());
+        }, parameters.getDate());
 
         return true;
     }
