@@ -108,7 +108,7 @@
     <bean id="gayAnswerDetector" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="[^?a-zа-я]*[нhn][еe][тt][^?a-zа-я]*"/>
+                <property name="pattern" value="[^a-zа-я]*[нhn][еe][тt][^?a-zа-я]*"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
@@ -136,6 +136,34 @@
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.SimpleAnswer">
                 <constructor-arg name="answer" value="Отсоси у тракториста!"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="denyWithReverseAnswer" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="и+го+рь,\s*ты(\s*|\s.+)\?"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.SimpleStickerSender">
+                <!--Нет блять, а ты?-->
+                <property name="sticker" value="BQADAgADdwADYI4MBy0SHMKDG97AAg"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="headOfDickDetector" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="[^a-zа-я]*(й+а+|я+)[^a-zа-я]*"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.SimpleAnswer">
+                <constructor-arg name="answer" value="Головка от хуя!"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -231,6 +259,7 @@
                         <ref bean="replyLayoutSwitcherModuleEng"/>
                         <ref bean="repeaterAdvanced"/>
                         <ref bean="forwardMessageBridge"/>
+                        <ref bean="denyWithReverseAnswer"/>
                         <ref bean="choiceMakerWithContext"/>
                         <ref bean="choiceMaker"/>
                         <ref bean="doNotKnowAnswerModule"/>
@@ -239,6 +268,7 @@
                         <!--<ref bean="randomFacePalmModule"/>-->
                         <ref bean="gayAnswerDetector"/>
                         <ref bean="agitatorOfSuckingTractorDriverStuff"/>
+                        <ref bean="headOfDickDetector"/>
                         <ref bean="songSingerModule"/>
                     </list>
                 </property>
