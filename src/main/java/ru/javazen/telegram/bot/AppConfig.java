@@ -5,7 +5,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import net.sf.junidecode.Junidecode;
-import org.apache.commons.codec.language.Metaphone;
+import org.apache.commons.codec.language.DoubleMetaphone;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
@@ -55,14 +55,14 @@ public class AppConfig {
     }
 
     @Bean
-    public Metaphone metaphone(){
-        Metaphone metaphone = new Metaphone();
+    public DoubleMetaphone doubleMetaphone(){
+        DoubleMetaphone metaphone = new DoubleMetaphone();
         metaphone.setMaxCodeLen(30);
         return metaphone;
     }
 
     @Bean
     public Function<String, String> songEncoder(){
-        return s -> metaphone().encode(Junidecode.unidecode(s));
+        return s -> doubleMetaphone().encode(Junidecode.unidecode(s));
     }
 }

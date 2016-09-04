@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
@@ -176,5 +176,219 @@
             <value>ХЛЕБ!</value>
             <value>(бутеры готовы детка)</value>
         </list>
+
+        <!--Тату-->
+        <!--Мальчик-гей-->
+        <list>
+            <value>смотришь нежно</value>
+            <value>ждёшь его вниманья</value>
+            <value>чувства те же</value>
+            <value>но не понимаю</value>
+            <value>сколько можно</value>
+            <value>жить, любя украдкой</value>
+            <value>очень сложно</value>
+            <value>скрыть твои повадки</value>
+            <value>очень трудно</value>
+            <value>скрыть мои страданья</value>
+            <value>очень очень очень очень</value>
+            <value>неприличное желанье</value>
+
+            <value>мальчик-гей, мальчик-гей</value>
+            <value>будь со мной понаглей</value>
+            <value>от стыда не красней</value>
+            <value>мальчик-гей, мальчик-гей</value>
+            <value>положи на друзей</value>
+            <value>мальчик-гей, мальчик-гей</value>
+            <value>от меня офигей</value>
+            <value>мальчик-гей, мальчик-гей</value>
+
+            <value>слёзы душат</value>
+            <value>мысли жить мешают</value>
+            <value>трудно слушать</value>
+            <value>нет, не понимаю</value>
+            <value>да, я знаю</value>
+            <value>все твои секреты</value>
+            <value>как ты терпишь</value>
+            <value>твёрдые предметы</value>
+            <value>всё же знаю</value>
+            <value>это безнадёжно</value>
+            <value>но мечтаю</value>
+            <value>таю таю таю таю таю таю</value>
+
+            <value>мальчик-гей, мальчик-гей</value>
+            <value>будь со мной понаглей</value>
+            <value>от стыда не красней</value>
+            <value>мальчик-гей, мальчик-гей</value>
+            <value>положи на друзей</value>
+            <value>мальчик-гей, мальчик-гей</value>
+            <value>от меня офигей</value>
+            <value>мальчик-гей, мальчик-гей</value>
+        </list>
+
+        <!--Михаил Круг-->
+        <!--Владимирский централ-->
+        <list>
+            <value>весна опять пришла</value>
+            <value>и лучики тепла</value>
+            <value>доверчиво глядят</value>
+            <value>в моё окно</value>
+            <value>опять защемит грудь</value>
+            <value>и в душу влезет грусть</value>
+            <value>по памяти пойдёт</value>
+            <value>со мной</value>
+
+            <value>пойдёт разворошит</value>
+            <value>и вместе согрешит</value>
+            <value>с той девочкой что так</value>
+            <value>давно любил</value>
+            <value>с той девочкой ушла</value>
+            <value>с той девочкой пришла</value>
+            <value>забыть её не хватит сил</value>
+
+            <value>владимирский централ</value>
+            <value>ветер северный</value>
+            <value>этапом из твери</value>
+            <value>зла немерено</value>
+            <value>лежит на сердце</value>
+            <value>тяжкий груз</value>
+            <value>владимирский централ</value>
+            <value>ветер северный</value>
+            <value>когда я банковал</value>
+            <value>жизнь разменяна</value>
+            <value>но не очко обычно губит</value>
+            <value>а к одиннадцати туз</value>
+        </list>
+
+        <!--Убийцы-->
+        <!--Россия-->
+        <list>
+            <value>напудренные алкаши</value>
+            <value>расскажи, покажи</value>
+            <value>напудренные алкаши</value>
+            <value>расскажи, покажи</value>
+            <value>убивай, водку пей</value>
+            <value>становись веселей</value>
+            <value>убивай, водку пей</value>
+            <value>становись веселей</value>
+
+            <value>давай Россия</value>
+            <value>давай, давай</value>
+            <value>давай красиво</value>
+            <value>давай, давай</value>
+
+            <value>давай Россия</value>
+            <value>давай, давай</value>
+            <value>давай красиво</value>
+
+            <value>вова ходит в бигуди</value>
+            <value>заходи проходи</value>
+            <value>открывай, убивай</value>
+            <value>танцевай, танцевай</value>
+            <value>вова ходит в бигуди</value>
+            <value>проходи заходи</value>
+            <value>открывай, убивай</value>
+
+            <value>давай Россия</value>
+            <value>давай, давай</value>
+            <value>давай красиво</value>
+            <value>давай, давай</value>
+
+            <value>давай Россия</value>
+            <value>давай, давай</value>
+            <value>давай красиво</value>
+
+            <value>в Сочи снежные хачи</value>
+            <value>и хачи, и хачи</value>
+            <value>и хачи, и хачи</value>
+            <value>и хачи, и хачи</value>
+            <value>и хачи, и хачи</value>
+            <value>и хачи, и хачи</value>
+            <value>и хачи, и хачи</value>
+            <value>и хачи, и хачи</value>
+        </list>
+
+        <!--Убийцы-->
+        <!--Лударь-->
+        <list>
+            <value>ты не рок-звезда у тебя нет подруг</value>
+            <value>твой единственный друг - михаил круг</value>
+            <value>утро, понедельник, воскресенье, суббота</value>
+            <value>надоела работа - бросай работу</value>
+
+            <value>но кто ты, кто ты, кто ты без работы?</value>
+            <value>что ты сделал для хип-хопа в свои годы?</value>
+            <value>кто вы, кто вы, ответьте сударь?</value>
+            <value>вы - отечественный ЛУДАРЬ</value>
+
+            <value>у тебя ковёр с иисусом работник цеховый</value>
+            <value>книга чехова и постер с чеховой</value>
+            <value>утро, понедельник, воскресенье, суббота</value>
+            <value>надоела работа - бросай работу</value>
+
+            <value>но кто ты, кто ты, кто ты без работы?</value>
+            <value>что ты сделал для хип-хопа в свои годы?</value>
+            <value>кто вы, кто вы, ответьте сударь?</value>
+            <value>вы - отечественный ЛУДАРЬ</value>
+        </list>
+
+        <!--Убийцы-->
+        <!--Цивил-->
+        <list>
+            <value>я богиня кали</value>
+            <value>я в кале</value>
+            <value>ты меня младше</value>
+            <value>так еще слаще</value>
+            <value>допью то, что не допил</value>
+            <value>цивил цивил</value>
+            <value>цивил цивил</value>
+
+            <value>ты нажимаешь на звонок</value>
+            <value>и убегаешь</value>
+            <value>я так люблю бухать в подъездах</value>
+            <value>ты меня знаешь</value>
+            <value>за треснутым окном</value>
+            <value>снежной вуалью</value>
+            <value>утро сибирских афин</value>
+            <value>пахнет шмалью</value>
+
+            <value>нас ждут страшные зимы</value>
+            <value>крест на шее богини</value>
+            <value>по бетонному полу</value>
+            <value>капли крови и колы</value>
+            <value>не удержал и всё пролил</value>
+            <value>цивил цивил</value>
+            <value>цивил цивил</value>
+
+            <value>ты нажимаешь на звонок</value>
+            <value>и убегаешь</value>
+            <value>я так люблю бухать в подъездах</value>
+            <value>ты меня знаешь</value>
+            <value>за треснутым окном</value>
+            <value>снежной вуалью</value>
+            <value>утро сибирских афин</value>
+            <value>пахнет шмалью</value>
+        </list>
+
+        <!--Убийцы-->
+        <!--Два икса-->
+        <list>
+            <value>здоровый образ жизни</value>
+            <value>неделю продержалась</value>
+            <value>врать что продержалась</value>
+            <value>я не лгу, я не лгу</value>
+            <value>мне больше чем трицаха</value>
+            <value>но меньше восемнадцати</value>
+            <value>у меня с собою паспорт</value>
+            <value>я не лгу, я не лгу</value>
+            <value>я не лгу, я завязала</value>
+
+            <value>я не знаю, где твои деньги</value>
+            <value>я не знаю, где твой телефон</value>
+            <value>я не знаю, где твоё золото</value>
+            <value>я не лгу, я завязала</value>
+            <value>я не лгу, я не лгу</value>
+            <value>я не лгу, я завязала</value>
+        </list>
+
     </util:list>
 </beans>
