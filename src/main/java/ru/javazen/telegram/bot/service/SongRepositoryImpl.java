@@ -10,13 +10,17 @@ public class SongRepositoryImpl implements SongRepository {
     private Map<String, SongLine> songLineMap = new HashMap<>();
     private Function<String, String> encoder;
 
+    public SongRepositoryImpl(){
+        this(s -> s);
+    }
+
     public SongRepositoryImpl(Function<String, String> encoder) {
         this.encoder = encoder;
     }
 
     public SongRepositoryImpl(Function<String, String> encoder, Collection<List<String>> songs){
         this(encoder);
-        songs.stream().forEach(this::saveSong);
+        songs.forEach(this::saveSong);
     }
 
     @Override
@@ -49,7 +53,10 @@ public class SongRepositoryImpl implements SongRepository {
     public SongLine findSong(SongLine songLine, String string) {
         string = encoder.apply(string);
         SongRepository.SongLine current = songLine;
-        while ((current = current.getNextLine()) != null){
+        for (int i = 0; i < 4; i++ ){
+            if ((current = current.getNextLine()) == null) {
+                return null;
+            }
             if (encoder.apply(current.getString()).equals(string)){
                 return current;
             }

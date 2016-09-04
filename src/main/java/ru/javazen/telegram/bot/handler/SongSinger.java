@@ -19,24 +19,23 @@ public class SongSinger implements UpdateHandler{
         String string = update.getMessage().getText();
         if (string == null) return false;
 
-        if (lastSongLine != null) {
-            SongRepository.SongLine nextLine = repository.findSong(lastSongLine, string);
-            if (nextLine != null) {
-                sendSongLine(update, bot, nextLine.getNextLine());
-                return true;
-            }
-        }
+        SongRepository.SongLine songLine = findLine(string);
 
-        return tryWithRepo(update, bot, string);
-    }
-
-    private boolean tryWithRepo(Update update, Bot bot, String string) {
-        SongRepository.SongLine songLine = repository.findSong(string);
-        if (songLine == null || songLine.getNextLine() == null)
-            return false;
+        if (songLine == null || songLine.getNextLine() == null) return false;
 
         sendSongLine(update, bot, songLine.getNextLine());
         return true;
+    }
+
+    private SongRepository.SongLine findLine(String string){
+        SongRepository.SongLine songLine = null;
+        if (lastSongLine != null) {
+            songLine = repository.findSong(lastSongLine, string);
+        }
+        if (songLine == null){
+            songLine = repository.findSong(string);
+        }
+        return songLine;
     }
 
     private void sendSongLine(Update update, Bot bot, SongRepository.SongLine songLine) {
