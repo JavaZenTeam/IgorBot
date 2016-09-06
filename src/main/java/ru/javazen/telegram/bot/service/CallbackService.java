@@ -14,9 +14,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
-@Path("/callback")
+@Path(CallbackService.CALLBACK_PATH)
 @Service
 public class CallbackService {
+    public static final String CALLBACK_PATH = "/callback";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackService.class);
 
     @Resource(name = "botMap")
