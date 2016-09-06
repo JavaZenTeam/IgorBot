@@ -242,7 +242,7 @@
 
     <util:map id="botMap" key-type="java.lang.String" value-type="ru.javazen.telegram.bot.Bot">
 
-        <entry key="${bot.name}">
+        <entry key="Igor">
             <bean class="ru.javazen.telegram.bot.CompositeBot">
                 <constructor-arg name="service">
                     <bean class="ru.javazen.telegram.bot.service.TelegramBotServiceImpl">
