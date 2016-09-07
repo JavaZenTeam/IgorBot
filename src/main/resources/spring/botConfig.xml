@@ -240,41 +240,37 @@
         <constructor-arg name="songs" ref="songs"/>
     </bean>
 
-    <util:map id="botMap" key-type="java.lang.String" value-type="ru.javazen.telegram.bot.Bot">
+    <bean id="telegramBotService" class="ru.javazen.telegram.bot.service.TelegramBotServiceImpl" />
 
-        <entry key="Igor">
-            <bean class="ru.javazen.telegram.bot.CompositeBot">
-                <constructor-arg name="service">
-                    <bean class="ru.javazen.telegram.bot.service.TelegramBotServiceImpl">
-                        <constructor-arg name="token" value="${bot.token}"/>
-                    </bean>
-                </constructor-arg>
-                <property name="supportChatId" value="-1001063148517"/>
-                <property name="updateHandlers">
-                    <list>
-                        <ref bean="pinnedForwarder"/>
-                        <ref bean="scheduler"/>
-                        <ref bean="updateInfoProvider"/>
-                        <ref bean="replyLayoutSwitcherModuleRus"/>
-                        <ref bean="replyLayoutSwitcherModuleEng"/>
-                        <ref bean="repeaterAdvanced"/>
-                        <ref bean="forwardMessageBridge"/>
-                        <ref bean="denyWithReverseAnswer"/>
-                        <ref bean="choiceMakerWithContext"/>
-                        <ref bean="choiceMaker"/>
-                        <ref bean="doNotKnowAnswerModule"/>
-                        <ref bean="randomYesNoAnswerModule"/>
-                        <ref bean="getStickerByIdModule"/>
-                        <!--<ref bean="randomFacePalmModule"/>-->
-                        <ref bean="gayAnswerDetector"/>
-                        <ref bean="agitatorOfSuckingTractorDriverStuff"/>
-                        <ref bean="headOfDickDetector"/>
-                        <ref bean="songSingerModule"/>
-                    </list>
-                </property>
-            </bean>
-        </entry>
+    <bean id="botName" class="java.lang.String">
+        <constructor-arg value="IgorBot"/>
+    </bean>
 
-    </util:map>
+    <bean id="bot" class="ru.javazen.telegram.bot.CompositeBot">
+
+        <property name="supportChatId" value="-1001063148517"/>
+        <property name="updateHandlers">
+            <list>
+                <ref bean="pinnedForwarder"/>
+                <ref bean="scheduler"/>
+                <ref bean="updateInfoProvider"/>
+                <ref bean="replyLayoutSwitcherModuleRus"/>
+                <ref bean="replyLayoutSwitcherModuleEng"/>
+                <ref bean="repeaterAdvanced"/>
+                <ref bean="forwardMessageBridge"/>
+                <ref bean="denyWithReverseAnswer"/>
+                <ref bean="choiceMakerWithContext"/>
+                <ref bean="choiceMaker"/>
+                <ref bean="doNotKnowAnswerModule"/>
+                <ref bean="randomYesNoAnswerModule"/>
+                <ref bean="getStickerByIdModule"/>
+                <!--<ref bean="randomFacePalmModule"/>-->
+                <ref bean="gayAnswerDetector"/>
+                <ref bean="agitatorOfSuckingTractorDriverStuff"/>
+                <ref bean="headOfDickDetector"/>
+                <ref bean="songSingerModule"/>
+            </list>
+        </property>
+    </bean>
 
 </beans>

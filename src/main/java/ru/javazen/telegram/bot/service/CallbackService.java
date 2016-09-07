@@ -2,6 +2,7 @@ package ru.javazen.telegram.bot.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
@@ -21,8 +22,8 @@ public class CallbackService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackService.class);
 
-    @Resource(name = "botMap")
-    private Map<String, Bot> botMap;
+    @Autowired
+    private Bot bot;
 
     @POST
     @Path("/{botName}")
@@ -37,7 +38,7 @@ public class CallbackService {
             LOGGER.error("Message in Update is not valid: {}", update);
             return;
         }
-        Bot bot = botMap.get(botName);
+        
         if (bot == null) {
             LOGGER.warn("Bot with name={} doesn't exist", botName);
             return;

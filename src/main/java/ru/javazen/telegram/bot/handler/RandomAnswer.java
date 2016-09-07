@@ -5,6 +5,7 @@ import org.springframework.util.Assert;
 import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.service.MessageHelper;
+import ru.javazen.telegram.bot.service.TelegramBotService;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +16,9 @@ import java.util.function.BiFunction;
 public class RandomAnswer implements UpdateHandler {
 
     @Autowired
+    private TelegramBotService botService;
+
+    @Autowired
     private Random random;
 
     private Map<String, Integer> answers = Collections.emptyMap();
@@ -22,7 +26,7 @@ public class RandomAnswer implements UpdateHandler {
     private int sum;
 
     @Override
-    public boolean handle(Update update, Bot bot) {
+    public boolean handle(Update update) {
         String text = update.getMessage().getText();
         if (text == null) return false;
 
@@ -35,7 +39,7 @@ public class RandomAnswer implements UpdateHandler {
         String answer = solveAnswer(text);
         if (answer == null) return false;
 
-        bot.getService().sendMessage(MessageHelper.answer(update.getMessage(), answer, true));
+        botService.sendMessage(MessageHelper.answer(update.getMessage(), answer, true));
         return true;
     }
 

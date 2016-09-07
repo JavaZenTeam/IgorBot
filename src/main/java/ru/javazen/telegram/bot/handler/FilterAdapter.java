@@ -17,7 +17,7 @@ public class FilterAdapter implements UpdateHandler {
     }
 
     @Override
-    public boolean handle(Update update, Bot bot) {
-        return filter.check(update) && handler.handle(update, bot);
+    public boolean handle(Update update) {
+        return filter.check(update) && handler.handle(update);
     }
 }
