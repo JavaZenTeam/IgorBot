@@ -15,7 +15,11 @@ import java.util.Map;
 @Service
 public class BotInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BotInitializer.class);
-    private Map<String, Bot> bots;
+
+    @Autowired
+    private String botName;
+
+    private Bot bot;
     private String path;
 
     @Autowired
@@ -23,17 +27,16 @@ public class BotInitializer {
         path = serverUrl + servletContext.getContextPath() + CallbackService.CALLBACK_PATH + "/";
     }
 
-    @Resource(name = "botMap")
-    public void setBots(Map<String, Bot> bots) {
-        this.bots = bots;
+    @Autowired
+    public void setBot(Bot bot) {
+        this.bot = bot;
     }
 
     @PostConstruct
     public void initBots(){
         LOGGER.debug("Start init bots");
-        for (Map.Entry<String, Bot> entry: bots.entrySet()){
-            initBot(entry.getKey(), entry.getValue());
-        }
+
+        initBot(botName, bot);
     }
 
     private void initBot(String name, Bot bot){

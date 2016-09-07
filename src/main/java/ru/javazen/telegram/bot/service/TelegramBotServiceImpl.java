@@ -7,6 +7,7 @@ import com.sun.jersey.api.client.WebResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import ru.javazen.telegram.bot.entity.request.Message;
 import ru.javazen.telegram.bot.entity.request.User;
 import ru.javazen.telegram.bot.entity.response.ForwardMessage;
@@ -26,10 +27,12 @@ public class TelegramBotServiceImpl implements TelegramBotService {
 
     @Autowired
     private Client client;
+
     private WebResource webResource;
     private String token;
 
-    public TelegramBotServiceImpl(String token) {
+    @Autowired
+    public TelegramBotServiceImpl(@Value("${bot.token}") String token) {
         this.token = token;
     }
 

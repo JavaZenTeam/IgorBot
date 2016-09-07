@@ -1,9 +1,11 @@
 package ru.javazen.telegram.bot.handler;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.service.MessageHelper;
+import ru.javazen.telegram.bot.service.TelegramBotService;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -13,6 +15,9 @@ import java.util.stream.Collectors;
 
 public class ChoiceMaker implements UpdateHandler{
     private static final String OPTIONS_GROUP_NAME = "options";
+
+    @Autowired
+    private TelegramBotService botService;
 
     private Pattern pattern;
     private String splitPattern;
@@ -44,7 +49,7 @@ public class ChoiceMaker implements UpdateHandler{
     }
 
     @Override
-    public boolean handle(Update update, Bot bot) {
+    public boolean handle(Update update) {
         String text = update.getMessage().getText();
         if (text == null) return false;
 
@@ -56,7 +61,7 @@ public class ChoiceMaker implements UpdateHandler{
 
         if (choice == null) return false;
 
-        bot.getService().sendMessage(MessageHelper.answer(update.getMessage(), choice));
+        botService.sendMessage(MessageHelper.answer(update.getMessage(), choice));
         return true;
     }
 
