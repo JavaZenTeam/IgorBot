@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.model.MessageTask;
+import ru.javazen.telegram.bot.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.service.TelegramBotService;
 
 import java.util.*;
@@ -16,6 +18,9 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
     @Autowired
     private TelegramBotService botService;
+
+    @Autowired
+    MessageSchedulerService messageSchedulerService;
 
     private Map<Long, Integer> userTasks = new HashMap<>();
 
@@ -70,10 +75,16 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         userTasks.computeIfPresent(userId, (key, val) -> val + 1);
         botService.sendMessage(answer(update.getMessage(), "Окей"));
 
-        taskScheduler.schedule(() -> {
-                userTasks.computeIfPresent(userId, (key, val) -> val - 1);
-                botService.sendMessage(answer(update.getMessage(), parameters.getMessage(), true));
-        }, parameters.getDate());
+        MessageTask task = new MessageTask();
+        task.setChatId(update.getMessage().getChat().getId());
+        task.setMessageId(update.getMessage().getMessageId());
+        task.setUserId(userId);
+        task.setReplyMessageId(update.getMessage().getMessageId());
+        task.setScheduledText(parameters.getMessage());
+        task.setTimeOfCompletion(parameters.getDate().getTime());
+
+        messageSchedulerService.scheduleTask(task);
+
 
         return true;
     }

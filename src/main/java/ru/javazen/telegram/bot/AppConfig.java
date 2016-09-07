@@ -12,11 +12,15 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
+import ru.javazen.telegram.bot.service.MessageSchedulerService;
+import ru.javazen.telegram.bot.service.impl.MessageSchedulerServiceImpl;
 
 import java.util.Random;
 import java.util.function.Function;
+
 
 @Configuration
 public class AppConfig {
@@ -64,5 +68,10 @@ public class AppConfig {
     @Bean
     public Function<String, String> songEncoder(){
         return s -> doubleMetaphone().encode(Junidecode.unidecode(s));
+    }
+
+    @Bean
+    public MessageSchedulerService messageSchedulerService() {
+        return new MessageSchedulerServiceImpl();
     }
 }
