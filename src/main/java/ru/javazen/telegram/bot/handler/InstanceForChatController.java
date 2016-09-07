@@ -10,12 +10,12 @@ public abstract class InstanceForChatController implements UpdateHandler {
     private Map<Long, UpdateHandler> map = new HashMap<>();
 
     @Override
-    public boolean handle(Update update, Bot bot) {
+    public boolean handle(Update update) {
         Long chatId = update.getMessage().getChat().getId();
         if (!map.containsKey(chatId)){
             map.put(chatId, newInstance());
         }
-        return map.get(chatId).handle(update, bot);
+        return map.get(chatId).handle(update);
     }
 
     protected abstract UpdateHandler newInstance();

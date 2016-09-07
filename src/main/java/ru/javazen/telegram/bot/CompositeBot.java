@@ -2,6 +2,7 @@ package ru.javazen.telegram.bot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.entity.response.ParseMode;
 import ru.javazen.telegram.bot.entity.response.SendMessage;
@@ -14,13 +15,11 @@ import java.util.Collection;
 public class CompositeBot implements Bot {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeBot.class);
 
+    @Autowired
     private TelegramBotService service;
+
     private Collection<UpdateHandler> updateHandlers = new ArrayList<>();
     private Long supportChatId;
-
-    public CompositeBot(TelegramBotService service) {
-        this.service = service;
-    }
 
     public void setUpdateHandlers(Collection<UpdateHandler> updateHandlers) {
         this.updateHandlers.clear();
@@ -40,7 +39,7 @@ public class CompositeBot implements Bot {
     public void onUpdate(Update update) {
         try {
             for (UpdateHandler handler : updateHandlers){
-                if (handler.handle(update, this)) return;
+                if (handler.handle(update)) return;
             }
             LOGGER.debug("This update is not handled: {}", update);
         } catch (Exception e){
