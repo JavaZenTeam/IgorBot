@@ -22,8 +22,6 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     @Autowired
     MessageSchedulerService messageSchedulerService;
 
-    private Map<Long, Integer> userTasks = new HashMap<>();
-
     private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
 
     private String validationPattern;
@@ -55,15 +53,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
             return false;
         }
 
-        //userTasks.computeIfAbsent(userId, num -> 0);
-        if (!userTasks.containsKey(userId)) {
-            userTasks.put(userId, 1);
-        }
-
-        if (userTasks.get(userId) > tasksLimit) {
-            botService.sendMessage(answer(update.getMessage(), "Я столько не запомню((", true));
-            return true;
-        }
+        // todo - task limit by time
 
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
@@ -72,7 +62,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
             return true;
         }
 
-        userTasks.computeIfPresent(userId, (key, val) -> val + 1);
+        /*userTasks.computeIfPresent(userId, (key, val) -> val + 1);*/
         botService.sendMessage(answer(update.getMessage(), "Окей"));
 
         MessageTask task = new MessageTask();
