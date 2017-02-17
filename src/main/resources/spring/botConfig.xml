@@ -220,6 +220,11 @@
     </bean>
 
     <bean id="pinnedForwarder" class="ru.javazen.telegram.bot.handler.PinnedForwarder">
+        <property name="storeFromChatIds">
+            <list>
+                <value>-1001038770422</value>
+            </list>
+        </property>
         <property name="storeChatId" value="-1001066106029"/>
     </bean>
 
