@@ -5,7 +5,7 @@
     <util:list id="songs" value-type="java.util.List">
         <!--Пика-->
         <!--Патимейкер-->
-        <list>
+        <!--<list>
             <value>Сучка</value>
             <value>Сучка эй</value>
 
@@ -54,7 +54,7 @@
             <value>До свидули, до свидули</value>
             <value>Дули</value>
             <value>Да сведу ли, дули</value>
-        </list>
+        </list>-->
 
         <!--Время и Стекло-->
         <!--Имя 505-->
