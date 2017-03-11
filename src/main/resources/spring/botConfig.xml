@@ -251,6 +251,25 @@
         <constructor-arg value="IgorBot"/>
     </bean>
 
+    <bean id="lowLevelJokes" class="ru.javazen.telegram.bot.handler.FilteredCompositeHandler">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.DeniedChatFilter">
+                <property name="deniedChatIds">
+                    <list>
+                        <value>-1001084636204</value>
+                    </list>
+                </property>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="updateHandlers">
+            <list>
+                <ref bean="gayAnswerDetector" />
+                <ref bean="agitatorOfSuckingTractorDriverStuff" />
+                <ref bean="headOfDickDetector" />
+            </list>
+        </constructor-arg>
+    </bean>
+
     <bean id="bot" class="ru.javazen.telegram.bot.CompositeBot">
 
         <property name="supportChatId" value="-1001063148517"/>
@@ -270,9 +289,7 @@
                 <ref bean="randomYesNoAnswerModule"/>
                 <ref bean="getStickerByIdModule"/>
                 <!--<ref bean="randomFacePalmModule"/>-->
-                <ref bean="gayAnswerDetector"/>
-                <ref bean="agitatorOfSuckingTractorDriverStuff"/>
-                <ref bean="headOfDickDetector"/>
+                <ref bean="lowLevelJokes"/>
                 <ref bean="songSingerModule"/>
             </list>
         </property>
