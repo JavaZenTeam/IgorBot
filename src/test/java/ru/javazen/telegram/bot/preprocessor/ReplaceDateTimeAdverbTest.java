@@ -17,7 +17,7 @@ public class ReplaceDateTimeAdverbTest {
 
         String r = instance.apply(update, " now ");
         System.out.println(r);
-        Assert.assertEquals(" 17.08.2016 22:07:00 ", r);
+        Assert.assertEquals(" 17.08.2016 23:07:00 ", r);
     }
 
     @Test
