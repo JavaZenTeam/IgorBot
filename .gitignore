@@ -2,3 +2,5 @@
 /.idea
 /IgorBot.iml
 /src/main/resources/config.properties
+/src/main/webapp/WEB-INF/hibernate.properties
+/src/main/webapp/WEB-INF/jdbc.properties

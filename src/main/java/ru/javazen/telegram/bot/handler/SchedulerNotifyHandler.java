@@ -5,6 +5,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.model.MessageTask;
+import ru.javazen.telegram.bot.service.MessageHelper;
 import ru.javazen.telegram.bot.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.service.TelegramBotService;
 
@@ -20,17 +21,18 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     private TelegramBotService botService;
 
     @Autowired
-    MessageSchedulerService messageSchedulerService;
+    private MessageSchedulerService messageSchedulerService;
 
     private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
 
     private String validationPattern;
 
     private int daysLimit, tasksLimit;
+    private String successResponse;
 
     @Override
     public boolean handle(final Update update) {
-        String message = update.getMessage().getText();
+        String message = MessageHelper.getActualText(update.getMessage());
         if (message == null || message.isEmpty()) {
             return false;
         }
@@ -63,7 +65,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         }
 
         /*userTasks.computeIfPresent(userId, (key, val) -> val + 1);*/
-        botService.sendMessage(answer(update.getMessage(), "Окей"));
+        botService.sendMessage(answer(update.getMessage(), successResponse));
 
         MessageTask task = new MessageTask();
         task.setChatId(update.getMessage().getChat().getId());
@@ -104,7 +106,6 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         Matcher matcher = pattern.matcher(message);
 
         GregorianCalendar calendar = new GregorianCalendar();
-        String returnMessage = null;
         boolean calendarChanged = false;
         Parameters parameters = new Parameters();
 
@@ -124,7 +125,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
             }
         }
 
-        returnMessage = matcher.group(matcher.groupCount());
+        String returnMessage = matcher.group(matcher.groupCount());
         if (returnMessage == null || returnMessage.isEmpty()) {
             throw new IllegalArgumentException("Message is empty");
         }
@@ -158,6 +159,10 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
     public void setValidationPattern(String pattern) {
         this.validationPattern = pattern;
+    }
+
+    public void setSuccessResponse(String successResponse) {
+        this.successResponse = successResponse;
     }
 
     private static class Parameters {
