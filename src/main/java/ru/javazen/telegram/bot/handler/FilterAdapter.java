@@ -1,23 +1,35 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.util.Assert;
-import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.filter.Filter;
 
+import java.util.Collections;
+import java.util.List;
+
 public class FilterAdapter implements UpdateHandler {
-    private Filter filter;
-    private UpdateHandler handler;
+    private List<Filter> filters;
+    private List<UpdateHandler> handlers;
 
     public FilterAdapter(Filter filter, UpdateHandler handler) {
-        Assert.notNull(filter, "filter can not be null");
-        Assert.notNull(handler, "handler can not be null");
-        this.filter = filter;
-        this.handler = handler;
+        this(Collections.singletonList(filter), Collections.singletonList(handler));
+    }
+
+    public FilterAdapter(List<Filter> filters, UpdateHandler handler) {
+        this(filters, Collections.singletonList(handler));
+    }
+
+    public FilterAdapter(Filter filter, List<UpdateHandler> handlers) {
+        this(Collections.singletonList(filter), handlers);
+    }
+
+    public FilterAdapter(List<Filter> filters, List<UpdateHandler> handlers) {
+        this.filters = filters;
+        this.handlers = handlers;
     }
 
     @Override
     public boolean handle(Update update) {
-        return filter.check(update) && handler.handle(update);
+        return filters.stream().allMatch(f -> f != null && f.check(update)) &&
+                handlers.stream().anyMatch(h -> h.handle(update));
     }
 }
