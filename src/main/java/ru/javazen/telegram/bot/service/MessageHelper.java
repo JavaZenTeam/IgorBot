@@ -17,4 +17,10 @@ public abstract class MessageHelper {
     public static SendMessage answer(Message message, String text){
         return answer(message, text, false);
     }
+
+    public static String getActualText(Message message){
+        return message.getText() != null ?
+                message.getText() :
+                message.getCaption();
+    }
 }
