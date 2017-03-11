@@ -31,6 +31,9 @@ public class Message {
     @JsonProperty("sticker")
     private Sticker sticker;
 
+    @JsonProperty("caption")
+    private String caption;
+
     public long getMessageId() {
         return messageId;
     }
@@ -95,6 +98,14 @@ public class Message {
         this.pinnedMessage = pinnedMessage;
     }
 
+    public String getCaption() {
+        return caption;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
@@ -106,6 +117,7 @@ public class Message {
                 ", replyMessage=" + replyMessage +
                 ", pinnedMessage=" + pinnedMessage +
                 ", sticker=" + sticker +
+                ", caption=" + caption +
                 '}';
     }
 

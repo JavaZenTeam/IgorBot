@@ -1,7 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.service.MessageHelper;
 import ru.javazen.telegram.bot.service.TelegramBotService;
@@ -23,7 +22,7 @@ public class RepeaterAdvanced implements UpdateHandler{
 
     @Override
     public boolean handle(Update update) {
-        String text = update.getMessage().getText();
+        String text = MessageHelper.getActualText(update.getMessage());
         if (text == null) return false;
 
         String answer = solveAnswer(text);

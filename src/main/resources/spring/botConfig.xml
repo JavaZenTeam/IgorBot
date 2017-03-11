@@ -76,7 +76,7 @@
     <bean id="replyLayoutSwitcherModuleRus" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="(п[оа][- ]?р[ую][сз][сз]?[кг][ие].*|ru.*)"/>
+                <property name="pattern" value="(п[оа][- ]?р[ую][сз][сз]?[кг][ие].*|rus?.*|рус.*|hec.*|кгы?.*)"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
@@ -90,7 +90,7 @@
     <bean id="replyLayoutSwitcherModuleEng" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="([иае]нгл.*|eng.*)"/>
+                <property name="pattern" value="([иае]нгл.*|eng.*|утп.*)"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
@@ -224,6 +224,7 @@
         <property name="validationPattern" value="и+го+рь,\s?ск[ао]ж[иы] че?р[еи]?з (.+)"/>
         <property name="daysLimit" value="1827"/>
         <property name="tasksLimit" value="30"/>
+        <property name="successResponse" value="Ok"/>
     </bean>
 
     <bean id="songSingerModule" class="ru.javazen.telegram.bot.handler.InstanceForChatController">
