@@ -1,7 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.entity.response.ForwardMessage;
 import ru.javazen.telegram.bot.service.TelegramBotService;
