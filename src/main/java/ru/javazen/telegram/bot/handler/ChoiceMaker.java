@@ -2,7 +2,6 @@ package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
-import ru.javazen.telegram.bot.Bot;
 import ru.javazen.telegram.bot.entity.request.Update;
 import ru.javazen.telegram.bot.service.MessageHelper;
 import ru.javazen.telegram.bot.service.TelegramBotService;
@@ -15,18 +14,23 @@ import java.util.stream.Collectors;
 
 public class ChoiceMaker implements UpdateHandler{
     private static final String OPTIONS_GROUP_NAME = "options";
+    private static final BiFunction<Update, String, String> DUMP_PROCESSOR = (udp, str) -> str;
 
     @Autowired
     private TelegramBotService botService;
 
     private Pattern pattern;
     private String splitPattern;
-    private Comparator<String> comparator;
+    private Comparator<String> comparator = Comparator.naturalOrder();
     private List<String> options;
-    private List<BiFunction<Update, String, String>> preprocessors;
+    private BiFunction<Update, String, String> processorsChain = DUMP_PROCESSOR;
 
     public void setPreprocessors(List<BiFunction<Update, String, String>> preprocessors) {
-        this.preprocessors = preprocessors;
+        this.processorsChain = preprocessors
+                .stream()
+                .reduce((p1, p2) ->
+                    (upd, str) -> p1.apply(upd,p2.apply(upd, str)))
+                .orElse(DUMP_PROCESSOR);
     }
 
     @Required
@@ -39,7 +43,6 @@ public class ChoiceMaker implements UpdateHandler{
         this.splitPattern = splitPattern;
     }
 
-    @Required
     public void setComparator(Comparator<String> comparator) {
         this.comparator = comparator;
     }
@@ -50,28 +53,28 @@ public class ChoiceMaker implements UpdateHandler{
 
     @Override
     public boolean handle(Update update) {
-        String text = update.getMessage().getText();
+        String text = MessageHelper.getActualText(update.getMessage());
         if (text == null) return false;
 
         Matcher matcher = pattern.matcher(text);
         if (!matcher.matches()) return false;
 
-        parseParameters(update, matcher);
-        String choice = makeChoice(update);
-
+        String choice = parseParamsAndMakeChoice(update, matcher);
         if (choice == null) return false;
 
         botService.sendMessage(MessageHelper.answer(update.getMessage(), choice));
         return true;
     }
 
+    private synchronized String parseParamsAndMakeChoice(Update update, Matcher matcher) {
+        parseParameters(update, matcher);
+        return makeChoice(update);
+    }
+
     private String makeChoice(Update update) {
         if (options == null || options.isEmpty()) return null;
 
-        if (preprocessors == null || preprocessors.isEmpty()){
-            return Collections.max(options, getComparator());
-        }
-
+        //KEY = processed option, VALUE = original option
         Map<String, String> processedOptions = options.stream()
                 .collect(Collectors.toMap(
                         o -> process(o, update),
@@ -83,14 +86,11 @@ public class ChoiceMaker implements UpdateHandler{
         return processedOptions.get(choice);
     }
 
-    protected String process(String string, Update update){
-        for (BiFunction<Update, String, String> preprocessor : preprocessors) {
-            string = preprocessor.apply(update, string);
-        }
-        return string;
+    String process(String string, Update update){
+        return processorsChain.apply(update, string);
     }
 
-    protected void parseParameters(Update update, Matcher matcher) {
+    void parseParameters(Update update, Matcher matcher) {
         String optionsGroup = matcher.group(OPTIONS_GROUP_NAME);
         if (optionsGroup == null) return;
         options = Arrays.asList(optionsGroup.split(splitPattern));
