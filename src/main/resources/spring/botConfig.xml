@@ -263,6 +263,82 @@
         </constructor-arg>
     </bean>
 
+    <bean id="secretAndSacred" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filters">
+            <list>
+                <bean class="ru.javazen.telegram.bot.filter.AllowedChatFilter">
+                    <property name="allowedChatIds">
+                        <list>
+                            <value>-1001084636204</value> <!-- Friends without Stas-->
+                            <value>-152877647</value> <!-- Defibrillator -->
+                            <value>97125098</value> <!-- Andrey -->
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="handlers">
+            <list>
+                <ref bean="theAngle" />
+                <ref bean="boysForStas" />
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="boysForStas" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filters">
+            <list>
+                <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
+                    <property name="probability" value="0.9" />
+                </bean>
+                <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                    <property name="pattern" value="[^?a-zа-я]*п[ао]ц[ао]ны[^?a-zа-я]*" />
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.SimpleStickerSender">
+                <property name="sticker" value="CAADAgADrAADWGWJCqKpjTD8hHQzAg" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="theAngle" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filters">
+            <list>
+                <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
+                    <property name="probability" value="0.9" />
+                </bean>
+                <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                    <property name="pattern" value=".*уг(|о)л.*" />
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.SimpleStickerSender">
+                <property name="sticker" value="CAADAgADngADWGWJCk1fdCmruZR4Ag" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="boysForAll" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filters">
+            <list>
+                <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
+                    <property name="probability" value="0.9" />
+                </bean>
+                <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                    <property name="pattern" value="[^?a-zа-я]*п[ао]ц[ао]ны[^?a-zа-я]*" />
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.SimpleStickerSender">
+                <property name="sticker" value="CAADAgADAgQAAhmGAwABdyWcY6kAAYt8Ag" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <bean id="bot" class="ru.javazen.telegram.bot.CompositeBot">
 
         <property name="supportChatId" value="-1001063148517"/>
@@ -284,6 +360,8 @@
                 <!--<ref bean="randomFacePalmModule"/>-->
                 <ref bean="lowLevelJokes"/>
                 <ref bean="songSingerModule"/>
+                <ref bean="secretAndSacred"/>
+                <ref bean="boysForAll"/>
             </list>
         </property>
     </bean>
