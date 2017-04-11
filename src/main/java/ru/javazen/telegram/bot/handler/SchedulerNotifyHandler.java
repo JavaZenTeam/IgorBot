@@ -29,6 +29,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
     private int daysLimit, tasksLimit;
     private String successResponse;
+    private String defaultReturnMessage;
 
     @Override
     public boolean handle(final Update update) {
@@ -127,7 +128,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
         String returnMessage = matcher.group(matcher.groupCount());
         if (returnMessage == null || returnMessage.isEmpty()) {
-            throw new IllegalArgumentException("Message is empty");
+            returnMessage = defaultReturnMessage;
         }
 
         if (!calendarChanged) {
@@ -163,6 +164,10 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
     public void setSuccessResponse(String successResponse) {
         this.successResponse = successResponse;
+    }
+
+    public void setDefaultReturnMessage(String defaultReturnMessage) {
+        this.defaultReturnMessage = defaultReturnMessage;
     }
 
     private static class Parameters {
