@@ -16,6 +16,7 @@ import ru.javazen.telegram.bot.entity.response.SendSticker;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.core.MediaType;
+import java.text.MessageFormat;
 import java.util.Arrays;
 
 import static javax.ws.rs.core.Response.Status.Family.CLIENT_ERROR;
@@ -94,7 +95,7 @@ public class TelegramBotServiceImpl implements TelegramBotService {
 
     private void assertResponse(String method, ClientResponse response) {
         if (Arrays.asList(CLIENT_ERROR, SERVER_ERROR).contains(response.getStatusInfo().getFamily())){
-            String msg = String.format("Calling of Method '%s' returns a response status %s. Response entity: {}",
+            String msg = MessageFormat.format("Call {0} failed with status {1}. Response: %s",
                     method, response.getStatus(), response.getEntity(String.class));
             LOGGER.error(msg);
             throw new RuntimeException(msg);
