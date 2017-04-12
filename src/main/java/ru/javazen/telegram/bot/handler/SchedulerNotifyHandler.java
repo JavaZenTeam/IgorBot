@@ -9,10 +9,13 @@ import ru.javazen.telegram.bot.service.MessageHelper;
 import ru.javazen.telegram.bot.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.service.TelegramBotService;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.springframework.util.StringUtils.isEmpty;
 import static ru.javazen.telegram.bot.service.MessageHelper.answer;
 
 public class SchedulerNotifyHandler implements UpdateHandler {
@@ -51,7 +54,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         }
 
         try {
-            parameters = parseParameters(message);
+            parameters = parseParameters(message, update);
         } catch (RuntimeException e) {
             return false;
         }
@@ -82,7 +85,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         return true;
     }
 
-    private Parameters parseParameters(String message) {
+    private Parameters parseParameters(String message, Update update) {
         String regexp = /* 1 */"( \\d* ?(?:л|лет|г|год|года))?" +
                         /* 2 */"( \\d* ?(?:мес|месяц|месяца|месяцев))?" +
                         /* 3 */"( \\d* ?(?:н|нед|недель|неделю|недели))?" +
@@ -127,7 +130,10 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         }
 
         String returnMessage = matcher.group(matcher.groupCount());
-        if (returnMessage == null || returnMessage.isEmpty()) {
+        if (isEmpty(returnMessage) && update.getMessage().getReplyMessage() != null){
+            returnMessage = MessageHelper.getActualText(update.getMessage().getReplyMessage());
+        }
+        if (isEmpty(returnMessage)) {
             returnMessage = defaultReturnMessage;
         }
 
