@@ -643,5 +643,66 @@
             <value>Лишь для тебя – живу и я под солнцем</value>
             <value>Для тебя</value>
         </list>
+
+        <!-- Lumen -->
+        <!-- Гореть -->
+        <list>
+            <value>Зачем кричать</value>
+            <value>Когда никто не слышит</value>
+            <value>О чем мы говорим...</value>
+
+            <value>Мне кажется</value>
+            <value>Что мы давно не живы</value>
+            <value>Зажглись и потихоньку догорим</value>
+
+            <value>Когда нас много начинается пожар</value>
+            <value>И города похожи</value>
+            <value>На крематорий и базар</value>
+
+            <value>И все привыкли ничего не замечать</value>
+            <value>Когда тебя не слышат</value>
+            <value>Для чего кричать?</value>
+
+            <value>Мы можем помолчать</value>
+            <value>Мы можем петь</value>
+            <value>Стоять или бежать</value>
+            <value>Но все равно гореть</value>
+
+            <value>Огромный синий кит</value>
+            <value>Порвать не может сеть</value>
+            <value>Сдаваться или нет</value>
+            <value>Но все равно гореть</value>
+
+            <value>И снова небо</value>
+            <value>Замыкает на себя</value>
+            <value>Слова и провода</value>
+
+            <value>И снова с неба</value>
+            <value>Проливается на нас</value>
+            <value>Ответы и вода</value>
+
+            <value>И если ты вдруг</value>
+            <value>Начал что-то понимать</value>
+            <value>И от прозрений, захотелось заорать</value>
+
+            <value>Давай кричи</value>
+            <value>Но тебя могут не понять</value>
+            <value>Никто из них не хочет ничего менять</value>
+
+            <value>Мы можем помолчать</value>
+            <value>Мы можем петь</value>
+            <value>Стоять или бежать</value>
+            <value>Но все равно гореть</value>
+
+            <value>Огромный синий кит</value>
+            <value>Порвать не может сеть</value>
+            <value>Сдаваться или нет</value>
+            <value>Но все равно гореть</value>
+
+            <value>Гори но не сжигай</value>
+            <value>Иначе скучно жить...</value>
+
+            <value>Гори но не сжигай, гори.. чтобы.. светить!</value>
+        </list>
     </util:list>
 </beans>
