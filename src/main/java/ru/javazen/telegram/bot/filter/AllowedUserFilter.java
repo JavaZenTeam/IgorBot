@@ -1,6 +1,7 @@
 package ru.javazen.telegram.bot.filter;
 
-import ru.javazen.telegram.bot.entity.request.Update;
+
+import ru.javazen.telegram.bot.entity.Update;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class AllowedUserFilter implements Filter {
 
     @Override
     public boolean check(Update update) {
-        return allowedUserIds.contains(update.getMessage().getFrom().getId());
+        return allowedUserIds.contains(update.getMessage().getFrom().getId().longValue());
     }
 
     public List<Long> getAllowedUserIds() {

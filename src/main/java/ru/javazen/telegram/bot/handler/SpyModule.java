@@ -1,22 +1,16 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.javazen.telegram.bot.Bot;
-import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.entity.response.ForwardMessage;
-import ru.javazen.telegram.bot.service.TelegramBotService;
+import ru.javazen.telegram.bot.BotMethodExecutor;
+import ru.javazen.telegram.bot.entity.Update;
+import ru.javazen.telegram.bot.method.send.ForwardMessage;
 
 public class SpyModule implements UpdateHandler {
-
-    @Autowired
-    private TelegramBotService botService;
 
     private long spyOnChatId;
     private long forwardToChatId;
 
     @Override
-    public boolean handle(Update update) {
-
+    public boolean handle(Update update, BotMethodExecutor executor) {
         if (update.getMessage().getChat().getId() != spyOnChatId) return false;
 
         ForwardMessage forwardMessage = new ForwardMessage();
@@ -24,7 +18,7 @@ public class SpyModule implements UpdateHandler {
         forwardMessage.setMessageId(update.getMessage().getMessageId());
 
         forwardMessage.setChatId(Long.toString(forwardToChatId));
-        botService.forwardMessage(forwardMessage);
+        executor.execute(forwardMessage, Void.class);
 
         return false;
     }

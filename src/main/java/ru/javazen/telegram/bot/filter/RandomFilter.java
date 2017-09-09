@@ -3,7 +3,7 @@ package ru.javazen.telegram.bot.filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.Assert;
-import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.entity.Update;
 
 import java.util.Random;
 

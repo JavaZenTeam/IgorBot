@@ -32,6 +32,9 @@ public class MessageTask {
     @Column(name = "MESSAGE_ID")
     private Long messageId;
 
+    @Column(name = "BOT_NAME")
+    private String botName;
+
     public Long getId() {
         return id;
     }
@@ -96,4 +99,11 @@ public class MessageTask {
         this.messageId = messageId;
     }
 
+    public String getBotName() {
+        return botName;
+    }
+
+    public void setBotName(String botName) {
+        this.botName = botName;
+    }
 }

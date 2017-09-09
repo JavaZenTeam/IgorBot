@@ -1,29 +1,25 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.javazen.telegram.bot.entity.request.Message;
-import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.service.MessageHelper;
-import ru.javazen.telegram.bot.service.TelegramBotService;
+import ru.javazen.telegram.bot.BotMethodExecutor;
+import ru.javazen.telegram.bot.entity.Message;
+import ru.javazen.telegram.bot.entity.Update;
+import ru.javazen.telegram.bot.util.MessageHelper;
 
 public class ReplyLayoutSwitcher implements UpdateHandler {
-
-    @Autowired
-    private TelegramBotService botService;
 
     private String sourceCharSet = "";
     private String targetCharSet = "";
 
     @Override
-    public boolean handle(Update update) {
-        Message replyMessage = update.getMessage().getReplyMessage();
+    public boolean handle(Update update, BotMethodExecutor executor) {
+        Message replyMessage = update.getMessage().getReplyToMessage();
         if (replyMessage == null) return false;
 
         String targetText = MessageHelper.getActualText(replyMessage);
         if (targetText == null) return false;
 
         String result = switchLayout(targetText);
-        botService.sendMessage(MessageHelper.answer(replyMessage, result, true));
+        executor.execute(MessageHelper.answer(replyMessage, result, true), Void.class);
         return true;
     }
 
