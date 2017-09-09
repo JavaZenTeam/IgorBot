@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.filter;
 
-import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.entity.Update;
 
 public interface Filter {
     /**

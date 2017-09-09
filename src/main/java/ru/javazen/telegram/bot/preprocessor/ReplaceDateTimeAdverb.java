@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.preprocessor;
 
-import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.entity.Update;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

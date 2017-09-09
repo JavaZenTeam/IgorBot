@@ -239,8 +239,6 @@
         <constructor-arg name="songs" ref="songs"/>
     </bean>
 
-    <bean id="telegramBotService" class="ru.javazen.telegram.bot.service.TelegramBotServiceImpl" />
-
     <bean id="botName" class="java.lang.String">
         <constructor-arg value="IgorBot"/>
     </bean>
@@ -340,7 +338,14 @@
         </constructor-arg>
     </bean>
 
+    <bean id="service" class="ru.javazen.telegram.bot.TelegramServiceImpl" />
+
+    <bean id="provider" class="ru.javazen.telegram.bot.longpolling.LongPollingUpdateProvider" />
+
     <bean id="bot" class="ru.javazen.telegram.bot.CompositeBot">
+        <constructor-arg name="name" value="${bot.name}"/>
+        <constructor-arg name="token" value="${bot.token}"/>
+        <constructor-arg name="telegramService" ref="service"/>
 
         <property name="supportChatId" value="-1001063148517"/>
         <property name="updateHandlers">

@@ -3,11 +3,11 @@ package ru.javazen.telegram.bot.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
-import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.BotMethodExecutor;
+import ru.javazen.telegram.bot.entity.Update;
 import ru.javazen.telegram.bot.model.MessageTask;
-import ru.javazen.telegram.bot.service.MessageHelper;
 import ru.javazen.telegram.bot.service.MessageSchedulerService;
-import ru.javazen.telegram.bot.service.TelegramBotService;
+import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -16,12 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.springframework.util.StringUtils.isEmpty;
-import static ru.javazen.telegram.bot.service.MessageHelper.answer;
+
 
 public class SchedulerNotifyHandler implements UpdateHandler {
-
-    @Autowired
-    private TelegramBotService botService;
 
     @Autowired
     private MessageSchedulerService messageSchedulerService;
@@ -35,7 +32,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     private String defaultReturnMessage;
 
     @Override
-    public boolean handle(final Update update) {
+    public boolean handle(Update update, BotMethodExecutor executor) {
         String message = MessageHelper.getActualText(update.getMessage());
         if (message == null || message.isEmpty()) {
             return false;
@@ -64,18 +61,18 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
         if (parameters.getDate().compareTo(calendar.getTime()) > 0) {
-            botService.sendMessage(answer(update.getMessage(), "Так долго я помнить не смогу, сорри", true));
+            executor.execute(MessageHelper.answer(update.getMessage(), "Так долго я помнить не смогу, сорри", true), Void.class);
             return true;
         }
 
         /*userTasks.computeIfPresent(userId, (key, val) -> val + 1);*/
-        botService.sendMessage(answer(update.getMessage(), successResponse));
+        executor.execute(MessageHelper.answer(update.getMessage(), successResponse), Void.class);
 
         MessageTask task = new MessageTask();
         task.setChatId(update.getMessage().getChat().getId());
-        task.setMessageId(update.getMessage().getMessageId());
+        task.setMessageId(update.getMessage().getMessageId().longValue());
         task.setUserId(userId);
-        task.setReplyMessageId(update.getMessage().getMessageId());
+        task.setReplyMessageId(update.getMessage().getMessageId().longValue());
         task.setScheduledText(parameters.getMessage());
         task.setTimeOfCompletion(parameters.getDate().getTime());
 
@@ -130,8 +127,8 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         }
 
         String returnMessage = matcher.group(matcher.groupCount());
-        if (isEmpty(returnMessage) && update.getMessage().getReplyMessage() != null){
-            returnMessage = MessageHelper.getActualText(update.getMessage().getReplyMessage());
+        if (isEmpty(returnMessage) && update.getMessage().getReplyToMessage() != null){
+            returnMessage = MessageHelper.getActualText(update.getMessage().getReplyToMessage());
         }
         if (isEmpty(returnMessage)) {
             returnMessage = defaultReturnMessage;

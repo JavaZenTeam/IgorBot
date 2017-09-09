@@ -1,7 +1,7 @@
 package ru.javazen.telegram.bot.filter;
 
-import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.service.MessageHelper;
+import ru.javazen.telegram.bot.entity.Update;
+import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.regex.Pattern;
 

@@ -13,6 +13,8 @@
 
     <bean class="ru.javazen.telegram.bot.config.RepositoryConfiguration"/>
 
+    <bean class="ru.javazen.telegram.bot.config.ServiceConfig"/>
+
     <bean class="ru.javazen.telegram.bot.AppConfig"/>
 
     <import resource="botConfig.xml"/>

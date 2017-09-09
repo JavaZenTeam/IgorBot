@@ -1,8 +1,8 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.Bot;
-import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.BotMethodExecutor;
+import ru.javazen.telegram.bot.entity.Update;
 
 public interface UpdateHandler {
-    boolean handle(Update update);
+    boolean handle(Update update, BotMethodExecutor executor);
 }

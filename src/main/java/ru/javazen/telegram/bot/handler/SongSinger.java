@@ -1,17 +1,11 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.javazen.telegram.bot.Bot;
-import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.BotMethodExecutor;
+import ru.javazen.telegram.bot.entity.Update;
 import ru.javazen.telegram.bot.service.SongRepository;
-import ru.javazen.telegram.bot.service.TelegramBotService;
-
-import static ru.javazen.telegram.bot.service.MessageHelper.answer;
+import ru.javazen.telegram.bot.util.MessageHelper;
 
 public class SongSinger implements UpdateHandler{
-
-    @Autowired
-    private TelegramBotService botService;
 
     private SongRepository repository;
     private SongRepository.SongLine lastSongLine;
@@ -21,7 +15,7 @@ public class SongSinger implements UpdateHandler{
     }
 
     @Override
-    public boolean handle(Update update) {
+    public boolean handle(Update update, BotMethodExecutor executor) {
         String string = update.getMessage().getText();
         if (string == null) return false;
 
@@ -29,7 +23,7 @@ public class SongSinger implements UpdateHandler{
 
         if (songLine == null || songLine.getNextLine() == null) return false;
 
-        sendSongLine(update, songLine.getNextLine());
+        sendSongLine(update, songLine.getNextLine(), executor);
         return true;
     }
 
@@ -44,10 +38,10 @@ public class SongSinger implements UpdateHandler{
         return songLine;
     }
 
-    private void sendSongLine(Update update, SongRepository.SongLine songLine) {
+    private void sendSongLine(Update update, SongRepository.SongLine songLine, BotMethodExecutor executor) {
         if (songLine.getNextLine() != null)
             lastSongLine = songLine;
 
-        botService.sendMessage(answer(update.getMessage(), songLine.getString()));
+        executor.execute(MessageHelper.answer(update.getMessage(), songLine.getString()), Void.class);
     }
 }

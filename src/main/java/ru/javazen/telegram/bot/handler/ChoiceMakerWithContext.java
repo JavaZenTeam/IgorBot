@@ -1,7 +1,7 @@
 package ru.javazen.telegram.bot.handler;
 
 import ru.javazen.telegram.bot.comparator.ContextWrapperComparator;
-import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.entity.Update;
 
 import java.util.Comparator;
 import java.util.regex.Matcher;
