@@ -1,6 +1,7 @@
 package ru.javazen.telegram.bot.filter;
 
-import ru.javazen.telegram.bot.entity.request.Update;
+
+import ru.javazen.telegram.bot.entity.Update;
 
 import java.util.ArrayList;
 import java.util.List;

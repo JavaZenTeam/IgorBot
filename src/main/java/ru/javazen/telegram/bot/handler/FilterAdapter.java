@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.entity.request.Update;
+import ru.javazen.telegram.bot.BotMethodExecutor;
 import ru.javazen.telegram.bot.filter.Filter;
 
 import java.util.Collections;
@@ -28,8 +28,8 @@ public class FilterAdapter implements UpdateHandler {
     }
 
     @Override
-    public boolean handle(Update update) {
+    public boolean handle(ru.javazen.telegram.bot.entity.Update update, BotMethodExecutor executor) {
         return filters.stream().allMatch(f -> f != null && f.check(update)) &&
-                handlers.stream().anyMatch(h -> h.handle(update));
+                handlers.stream().anyMatch(h -> h.handle(update, executor));
     }
 }

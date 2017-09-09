@@ -1,6 +1,7 @@
 package ru.javazen.telegram.bot.preprocessor;
 
-import ru.javazen.telegram.bot.entity.request.Update;
+
+import ru.javazen.telegram.bot.entity.Update;
 
 import java.util.List;
 import java.util.function.BiFunction;

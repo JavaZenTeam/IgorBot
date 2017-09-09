@@ -2,24 +2,23 @@ package ru.javazen.telegram.bot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.entity.response.ParseMode;
-import ru.javazen.telegram.bot.entity.response.SendMessage;
+import ru.javazen.telegram.bot.entity.Update;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
-import ru.javazen.telegram.bot.service.TelegramBotService;
+import ru.javazen.telegram.bot.method.send.SendMessage;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class CompositeBot implements Bot {
+public class CompositeBot extends AbsTelegramBot {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeBot.class);
-
-    @Autowired
-    private TelegramBotService service;
 
     private Collection<UpdateHandler> updateHandlers = new ArrayList<>();
     private Long supportChatId;
+
+    public CompositeBot(String name, TelegramService telegramService, String token) {
+        super(name, telegramService, token);
+    }
 
     public void setUpdateHandlers(Collection<UpdateHandler> updateHandlers) {
         this.updateHandlers.clear();
@@ -30,31 +29,38 @@ public class CompositeBot implements Bot {
         this.supportChatId = supportChatId;
     }
 
+    @PostConstruct
     public void onStart() {
         if (supportChatId != null){
-            getService().sendMessage(new SendMessage(supportChatId, "Start successfully"));
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(supportChatId.toString());
+            sendMessage.setText("ПРЕКЛОНИТЕСЬ ПРЕДО МНОЙ");
+            getBotMethodExecutor().execute(sendMessage, Void.class);
         }
     }
 
-    public void onUpdate(Update update) {
+    @Override
+    public void handleUpdate(Update update) {
+
+        if(update.getMessage() == null) { return; }
         try {
             for (UpdateHandler handler : updateHandlers){
-                if (handler.handle(update)) return;
+                if (handler.handle(update, getBotMethodExecutor())) return;
             }
             LOGGER.debug("This update is not handled: {}", update);
         } catch (Exception e){
             LOGGER.error("Error on handling update", e);
             if (supportChatId != null){
                 StackTraceElement[] st = e.getStackTrace();
+
+                SendMessage sendMessage = new SendMessage();
+                sendMessage.setChatId(supportChatId.toString());
+
                 String message = String.format("*Error!*\n%s\n```%s\n%s\n%s```", e, st[0], st[1], st[2]);
-                SendMessage msg = new SendMessage(supportChatId, message);
-                msg.setParseMode(ParseMode.MARKDOWN);
-                getService().sendMessage(msg);
+                sendMessage.setText(message);
+                sendMessage.setParseMode("MARKDOWN");
+                getBotMethodExecutor().execute(sendMessage, Void.class);
             }
         }
-    }
-
-    public TelegramBotService getService() {
-        return service;
     }
 }

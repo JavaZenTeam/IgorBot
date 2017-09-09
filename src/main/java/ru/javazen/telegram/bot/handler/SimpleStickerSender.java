@@ -1,26 +1,20 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.javazen.telegram.bot.Bot;
-import ru.javazen.telegram.bot.entity.request.Update;
-import ru.javazen.telegram.bot.entity.response.SendSticker;
-import ru.javazen.telegram.bot.service.TelegramBotService;
+import ru.javazen.telegram.bot.BotMethodExecutor;
+import ru.javazen.telegram.bot.entity.Update;
+import ru.javazen.telegram.bot.method.send.SendSticker;
 
 public class SimpleStickerSender implements UpdateHandler {
-
-    @Autowired
-    private TelegramBotService botService;
 
     private String sticker;
 
     @Override
-    public boolean handle(Update update) {
+    public boolean handle(Update update, BotMethodExecutor executor) {
         SendSticker sendSticker = new SendSticker();
-        sendSticker.setChatId(update.getMessage().getChat().getId());
+        sendSticker.setChatId(update.getMessage().getChat().getId().toString());
         sendSticker.setSticker(sticker);
 
-        botService.sendSticker(sendSticker);
-
+        executor.execute(sendSticker, Void.class);
         return true;
     }
 
