@@ -704,5 +704,50 @@
 
             <value>Гори но не сжигай, гори.. чтобы.. светить!</value>
         </list>
+        <!-- Олег Анофриев -->
+        <!-- Есть только миг -->
+        <list>
+            <value>Призрачно всё</value>
+            <value>В этом мире бушующем</value>
+            <value>Есть только миг</value>
+            <value>За него и держись</value>
+            <value>Есть только миг</value>
+            <value>Между прошлым и будущим</value>
+            <value>Именно он</value>
+            <value>Называется жизнь</value>
+            <value>Вечный покой</value>
+            <value>Сердце вряд ли обрадует</value>
+            <value>Вечный покой</value>
+            <value>Для седых пирамид</value>
+            <value>А для звезды</value>
+            <value>Что сорвалась и падает</value>
+            <value>Есть только миг</value>
+            <value>Ослепительный миг</value>
+            <value>А для звезды</value>
+            <value>Что сорвалась и падает</value>
+            <value>Есть только миг</value>
+            <value>Ослепительный миг</value>
+            <value>Пусть этот мир вдаль</value>
+            <value>Летит сквозь столетия</value>
+            <value>Но не всегда</value>
+            <value>По дороге мне с ним</value>
+            <value>Чем дорожу</value>
+            <value>Чем рискую на свете я</value>
+            <value>Мигом одним</value>
+            <value>Только мигом одним</value>
+            <value>Счастье дано</value>
+            <value>Повстречать иль беду ещё</value>
+            <value>Есть только миг</value>
+            <value>За него и держись</value>
+            <value>Есть только миг</value>
+            <value>Между прошлым и будущим</value>
+            <value>Именно он</value>
+            <value>Называется жизнь</value>
+            <value>Есть только миг</value>
+            <value>Между прошлым и будущим</value>
+            <value>Именно он</value>
+            <value>Называется жизнь</value>
+
+        </list>
     </util:list>
 </beans>
