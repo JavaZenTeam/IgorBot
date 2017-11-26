@@ -171,7 +171,9 @@
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
-            <bean class="ru.javazen.telegram.bot.handler.UpdateInfoProvider"/>
+            <bean class="ru.javazen.telegram.bot.handler.UpdateInfoProvider">
+                <property name="invalidPathMessage" value="не понял"/>
+            </bean>
         </constructor-arg>
     </bean>
 
