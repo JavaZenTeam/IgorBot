@@ -4,6 +4,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.javazen.telegram.bot.BotMethodExecutor;
+import ru.javazen.telegram.bot.entity.Message;
 import ru.javazen.telegram.bot.entity.Update;
 import ru.javazen.telegram.bot.method.send.SendMessage;
 import ru.javazen.telegram.bot.util.MessageHelper;
@@ -21,10 +22,11 @@ public class UpdateInfoProvider implements UpdateHandler {
     @Override
     public boolean handle(Update update, BotMethodExecutor executor) {
         try {
-            String text = MessageHelper.getActualText(update.getMessage());
-            Object requestedEntity = text.split(" ").length > 1
-                    ? resolveEntity(update, text.split(" ")[1])
-                    : update;
+            Message replyToMessage = update.getMessage().getReplyToMessage();
+            Object requestedEntity = replyToMessage == null ? update : replyToMessage;
+
+            String[] args = MessageHelper.getActualText(update.getMessage()).split(" ");
+            if (args.length > 1) requestedEntity = resolveEntity(requestedEntity, args[1]);
 
             String answer = mapper.writeValueAsString(requestedEntity);
             SendMessage message = MessageHelper.answer(update.getMessage(), "```" + answer + "```");
