@@ -3,7 +3,6 @@ package ru.javazen.telegram.bot.handler;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.javazen.telegram.bot.BotMethodExecutorStub;
 import ru.javazen.telegram.bot.entity.*;
@@ -15,13 +14,13 @@ import java.util.Collections;
 
 public class UpdateInfoProviderTest {
     private static final String INVALID_PATH_MESSAGE = "invalid";
-    private static Update update;
-    private static BotMethodExecutorStub botMethodExecutor;
-    private static ObjectMapper mapper;
+    private Update update;
+    private BotMethodExecutorStub botMethodExecutor;
+    private ObjectMapper mapper;
     private UpdateInfoProvider updateInfoProvider;
 
-    @BeforeClass
-    public static void setUpStatic() throws Exception {
+    @Before
+    public void setUpStatic() throws Exception {
         botMethodExecutor = new BotMethodExecutorStub();
         mapper = new ObjectMapper();
 
@@ -39,13 +38,6 @@ public class UpdateInfoProviderTest {
         chat.setType(Chat.SUPERGROUP_CHAT_TYPE);
         chat.setTitle("My Chat");
         message.setChat(chat);
-        Message replyToMessage = new Message();
-        replyToMessage.setMessageId(777770);
-        replyToMessage.setFrom(from);
-        replyToMessage.setDate(1511723066);
-        replyToMessage.setChat(chat);
-        replyToMessage.setText("replyToMessage text");
-        message.setReplyToMessage(replyToMessage);
         message.setText("");
         MessageEntity messageEntity = new MessageEntity();
         messageEntity.setType(MessageEntity.BOT_COMMAND_TYPE);
@@ -53,15 +45,10 @@ public class UpdateInfoProviderTest {
         messageEntity.setLength(5);
         message.setEntities(Collections.singletonList(messageEntity));
         update.setMessage(message);
-    }
 
-    @Before
-    public void setUp() throws Exception {
-        botMethodExecutor.execute(null, null);
         updateInfoProvider = new UpdateInfoProvider();
         updateInfoProvider.setMapper(mapper);
         updateInfoProvider.setInvalidPathMessage(INVALID_PATH_MESSAGE);
-        update.getMessage().setText("");
     }
 
     @Test
@@ -70,8 +57,32 @@ public class UpdateInfoProviderTest {
     }
 
     @Test
+    public void handleReply() throws Exception {
+        Message replyToMessage = new Message();
+        replyToMessage.setMessageId(777770);
+        replyToMessage.setFrom(update.getMessage().getFrom());
+        replyToMessage.setDate(1511723066);
+        replyToMessage.setChat(update.getMessage().getChat());
+        replyToMessage.setText("replyToMessage text");
+        update.getMessage().setReplyToMessage(replyToMessage);
+
+        testSuccess("/info", replyToMessage);
+    }
+
+    @Test
     public void handlePathEntity() throws Exception {
         testSuccess("/info message.chat", update.getMessage().getChat());
+    }
+
+    @Test
+    public void handleReplyPath() throws Exception {
+        Message replyToMessage = new Message();
+        replyToMessage.setMessageId(777770);
+        replyToMessage.setChat(update.getMessage().getChat());
+        replyToMessage.setText("replyToMessage text");
+        update.getMessage().setReplyToMessage(replyToMessage);
+
+        testSuccess("/info chat", replyToMessage.getChat());
     }
 
     @Test
