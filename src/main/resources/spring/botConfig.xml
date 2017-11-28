@@ -241,6 +241,19 @@
         <constructor-arg name="songs" ref="songs"/>
     </bean>
 
+    <bean id="anniversaryMessageCongratulations" class="ru.javazen.telegram.bot.handler.AnniversaryMessageCongratulations">
+        <property name="messageIdPattern" value="\d0{3,}"/>
+        <property name="templates">
+            <list>
+                <value>Achievement Get! {0} сообщений в чате</value>
+                <value>Это было сообщение номер {0}. Здорово, правда?!</value>
+                <value>Опа, а у нас тут уже {0} сообщений</value>
+                <value>В этом чате {0} сообщений уже. Одумайтесь!</value>
+                <value>Вы стали автором {0}-ого сообщения в этом чате! Можете 2 раза улыбнуться</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="botName" class="java.lang.String">
         <constructor-arg value="IgorBot"/>
     </bean>
@@ -352,6 +365,7 @@
         <property name="supportChatId" value="-1001063148517"/>
         <property name="updateHandlers">
             <list>
+                <ref bean="anniversaryMessageCongratulations"/>
                 <ref bean="pinnedForwarder"/>
                 <ref bean="scheduler"/>
                 <ref bean="updateInfoProvider"/>
