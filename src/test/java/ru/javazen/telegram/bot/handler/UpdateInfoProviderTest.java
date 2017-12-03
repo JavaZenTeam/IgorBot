@@ -128,6 +128,6 @@ public class UpdateInfoProviderTest {
         Assert.assertTrue(apiMethod instanceof SendMessage);
         SendMessage sendMessage = (SendMessage) apiMethod;
         Assert.assertEquals(update.getMessage().getChat().getId().toString(), sendMessage.getChatId());
-        Assert.assertEquals(mapper.writeValueAsString(expected), sendMessage.getText().substring(3, sendMessage.getText().length() - 3));
+        Assert.assertEquals(mapper.writeValueAsString(expected), sendMessage.getText().substring(4, sendMessage.getText().length() - 3));
     }
 }

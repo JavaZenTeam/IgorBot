@@ -56,7 +56,7 @@ public class CompositeBot extends AbsTelegramBot {
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(supportChatId.toString());
 
-                String message = String.format("*Error!*\n%s\n```%s\n%s\n%s```", e, st[0], st[1], st[2]);
+                String message = String.format("*Error!*\n%s\n```\n%s\n%s\n%s```", e, st[0], st[1], st[2]);
                 sendMessage.setText(message);
                 sendMessage.setParseMode("MARKDOWN");
                 getBotMethodExecutor().execute(sendMessage, Void.class);

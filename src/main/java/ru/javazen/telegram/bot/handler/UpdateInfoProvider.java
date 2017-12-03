@@ -29,7 +29,7 @@ public class UpdateInfoProvider implements UpdateHandler {
             if (args.length > 1) requestedEntity = resolveEntity(requestedEntity, args[1]);
 
             String answer = mapper.writeValueAsString(requestedEntity);
-            SendMessage message = MessageHelper.answer(update.getMessage(), "```" + answer + "```");
+            SendMessage message = MessageHelper.answer(update.getMessage(), "```\n" + answer + "```");
             message.setParseMode("MARKDOWN");
             executor.execute(message, Void.class);
             return true;
