@@ -9,12 +9,13 @@ public class ContinueRepeatableSequence implements UpdateHandler {
 
     @Override
     public boolean handle(Update update, BotMethodExecutor executor) {
-        if (lastUpdate != null){
-            boolean textEquals = update.getMessage().getText().equals(lastUpdate.getMessage().getText());
+        String text = update.getMessage().getText();
+        if (lastUpdate != null && text != null){
+            boolean textEquals = text.equals(lastUpdate.getMessage().getText());
             boolean fromEquals = update.getMessage().getFrom().getId().equals(lastUpdate.getMessage().getFrom().getId());
 
             if (textEquals && !fromEquals){
-                executor.execute(MessageHelper.answer(update.getMessage(), update.getMessage().getText()), Void.class);
+                executor.execute(MessageHelper.answer(update.getMessage(), text), Void.class);
                 return true;
             }
         }
