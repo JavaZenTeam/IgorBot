@@ -257,7 +257,9 @@
     <bean id="continueRepeatableSequenceModule" class="ru.javazen.telegram.bot.handler.InstanceForChatController">
         <lookup-method name="newInstance" bean="continueRepeatableSequenceHandler"/>
     </bean>
-    <bean id="continueRepeatableSequenceHandler" class="ru.javazen.telegram.bot.handler.ContinueRepeatableSequence"/>
+    <bean id="continueRepeatableSequenceHandler"
+          class="ru.javazen.telegram.bot.handler.ContinueRepeatableSequence"
+          scope="prototype"/>
 
     <bean id="botName" class="java.lang.String">
         <constructor-arg value="IgorBot"/>
