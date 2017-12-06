@@ -328,10 +328,10 @@
         <constructor-arg name="filters">
             <list>
                 <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
-                    <property name="probability" value="0.9" />
+                    <property name="probability" value="0.2" />
                 </bean>
                 <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                    <property name="pattern" value=".*уг(|о)л.*" />
+                    <property name="pattern" value="(.*угл.*)|(.*угол.*)" />
                 </bean>
             </list>
         </constructor-arg>
