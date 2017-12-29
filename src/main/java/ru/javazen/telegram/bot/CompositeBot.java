@@ -8,10 +8,12 @@ import ru.javazen.telegram.bot.method.send.SendMessage;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class CompositeBot extends AbsTelegramBot {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeBot.class);
+    private static final String ROOT_PACKAGE_NAME = CompositeBot.class.getPackage().getName();
 
     private Collection<UpdateHandler> updateHandlers = new ArrayList<>();
     private Long supportChatId;
@@ -51,12 +53,16 @@ public class CompositeBot extends AbsTelegramBot {
         } catch (Exception e){
             LOGGER.error("Error on handling update", e);
             if (supportChatId != null){
-                StackTraceElement[] st = e.getStackTrace();
+                String stackTraceString = Arrays.stream(e.getStackTrace())
+                        .filter(el -> el.getClass().getName().startsWith(ROOT_PACKAGE_NAME))
+                        .findFirst()
+                        .orElse(e.getStackTrace()[0])
+                        .toString();
 
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(supportChatId.toString());
 
-                String message = String.format("*Error!*\n%s\n```\n%s\n%s\n%s```", e, st[0], st[1], st[2]);
+                String message = String.format("*Error!*\n%s\n```%s```", e, stackTraceString);
                 sendMessage.setText(message);
                 sendMessage.setParseMode("MARKDOWN");
                 getBotMethodExecutor().execute(sendMessage, Void.class);
