@@ -55,8 +55,6 @@ public class CompositeBot extends AbsTelegramBot {
             if (supportChatId != null){
                 String stackTraceString = Arrays.stream(e.getStackTrace())
                         .filter(el -> el.getClass().getName().startsWith(ROOT_PACKAGE_NAME))
-                        .findFirst()
-                        .orElse(e.getStackTrace()[0])
                         .toString();
 
                 SendMessage sendMessage = new SendMessage();
