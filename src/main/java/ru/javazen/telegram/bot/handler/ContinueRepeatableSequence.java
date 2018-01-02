@@ -8,14 +8,14 @@ import ru.javazen.telegram.bot.method.send.SendMessage;
 import ru.javazen.telegram.bot.method.send.SendSticker;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 public class ContinueRepeatableSequence implements UpdateHandler {
     private static final int BUFFER_SIZE = 5;
-    private Queue<Message> messageQueue = new LinkedList<>();
+    private final Queue<Message> messageQueue = new ConcurrentLinkedQueue<>();
 
     @Override
     public boolean handle(Update update, BotMethodExecutor executor) {
