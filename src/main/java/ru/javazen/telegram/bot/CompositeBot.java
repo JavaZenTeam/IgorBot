@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class CompositeBot extends AbsTelegramBot {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeBot.class);
@@ -54,13 +55,14 @@ public class CompositeBot extends AbsTelegramBot {
             LOGGER.error("Error on handling update", e);
             if (supportChatId != null){
                 String stackTraceString = Arrays.stream(e.getStackTrace())
-                        .filter(el -> el.getClass().getName().startsWith(ROOT_PACKAGE_NAME))
-                        .toString();
+                        .filter(el -> el.getClassName().startsWith(ROOT_PACKAGE_NAME))
+                        .map(StackTraceElement::toString)
+                        .collect(Collectors.joining("\n"));
 
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(supportChatId.toString());
 
-                String message = String.format("*Error!*\n%s\n```%s```", e, stackTraceString);
+                String message = String.format("*Error!*\n%s\n```\n%s```", e, stackTraceString);
                 sendMessage.setText(message);
                 sendMessage.setParseMode("MARKDOWN");
                 getBotMethodExecutor().execute(sendMessage, Void.class);
