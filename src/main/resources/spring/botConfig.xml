@@ -261,6 +261,11 @@
           class="ru.javazen.telegram.bot.handler.ContinueRepeatableSequence"
           scope="prototype"/>
 
+    <bean id="counter" class="ru.javazen.telegram.bot.handler.Counter">
+        <property name="pattern" value="и+го+рь,? считай( от (?&lt;from&gt;-?\d+)|)( до (?&lt;to&gt;-?\d+)|)"/>
+        <property name="errorMessage" value="сам считай"/>
+    </bean>
+
     <bean id="botName" class="java.lang.String">
         <constructor-arg value="IgorBot"/>
     </bean>
@@ -386,6 +391,7 @@
                 <ref bean="choiceMaker"/>
                 <ref bean="doNotKnowAnswerModule"/>
                 <ref bean="randomYesNoAnswerModule"/>
+                <ref bean="counter"/>
                 <ref bean="getStickerByIdModule"/>
                 <!--<ref bean="randomFacePalmModule"/>-->
                 <ref bean="lowLevelJokes"/>
