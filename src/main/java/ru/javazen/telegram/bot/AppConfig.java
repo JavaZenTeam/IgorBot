@@ -14,6 +14,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 import ru.javazen.telegram.bot.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.service.impl.MessageSchedulerServiceImpl;
@@ -68,6 +71,11 @@ public class AppConfig {
     @Bean
     public Function<String, String> songEncoder(){
         return s -> doubleMetaphone().encode(Junidecode.unidecode(s));
+    }
+
+    @Bean
+    public TaskScheduler taskScheduler(){
+        return new ConcurrentTaskScheduler();
     }
 
     @Bean
