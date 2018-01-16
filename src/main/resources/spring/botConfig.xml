@@ -7,7 +7,7 @@
 
     <import resource="processors.xml"/>
     <import resource="songs.xml"/>
-    
+
     <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
@@ -148,10 +148,15 @@
     </bean>
 
     <bean id="headOfDickDetector" class="ru.javazen.telegram.bot.handler.FilterAdapter">
-        <constructor-arg name="filter">
-            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="[^a-zа-я]*(й+а+|я+)[^a-zа-я]*"/>
-            </bean>
+        <constructor-arg name="filters">
+            <list>
+                <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                    <property name="pattern" value="[^a-zа-я]*(й+а+|я+)[^a-zа-я]*"/>
+                </bean>
+                <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
+                    <property name="probability" value="0.66"/>
+                </bean>
+            </list>
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.SimpleAnswer">
@@ -365,6 +370,31 @@
         </constructor-arg>
     </bean>
 
+    <!--Subscription Module-->
+    <bean id="subscriptionListen" class="ru.javazen.telegram.bot.handler.subscriptions.ListenSubscriptionKeysHandler">
+    </bean>
+    <bean id="subscriptionCreate" class="ru.javazen.telegram.bot.handler.subscriptions.CreateSubscriptionHandler">
+        <property name="pattern" value="и+го+рь,? к[оа]гда (?&lt;userFlag&gt;у меня |я )?(?&lt;trigger&gt;.+),? (г[оа]вори|ск[оа]ж[иы]) (?&lt;response&gt;.+)"/>
+        <property name="successResponse" value="ок"/>
+    </bean>
+    <bean id="subscriptionGet" class="ru.javazen.telegram.bot.handler.subscriptions.GetSubscriptionsByKeyHandler">
+        <property name="pattern" value="и+го+рь,? [чш]т?[ое] ск[оа]ж[еи]шь?,? есл[еи] (?&lt;trigger&gt;.+)\??"/>
+        <property name="onEmptyResponse" value="ничего("/>
+    </bean>
+    <bean id="subscriptionCancel" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="(з[ао]+(в[ао]ли|ткнись|мол(кн|ч)и)|ш[ао]+т[ао]+п)"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.subscriptions.CancelSubscriptionHandler">
+                <property name="successResponse" value="ок("/>
+                <property name="failedResponse" value="ты вообще об чем?"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <bean id="service" class="ru.javazen.telegram.bot.TelegramServiceImpl" />
 
     <bean id="provider" class="ru.javazen.telegram.bot.longpolling.LongPollingUpdateProvider" />
@@ -380,6 +410,10 @@
                 <ref bean="anniversaryMessageCongratulations"/>
                 <ref bean="pinnedForwarder"/>
                 <ref bean="continueRepeatableSequenceModule"/>
+                <ref bean="subscriptionCreate"/>
+                <ref bean="subscriptionGet"/>
+                <ref bean="subscriptionCancel"/>
+                <ref bean="subscriptionListen"/>
                 <ref bean="scheduler"/>
                 <ref bean="updateInfoProvider"/>
                 <ref bean="replyLayoutSwitcherModuleRus"/>
