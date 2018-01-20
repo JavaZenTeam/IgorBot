@@ -374,23 +374,22 @@
     <bean id="subscriptionListen" class="ru.javazen.telegram.bot.handler.subscriptions.ListenSubscriptionKeysHandler">
     </bean>
     <bean id="subscriptionCreate" class="ru.javazen.telegram.bot.handler.subscriptions.CreateSubscriptionHandler">
-        <property name="pattern" value="и+го+рь,? к[оа]гда (?&lt;userFlag&gt;у меня |я )?(?&lt;trigger&gt;.+),? (г[оа]вори|ск[оа]ж[иы]) (?&lt;response&gt;.+)"/>
+        <property name="pattern" value="и+го+рь,? (к[оа]гда|есл?[еи]) (?&lt;userFlag&gt;у меня |я )?(?&lt;trigger&gt;.+?),? (г[оа]вори|ск[оа]ж[иы]) (?&lt;response&gt;.+)"/>
         <property name="successResponse" value="ок"/>
     </bean>
     <bean id="subscriptionGet" class="ru.javazen.telegram.bot.handler.subscriptions.GetSubscriptionsByKeyHandler">
-        <property name="pattern" value="и+го+рь,? [чш]т?[ое] ск[оа]ж[еи]шь?,? есл[еи] (?&lt;trigger&gt;.+)\??"/>
+        <property name="pattern" value="и+го+рь,? [чш]т?[ое] ск[оа]ж[еи]шь?,? (к[оа]гда|есл?[еи]) (?&lt;trigger&gt;.+)\??"/>
         <property name="onEmptyResponse" value="ничего("/>
     </bean>
     <bean id="subscriptionCancel" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="(з[ао]+(в[ао]ли|ткнись|мол(кн|ч)и)|ш[ао]+т[ао]+п)"/>
+                <property name="pattern" value="(з[ао]+(в[ао]ли|ткнись|мол(кн|ч)и|бу[дт]ь)|ш[ао]+т[ао]+п|пр[еи]крати|п[еи]р[еи]стань)"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.subscriptions.CancelSubscriptionHandler">
                 <property name="successResponse" value="ок("/>
-                <property name="failedResponse" value="ты вообще об чем?"/>
             </bean>
         </constructor-arg>
     </bean>

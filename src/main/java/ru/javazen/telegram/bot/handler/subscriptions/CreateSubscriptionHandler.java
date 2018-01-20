@@ -2,8 +2,10 @@ package ru.javazen.telegram.bot.handler.subscriptions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.javazen.telegram.bot.BotMethodExecutor;
+import ru.javazen.telegram.bot.entity.Message;
 import ru.javazen.telegram.bot.entity.Update;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.method.send.SendMessage;
 import ru.javazen.telegram.bot.model.MessagePK;
 import ru.javazen.telegram.bot.model.Subscription;
 import ru.javazen.telegram.bot.service.SubscriptionService;
@@ -39,7 +41,9 @@ public class CreateSubscriptionHandler implements UpdateHandler {
 
         subscriptionService.createSubscription(template);
 
-        executor.execute(MessageHelper.answer(update.getMessage(), successResponse), Void.class);
+        SendMessage answer = MessageHelper.answer(update.getMessage(), successResponse);
+        Message m = executor.execute(answer, Message.class);
+        subscriptionService.saveSubscriptionReply(subscriptionPK, m.getMessageId());
         return true;
     }
 
