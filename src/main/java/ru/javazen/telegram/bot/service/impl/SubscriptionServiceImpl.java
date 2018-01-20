@@ -2,7 +2,6 @@ package ru.javazen.telegram.bot.service.impl;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableBiMap;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,10 +55,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public boolean cancelSubscriptionByReply(MessagePK replyMessagePK) {
-        Integer messageId = chatReplies
-                .getOrDefault(replyMessagePK.getChatId(), ImmutableBiMap.of())
-                .remove(replyMessagePK.getMessageId());
-
+        BiMap<Integer, Integer> replies = chatReplies.get(replyMessagePK.getChatId());
+        if (replies == null) return false;
+        Integer messageId = replies.remove(replyMessagePK.getMessageId());
         return messageId != null &&
                 cancelSubscriptionByPK(new MessagePK(replyMessagePK.getChatId(), messageId));
     }

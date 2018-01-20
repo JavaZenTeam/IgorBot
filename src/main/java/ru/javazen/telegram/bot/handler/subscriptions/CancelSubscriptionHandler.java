@@ -11,10 +11,11 @@ import ru.javazen.telegram.bot.util.MessageHelper;
 public class CancelSubscriptionHandler implements UpdateHandler {
     private SubscriptionService subscriptionService;
     private String successResponse = "Canceled Successfully";
-    private String failedResponse = "Subscription not found";
 
     @Override
     public boolean handle(Update update, BotMethodExecutor executor) {
+        if (update.getMessage().getReplyToMessage() == null) return false;
+
         MessagePK messagePK = new MessagePK(
                 update.getMessage().getChat().getId(),
                 update.getMessage().getReplyToMessage().getMessageId());
@@ -22,8 +23,8 @@ public class CancelSubscriptionHandler implements UpdateHandler {
         boolean result = subscriptionService.cancelSubscriptionByPK(messagePK)
                 || subscriptionService.cancelSubscriptionByReply(messagePK);
 
-        String response = result ? successResponse : failedResponse;
-        executor.execute(MessageHelper.answer(update.getMessage(), response), Void.class);
+        if (!result) return false;
+        executor.execute(MessageHelper.answer(update.getMessage(), successResponse), Void.class);
         return true;
     }
 
@@ -34,9 +35,5 @@ public class CancelSubscriptionHandler implements UpdateHandler {
 
     public void setSuccessResponse(String successResponse) {
         this.successResponse = successResponse;
-    }
-
-    public void setFailedResponse(String failedResponse) {
-        this.failedResponse = failedResponse;
     }
 }
