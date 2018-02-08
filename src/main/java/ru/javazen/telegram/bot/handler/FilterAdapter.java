@@ -1,6 +1,8 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.BotMethodExecutor;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.filter.Filter;
 
 import java.util.Collections;
@@ -28,8 +30,14 @@ public class FilterAdapter implements UpdateHandler {
     }
 
     @Override
-    public boolean handle(ru.javazen.telegram.bot.entity.Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender)throws TelegramApiException {
         return filters.stream().allMatch(f -> f != null && f.check(update)) &&
-                handlers.stream().anyMatch(h -> h.handle(update, executor));
+                handlers.stream().anyMatch(h -> {
+                    try {
+                        return h.handle(update, sender);
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 }

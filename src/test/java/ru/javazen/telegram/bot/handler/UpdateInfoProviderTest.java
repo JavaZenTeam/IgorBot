@@ -3,48 +3,57 @@ package ru.javazen.telegram.bot.handler;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import ru.javazen.telegram.bot.BotMethodExecutorStub;
-import ru.javazen.telegram.bot.entity.*;
-import ru.javazen.telegram.bot.method.ApiMethod;
-import ru.javazen.telegram.bot.method.send.SendMessage;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.telegram.telegrambots.api.methods.BotApiMethod;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.*;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.AbsSenderStub;
 
 import java.io.IOException;
 import java.util.Collections;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@Ignore
+@RunWith(PowerMockRunner.class)
 public class UpdateInfoProviderTest {
     private static final String INVALID_PATH_MESSAGE = "invalid";
     private Update update;
-    private BotMethodExecutorStub botMethodExecutor;
+    private AbsSenderStub botMethodExecutor;
     private ObjectMapper mapper;
     private UpdateInfoProvider updateInfoProvider;
 
     @Before
     public void setUpStatic() throws Exception {
-        botMethodExecutor = new BotMethodExecutorStub();
+        botMethodExecutor = new AbsSenderStub();
         mapper = new ObjectMapper();
 
-        update = new Update();
-        update.setUpdateId(5555555);
-        Message message = new Message();
-        message.setMessageId(777777);
-        User from = new User();
-        from.setId(909090909);
-        from.setFirstName("Mr. User");
-        message.setFrom(from);
-        message.setDate(1511723066);
-        Chat chat = new Chat();
-        chat.setId(-7777777777777L);
-        chat.setType(Chat.SUPERGROUP_CHAT_TYPE);
-        chat.setTitle("My Chat");
-        message.setChat(chat);
-        message.setText("");
-        MessageEntity messageEntity = new MessageEntity();
-        messageEntity.setType(MessageEntity.BOT_COMMAND_TYPE);
-        messageEntity.setOffset(0);
-        messageEntity.setLength(5);
-        message.setEntities(Collections.singletonList(messageEntity));
-        update.setMessage(message);
+        update = mock(Update.class);
+        when(update.getUpdateId()).thenReturn(5555555);
+        Message message = mock(Message.class);
+        when(message.getMessageId()).thenReturn(777777);
+        User from = mock(User.class);
+        when(from.getId()).thenReturn(909090909);
+        when(from.getFirstName()).thenReturn("Mr. User");
+        when(message.getFrom()).thenReturn(from);
+        when(message.getDate()).thenReturn(1511723066);
+        Chat chat = mock(Chat.class);
+        when(chat.getId()).thenReturn(-7777777777777L);
+        when(chat.isSuperGroupChat()).thenReturn(true);
+        when(chat.getTitle()).thenReturn("My Chat");
+        when(message.getChat()).thenReturn(chat);
+        when(message.getText()).thenReturn("");
+        MessageEntity messageEntity = mock(MessageEntity.class);
+        when(messageEntity.getType()).thenReturn("bot_command");
+        when(messageEntity.getOffset()).thenReturn(0);
+        when(messageEntity.getLength()).thenReturn(5);
+        when(message.getEntities()).thenReturn(Collections.singletonList(messageEntity));
+        when(update.getMessage()).thenReturn(message);
 
         updateInfoProvider = new UpdateInfoProvider();
         updateInfoProvider.setMapper(mapper);
@@ -58,13 +67,13 @@ public class UpdateInfoProviderTest {
 
     @Test
     public void handleReply() throws Exception {
-        Message replyToMessage = new Message();
-        replyToMessage.setMessageId(777770);
-        replyToMessage.setFrom(update.getMessage().getFrom());
-        replyToMessage.setDate(1511723066);
-        replyToMessage.setChat(update.getMessage().getChat());
-        replyToMessage.setText("replyToMessage text");
-        update.getMessage().setReplyToMessage(replyToMessage);
+        Message replyToMessage = mock(Message.class);
+        when(replyToMessage.getMessageId()).thenReturn(777770);
+        when(replyToMessage.getFrom()).thenReturn(update.getMessage().getFrom());
+        when(replyToMessage.getDate()).thenReturn(1511723066);
+        when(replyToMessage.getChat()).thenReturn(update.getMessage().getChat());
+        when(replyToMessage.getText()).thenReturn("replyToMessage text");
+        when(update.getMessage().getReplyToMessage()).thenReturn(replyToMessage);
 
         testSuccess("/info", replyToMessage);
     }
@@ -76,11 +85,12 @@ public class UpdateInfoProviderTest {
 
     @Test
     public void handleReplyPath() throws Exception {
-        Message replyToMessage = new Message();
-        replyToMessage.setMessageId(777770);
-        replyToMessage.setChat(update.getMessage().getChat());
-        replyToMessage.setText("replyToMessage text");
-        update.getMessage().setReplyToMessage(replyToMessage);
+        Message replyToMessage = mock(Message.class);
+        when(replyToMessage.getMessageId()).thenReturn(777770);
+        Chat chat = update.getMessage().getChat();
+        when(replyToMessage.getChat()).thenReturn(chat);
+        when(replyToMessage.getText()).thenReturn("replyToMessage text");
+        when(update.getMessage().getReplyToMessage()).thenReturn(replyToMessage);
 
         testSuccess("/info chat", replyToMessage.getChat());
     }
@@ -111,20 +121,20 @@ public class UpdateInfoProviderTest {
     }
 
 
-    private void testFailed(String input){
-        update.getMessage().setText(input);
+    private void testFailed(String input) throws TelegramApiException {
+        when(update.getMessage().getText()).thenReturn(input);
         updateInfoProvider.handle(update, botMethodExecutor);
-        ApiMethod apiMethod = botMethodExecutor.getApiMethod();
+        BotApiMethod apiMethod = botMethodExecutor.getApiMethod();
         Assert.assertTrue(apiMethod instanceof SendMessage);
         SendMessage sendMessage = (SendMessage) apiMethod;
         Assert.assertEquals(update.getMessage().getChat().getId().toString(), sendMessage.getChatId());
         Assert.assertEquals(INVALID_PATH_MESSAGE, sendMessage.getText());
     }
 
-    private void testSuccess(String input, Object expected) throws IOException {
-        update.getMessage().setText(input);
+    private void testSuccess(String input, Object expected) throws IOException, TelegramApiException {
+        when(update.getMessage().getText()).thenReturn(input);
         updateInfoProvider.handle(update, botMethodExecutor);
-        ApiMethod apiMethod = botMethodExecutor.getApiMethod();
+        BotApiMethod apiMethod = botMethodExecutor.getApiMethod();
         Assert.assertTrue(apiMethod instanceof SendMessage);
         SendMessage sendMessage = (SendMessage) apiMethod;
         Assert.assertEquals(update.getMessage().getChat().getId().toString(), sendMessage.getChatId());

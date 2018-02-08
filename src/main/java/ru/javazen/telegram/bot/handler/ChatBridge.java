@@ -1,8 +1,10 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Update;
-import ru.javazen.telegram.bot.method.send.ForwardMessage;
+
+import org.telegram.telegrambots.api.methods.ForwardMessage;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 public class ChatBridge implements UpdateHandler {
 
@@ -11,7 +13,7 @@ public class ChatBridge implements UpdateHandler {
     private long secondChat;
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         if (update.getMessage().getChat().getId() != firstChat
                 && update.getMessage().getChat().getId() != secondChat) return false;
 
@@ -22,7 +24,7 @@ public class ChatBridge implements UpdateHandler {
         forwardMessage.setMessageId(update.getMessage().getMessageId());
 
         forwardMessage.setChatId(Long.toString(chatTo));
-        executor.execute(forwardMessage, Void.class);
+        sender.execute(forwardMessage);
 
         return false;
     }

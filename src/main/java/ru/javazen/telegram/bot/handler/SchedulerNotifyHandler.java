@@ -3,8 +3,9 @@ package ru.javazen.telegram.bot.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Update;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.util.MessageHelper;
@@ -32,7 +33,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     private String defaultReturnMessage;
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         String message = MessageHelper.getActualText(update.getMessage());
         if (message == null || message.isEmpty()) {
             return false;
@@ -61,12 +62,12 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
         if (parameters.getDate().compareTo(calendar.getTime()) > 0) {
-            executor.execute(MessageHelper.answer(update.getMessage(), "Так долго я помнить не смогу, сорри", true), Void.class);
+            sender.execute(MessageHelper.answer(update.getMessage(), "Так долго я помнить не смогу, сорри", true));
             return true;
         }
 
         /*userTasks.computeIfPresent(userId, (key, val) -> val + 1);*/
-        executor.execute(MessageHelper.answer(update.getMessage(), successResponse), Void.class);
+        sender.execute(MessageHelper.answer(update.getMessage(), successResponse));
 
         MessageTask task = new MessageTask();
         task.setChatId(update.getMessage().getChat().getId());

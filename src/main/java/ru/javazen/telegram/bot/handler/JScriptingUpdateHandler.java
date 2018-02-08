@@ -2,8 +2,9 @@ package ru.javazen.telegram.bot.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Update;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import javax.script.Invocable;
@@ -31,7 +32,7 @@ public class JScriptingUpdateHandler implements UpdateHandler {
                     "}";
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         String message = update.getMessage().getText();
         if (message != null
                 && message.startsWith("/script")
@@ -57,14 +58,14 @@ public class JScriptingUpdateHandler implements UpdateHandler {
                 engine.eval(script);
                 Invocable invocable = (Invocable) engine;
 
-                Object result = invocable.invokeFunction("handler", update, executor);
+                Object result = invocable.invokeFunction("handler", update, sender);
 
                 if (result != null && result instanceof Boolean) {
                     return (Boolean) result;
                 }
             } catch (ScriptException | NoSuchMethodException e) {
                 LOGGER.error("JS HAS FALLEN", e);
-                executor.execute(MessageHelper.answer(update.getMessage(), e.getMessage()), Void.class);
+                sender.execute(MessageHelper.answer(update.getMessage(), e.getMessage()));
             }
         }
         return false;

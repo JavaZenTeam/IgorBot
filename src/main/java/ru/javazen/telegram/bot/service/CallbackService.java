@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.javazen.telegram.bot.TelegramBot;
-import ru.javazen.telegram.bot.entity.Update;
+import org.telegram.telegrambots.api.objects.Update;
+import ru.javazen.telegram.bot.CompositeBot;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -21,7 +21,7 @@ public class CallbackService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackService.class);
 
     @Autowired
-    private TelegramBot bot;
+    private CompositeBot bot;
 
     @POST
     @Path("/{botName}")
@@ -42,6 +42,6 @@ public class CallbackService {
             return;
         }
 
-        bot.handleUpdate(update);
+        bot.onUpdateReceived(update);
     }
 }

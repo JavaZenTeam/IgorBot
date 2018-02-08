@@ -3,10 +3,11 @@ package ru.javazen.telegram.bot.handler;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Message;
-import ru.javazen.telegram.bot.entity.Update;
-import ru.javazen.telegram.bot.method.send.SendMessage;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.beans.PropertyDescriptor;
@@ -20,7 +21,7 @@ public class UpdateInfoProvider implements UpdateHandler {
     private String invalidPathMessage = "invalid path";
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         try {
             Message replyToMessage = update.getMessage().getReplyToMessage();
             Object requestedEntity = replyToMessage == null ? update : replyToMessage;
@@ -31,11 +32,11 @@ public class UpdateInfoProvider implements UpdateHandler {
             String answer = mapper.writeValueAsString(requestedEntity);
             SendMessage message = MessageHelper.answer(update.getMessage(), "```\n" + answer + "```");
             message.setParseMode("MARKDOWN");
-            executor.execute(message, Void.class);
+            sender.execute(message);
             return true;
         } catch (IllegalArgumentException e) {
             SendMessage message = MessageHelper.answer(update.getMessage(), invalidPathMessage);
-            executor.execute(message, Void.class);
+            sender.execute(message);
             return true;
         } catch (IOException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);

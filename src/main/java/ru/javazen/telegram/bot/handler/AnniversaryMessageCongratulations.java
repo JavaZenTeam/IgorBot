@@ -2,9 +2,10 @@ package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Update;
-import ru.javazen.telegram.bot.method.send.SendMessage;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.MessageFormat;
@@ -18,13 +19,13 @@ public class AnniversaryMessageCongratulations implements UpdateHandler {
     private MessageFormat[] templates;
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         String messageId = update.getMessage().getMessageId().toString();
         if (messageIdPattern.matcher(messageId).matches()) {
             MessageFormat congratulationsTemplate = templates[random.nextInt(templates.length)];
             String text = congratulationsTemplate.format(new Object[]{messageId});
             SendMessage sendMessage = MessageHelper.answer(update.getMessage(), text, true);
-            executor.execute(sendMessage, Void.class);
+            sender.execute(sendMessage);
         }
         return false;
     }
