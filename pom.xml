@@ -14,26 +14,21 @@
         <slf4j.version>1.7.13</slf4j.version>
         <spring.data.version>1.10.2.RELEASE</spring.data.version>
         <hiberhate.version>5.2.2.Final</hiberhate.version>
+        <mockito.version>2.0.5-beta</mockito.version>
+        <powermock.version>1.6.2</powermock.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
-            <groupId>ru.javazen.telegram.bot</groupId>
-            <artifactId>telegram-bot-meta</artifactId>
-            <version>0.9.2-SNAPSHOT</version>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots</artifactId>
+            <version>3.5</version>
         </dependency>
-
         <dependency>
-            <groupId>ru.javazen.telegram.bot</groupId>
-            <artifactId>telegram-bot-service</artifactId>
-            <version>0.9.4-SNAPSHOT</version>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambotsextensions</artifactId>
+            <version>3.5</version>
         </dependency>
 
         <dependency>
@@ -145,6 +140,31 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>23.6-jre</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

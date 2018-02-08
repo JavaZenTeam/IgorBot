@@ -1,11 +1,13 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Message;
-import ru.javazen.telegram.bot.entity.Update;
-import ru.javazen.telegram.bot.entity.User;
-import ru.javazen.telegram.bot.method.send.SendMessage;
-import ru.javazen.telegram.bot.method.send.SendSticker;
+
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.methods.send.SendSticker;
+import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.User;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.List;
@@ -18,7 +20,7 @@ public class ContinueRepeatableSequence implements UpdateHandler {
     private final Queue<Message> messageQueue = new ConcurrentLinkedQueue<>();
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         Message msg = update.getMessage();
         messageQueue.add(msg);
         if (messageQueue.size() > BUFFER_SIZE){
@@ -40,7 +42,7 @@ public class ContinueRepeatableSequence implements UpdateHandler {
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(msg.getChat().getId().toString());
             sendMessage.setText(MessageHelper.getActualText(msg));
-            executor.execute(sendMessage, Void.class);
+            sender.execute(sendMessage);
             messageQueue.clear();
             return true;
         }
@@ -48,7 +50,7 @@ public class ContinueRepeatableSequence implements UpdateHandler {
             SendSticker sendSticker = new SendSticker();
             sendSticker.setChatId(msg.getChat().getId().toString());
             sendSticker.setSticker(msg.getSticker().getFileId());
-            executor.execute(sendSticker, Void.class);
+            sender.sendSticker(sendSticker);
             messageQueue.clear();
             return true;
         }

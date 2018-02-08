@@ -1,8 +1,9 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Message;
-import ru.javazen.telegram.bot.entity.Update;
+import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 public class ReplyLayoutSwitcher implements UpdateHandler {
@@ -11,7 +12,7 @@ public class ReplyLayoutSwitcher implements UpdateHandler {
     private String targetCharSet = "";
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         Message replyMessage = update.getMessage().getReplyToMessage();
         if (replyMessage == null) return false;
 
@@ -19,7 +20,7 @@ public class ReplyLayoutSwitcher implements UpdateHandler {
         if (targetText == null) return false;
 
         String result = switchLayout(targetText);
-        executor.execute(MessageHelper.answer(replyMessage, result, true), Void.class);
+        sender.execute(MessageHelper.answer(replyMessage, result, true));
         return true;
     }
 

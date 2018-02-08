@@ -1,8 +1,6 @@
 package ru.javazen.telegram.bot.filter;
 
-import ru.javazen.telegram.bot.entity.Update;
-import ru.javazen.telegram.bot.util.MessageHelper;
-
+import org.telegram.telegrambots.api.objects.Update;
 import java.util.regex.Pattern;
 
 public class RegexpFilter implements Filter {
@@ -15,7 +13,7 @@ public class RegexpFilter implements Filter {
 
     @Override
     public boolean check(Update update) {
-        String text = MessageHelper.getActualText(update.getMessage());
+        String text = update.getMessage().getText(); // TODO MessageHelper.getActualText(update.getMessage());
         return text != null && pattern.matcher(text).matches();
     }
 }

@@ -1,6 +1,11 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.BotMethodExecutor;
+import org.telegram.telegrambots.api.methods.send.SendSticker;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
+
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GetStickerById implements UpdateHandler {
@@ -8,8 +13,19 @@ public class GetStickerById implements UpdateHandler {
     private Pattern pattern = DEFAULT_PATTERN;
 
     @Override
-    public boolean handle(ru.javazen.telegram.bot.entity.Update update, BotMethodExecutor executor) {
-        return false; //TODO
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
+        String text = update.getMessage().getText();
+        if (text == null) return false;
+        Matcher matcher = pattern.matcher(text);
+        if (!matcher.matches() || matcher.groupCount() < 1) return false;
+
+        SendSticker sendSticker = new SendSticker();
+        sendSticker.setChatId(update.getMessage().getChat().getId());
+        sendSticker.setSticker(matcher.group(1));
+
+        sender.sendSticker(sendSticker);
+
+        return true;
     }
 
     public void setPattern(String pattern) {

@@ -1,7 +1,8 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Update;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.service.SongRepository;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
@@ -15,7 +16,7 @@ public class SongSinger implements UpdateHandler{
     }
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         String string = update.getMessage().getText();
         if (string == null) return false;
 
@@ -23,7 +24,7 @@ public class SongSinger implements UpdateHandler{
 
         if (songLine == null || songLine.getNextLine() == null) return false;
 
-        sendSongLine(update, songLine.getNextLine(), executor);
+        sendSongLine(update, songLine.getNextLine(), sender);
         return true;
     }
 
@@ -38,10 +39,10 @@ public class SongSinger implements UpdateHandler{
         return songLine;
     }
 
-    private void sendSongLine(Update update, SongRepository.SongLine songLine, BotMethodExecutor executor) {
+    private void sendSongLine(Update update, SongRepository.SongLine songLine, AbsSender sender) throws TelegramApiException {
         if (songLine.getNextLine() != null)
             lastSongLine = songLine;
 
-        executor.execute(MessageHelper.answer(update.getMessage(), songLine.getString()), Void.class);
+        sender.execute(MessageHelper.answer(update.getMessage(), songLine.getString()));
     }
 }
