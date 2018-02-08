@@ -3,9 +3,10 @@ package ru.javazen.telegram.bot.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.scheduling.TaskScheduler;
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Update;
-import ru.javazen.telegram.bot.method.send.SendMessage;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Date;
@@ -21,7 +22,7 @@ public class Counter implements UpdateHandler {
     private TaskScheduler taskScheduler;
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         String text = MessageHelper.getActualText(update.getMessage());
         if (text == null) return false;
 
@@ -32,7 +33,7 @@ public class Counter implements UpdateHandler {
         Integer to = getParam(matcher, "to", 0);
 
         if (from == null || to == null){
-            executor.execute(MessageHelper.answer(update.getMessage(), errorMessage), Void.class);
+            sender.execute(MessageHelper.answer(update.getMessage(), errorMessage));
             return false;
         }
 
@@ -40,7 +41,13 @@ public class Counter implements UpdateHandler {
                 .forEach(i -> {
                     SendMessage message = MessageHelper.answer(update.getMessage(), String.valueOf(i));
                     Date time = new Date(Math.abs(i - from) * 1000 + System.currentTimeMillis());
-                    taskScheduler.schedule(() -> executor.execute(message, Void.class), time);
+                    taskScheduler.schedule(() -> {
+                        try {
+                            sender.execute(message);
+                        } catch (TelegramApiException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }, time);
                 });
 
         return true;

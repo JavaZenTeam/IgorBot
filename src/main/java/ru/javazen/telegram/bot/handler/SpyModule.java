@@ -1,8 +1,10 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Update;
-import ru.javazen.telegram.bot.method.send.ForwardMessage;
+
+import org.telegram.telegrambots.api.methods.ForwardMessage;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 public class SpyModule implements UpdateHandler {
 
@@ -10,7 +12,7 @@ public class SpyModule implements UpdateHandler {
     private long forwardToChatId;
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         if (update.getMessage().getChat().getId() != spyOnChatId) return false;
 
         ForwardMessage forwardMessage = new ForwardMessage();
@@ -18,7 +20,7 @@ public class SpyModule implements UpdateHandler {
         forwardMessage.setMessageId(update.getMessage().getMessageId());
 
         forwardMessage.setChatId(Long.toString(forwardToChatId));
-        executor.execute(forwardMessage, Void.class);
+        sender.execute(forwardMessage);
 
         return false;
     }

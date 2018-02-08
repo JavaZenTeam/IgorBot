@@ -2,8 +2,9 @@ package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Update;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Collections;
@@ -22,7 +23,7 @@ public class RandomAnswer implements UpdateHandler {
     private int sum;
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         String text = MessageHelper.getActualText(update.getMessage());
         if (text == null) return false;
 
@@ -35,7 +36,7 @@ public class RandomAnswer implements UpdateHandler {
         String answer = solveAnswer(text);
         if (answer == null) return false;
 
-        executor.execute(MessageHelper.answer(update.getMessage(), answer, true), Void.class);
+        sender.execute(MessageHelper.answer(update.getMessage(), answer, true));
         return true;
     }
 

@@ -1,8 +1,9 @@
 package ru.javazen.telegram.bot.handler;
 
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.entity.Update;
-import ru.javazen.telegram.bot.method.send.ForwardMessage;
+import org.telegram.telegrambots.api.methods.ForwardMessage;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,7 +14,7 @@ public class MessageForwardBridge implements UpdateHandler {
     private Pattern pattern = DEFAULT_PATTERN;
 
     @Override
-    public boolean handle(Update update, BotMethodExecutor executor) {
+    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         String text = update.getMessage().getText();
         if (text == null || update.getMessage().getReplyToMessage() == null) return false;
         Matcher matcher = pattern.matcher(text);
@@ -23,7 +24,7 @@ public class MessageForwardBridge implements UpdateHandler {
         forwardMessage.setFromChatId(Long.toString(update.getMessage().getChat().getId()));
         forwardMessage.setMessageId(update.getMessage().getReplyToMessage().getMessageId());
         forwardMessage.setChatId(matcher.group(1));
-        executor.execute(forwardMessage, Void.class);
+        sender.execute(forwardMessage);
 
         return true;
     }

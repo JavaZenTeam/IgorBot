@@ -5,9 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
-import ru.javazen.telegram.bot.BotMethodExecutor;
-import ru.javazen.telegram.bot.TelegramBot;
-import ru.javazen.telegram.bot.method.send.SendMessage;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.CompositeBot;
 import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
 import ru.javazen.telegram.bot.service.MessageSchedulerService;
@@ -25,7 +26,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSchedulerServiceImpl.class);
 
     @Autowired
-    private TelegramBot telegramBot;
+    private CompositeBot telegramBot;
 
     @Autowired
     private MessageTaskRepository messageTaskRepository;
@@ -35,10 +36,10 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
     @Override
     public void scheduleTask(MessageTask task) {
-        task.setBotName(telegramBot.getName());
+        task.setBotName(telegramBot.getBotUsername());
         messageTaskRepository.save(task);
 
-        performSchedulingTasks(task, telegramBot.getBotMethodExecutor());
+        performSchedulingTasks(task, telegramBot);
 
     }
 
@@ -71,11 +72,11 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
         Iterable<MessageTask> tasks = messageTaskRepository.findAll();
 
         for (MessageTask task : tasks) {
-            performSchedulingTasks(task, telegramBot.getBotMethodExecutor());
+            performSchedulingTasks(task, telegramBot);
         }
     }
 
-    private void performSchedulingTasks(MessageTask task, BotMethodExecutor executor) {
+    private void performSchedulingTasks(MessageTask task, AbsSender sender) {
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(task.getChatId().toString());
@@ -88,16 +89,22 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                     .findFirst().get(); //TODO
 
             try {
-                futureTask.getExecutor().execute(sendMessage, Void.class);
+                futureTask.getSender().execute(sendMessage);
             } catch (RuntimeException e) {
                 // for case when reply message was removed. TODO - get cause of send error for detect tis case
                 sendMessage.setReplyToMessageId(null);
                 try {
-                    futureTask.getExecutor().execute(sendMessage, Void.class);
+                    futureTask.getSender().execute(sendMessage);
                 } catch (RuntimeException rex) {
                     LOGGER.error("Something is wrong with task with {} id. Error message: {}", task.getId(), rex.getMessage());
                     throw rex;
+                } catch (TelegramApiException te) {
+                    LOGGER.error("Can't send message", te);
+                    throw new RuntimeException(te);
                 }
+            } catch (TelegramApiException e) {
+                LOGGER.error("Can't send message", e);
+                throw new RuntimeException(e);
             }
 
             futureTasks.remove(futureTask);
@@ -108,7 +115,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
         FutureTask futureTask = new FutureTask();
         futureTask.setTaskId(task.getId());
         futureTask.setFuture(future);
-        futureTask.setExecutor(executor);
+        futureTask.setSender(sender);
         futureTasks.add(futureTask);
     }
 
@@ -126,7 +133,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
     private static class FutureTask {
         private Long taskId;
         private ScheduledFuture future;
-        private BotMethodExecutor executor;
+        private AbsSender sender;
 
         public Long getTaskId() {
             return taskId;
@@ -144,12 +151,12 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
             this.future = future;
         }
 
-        public BotMethodExecutor getExecutor() {
-            return executor;
+        public AbsSender getSender() {
+            return sender;
         }
 
-        public void setExecutor(BotMethodExecutor executor) {
-            this.executor = executor;
+        public void setSender(AbsSender sender) {
+            this.sender = sender;
         }
 
         @Override
