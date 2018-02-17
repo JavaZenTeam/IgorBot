@@ -7,11 +7,7 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
        ">
 
-    <context:property-placeholder location="classpath:config.properties"/>
-
-    <context:component-scan base-package="ru.javazen.telegram.bot.service"/>
-
-    <bean class="ru.javazen.telegram.bot.config.RepositoryConfiguration"/>
+    <!--<context:component-scan base-package="ru.javazen.telegram.bot.service"/>-->
 
     <bean class="ru.javazen.telegram.bot.AppConfig"/>
 
