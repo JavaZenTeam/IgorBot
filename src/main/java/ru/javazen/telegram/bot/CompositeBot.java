@@ -2,13 +2,17 @@ package ru.javazen.telegram.bot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.generics.BotSession;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +27,7 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     private String name;
     private String token;
+    private BotSession session;
 
     public CompositeBot(String name, String token) {
         this.name = name;
@@ -80,8 +85,15 @@ public class CompositeBot extends TelegramLongPollingBot {
         this.supportChatId = supportChatId;
     }
 
+    static {
+        ApiContextInitializer.init();
+    }
+
     @PostConstruct
     public void onStart() throws TelegramApiException {
+        TelegramBotsApi botsApi = new TelegramBotsApi();
+        session = botsApi.registerBot(this);
+
         if (supportChatId != null){
 
             SendMessage message = new SendMessage()
@@ -89,6 +101,13 @@ public class CompositeBot extends TelegramLongPollingBot {
                     .setText("МНЕ ПОД ДРАМ ВСТАВАТЬ ЛЕГКО");
 
             execute(message);
+        }
+    }
+
+    @PreDestroy
+    public void onStop() {
+        if (session != null) {
+            session.stop();
         }
     }
 
