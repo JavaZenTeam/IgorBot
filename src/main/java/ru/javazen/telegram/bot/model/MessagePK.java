@@ -1,11 +1,16 @@
 package ru.javazen.telegram.bot.model;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
 public class MessagePK implements Serializable {
+
+    @Column(name = "chatid")
     private long chatId;
+
+    @Column(name = "messageid")
     private int messageId;
 
     public MessagePK() {
