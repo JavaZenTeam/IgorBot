@@ -6,7 +6,6 @@
     <groupId>ru.javazen.telegram.igorbot</groupId>
     <artifactId>IgorBot</artifactId>
     <version>0.1</version>
-    <packaging>war</packaging>
 
     <name>IgorBot Maven Webapp</name>
     <description>IgorBot is a Telegram bot</description>
