@@ -422,7 +422,7 @@
                 <ref bean="counter"/>
                 <ref bean="getStickerByIdModule"/>
                 <!--<ref bean="randomFacePalmModule"/>-->
-                <ref bean="lowLevelJokes"/>
+                <!--<ref bean="lowLevelJokes"/>-->
                 <ref bean="songSingerModule"/>
                 <ref bean="secretAndSacred"/>
                 <ref bean="boysForAll"/>
