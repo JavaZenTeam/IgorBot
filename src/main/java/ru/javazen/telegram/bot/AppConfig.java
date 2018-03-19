@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.sf.junidecode.Junidecode;
 import org.apache.commons.codec.language.DoubleMetaphone;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -21,6 +24,7 @@ import java.util.function.Function;
 
 
 @Configuration
+@EnableCaching
 public class AppConfig {
 
     /*@Bean(destroyMethod = "destroy")
@@ -34,6 +38,11 @@ public class AppConfig {
     @Scope("prototype")
     public Random random(){
         return new Random();
+    }
+
+    @Bean
+    public CacheManager cacheManager(){
+        return new ConcurrentMapCacheManager("ChatConfig");
     }
 
     @Bean

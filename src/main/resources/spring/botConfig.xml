@@ -271,10 +271,6 @@
         <property name="errorMessage" value="сам считай"/>
     </bean>
 
-    <bean id="botName" class="java.lang.String">
-        <constructor-arg value="IgorBot"/>
-    </bean>
-
     <bean id="lowLevelJokes" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.DeniedChatFilter">
@@ -394,6 +390,21 @@
         </constructor-arg>
     </bean>
 
+    <!--Message Collector handlers-->
+    <bean name="messageCollector" class="ru.javazen.telegram.bot.handler.MessageCollector">
+        <property name="saveTextKey" value="messageCollector.saveText"/>
+        <property name="saveTextValue" value="Y"/>
+    </bean>
+    <bean name="messageCollectorSaveTextSwitch" class="ru.javazen.telegram.bot.handler.ToggleChatConfigHandler">
+        <property name="configKey" value="messageCollector.saveText"/>
+        <property name="pattern2value">
+            <map>
+                <entry key="/fsb_mode_on" value="Y"/>
+                <entry key="/fsb_mode_off" value="N"/>
+            </map>
+        </property>
+    </bean>
+
     <bean id="bot" class="ru.javazen.telegram.bot.CompositeBot">
         <constructor-arg name="name" value="${bot.name}"/>
         <constructor-arg name="token" value="${bot.token}"/>
@@ -402,6 +413,8 @@
         <property name="updateHandlers">
             <list>
                 <ref bean="anniversaryMessageCongratulations"/>
+                <ref bean="messageCollector"/>
+                <ref bean="messageCollectorSaveTextSwitch"/>
                 <ref bean="pinnedForwarder"/>
                 <ref bean="continueRepeatableSequenceModule"/>
                 <ref bean="subscriptionCreate"/>
