@@ -16,7 +16,7 @@ public class MessageEntity {
     @Column
     private Integer userId;
 
-    @Column
+    @Column(length = 4096)
     private String text;
 
     @Column
