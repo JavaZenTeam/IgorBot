@@ -27,7 +27,7 @@ public class MessageCollector implements UpdateHandler {
         MessageEntity entity = new MessageEntity();
         Message message = update.getMessage();
         entity.setMessagePK(new MessagePK(message.getChatId(), message.getMessageId()));
-        entity.setDate(new Date(1000 * message.getDate()));
+        entity.setDate(new Date(1000L * message.getDate()));
         entity.setUserId(message.getFrom().getId());
 
         if (saveTextKey != null){
