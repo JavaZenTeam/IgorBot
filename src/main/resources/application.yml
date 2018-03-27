@@ -1,0 +1,27 @@
+spring:
+  application.name: bot-platform
+  profiles.active: ${IGOR_BOT_ACTIVE_PROFILE:dev}
+bot:
+  name: ${IGOR_BOT_USERNAME}
+  token: ${IGOR_BOT_TOKEN}
+---
+spring:
+  profiles: dev
+logging:
+  level:
+    org.springframework.web: DEBUG
+    ru.javazen.telegram.bot: DEBUG
+    org.hibernate: DEBUG
+---
+spring:
+  profiles: production
+  datasource:
+    url: ${IGOR_DB_CONNECTION_URL}
+    username: ${IGOR_DB_USER}
+    password: ${IGOR_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+logging:
+  level:
+    org.springframework.web: WARN
+    ru.javazen.telegram.bot: WARN
+    org.hibernate: WARN
