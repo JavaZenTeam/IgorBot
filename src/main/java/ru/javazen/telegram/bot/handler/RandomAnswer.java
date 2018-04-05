@@ -1,26 +1,21 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.container.SizedItemsContainer;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.BiFunction;
 
 public class RandomAnswer implements UpdateHandler {
-
-    @Autowired
     private Random random;
-
-    private Map<String, Integer> answers = Collections.emptyMap();
     private List<BiFunction<Update, String, String>> preprocessors;
-    private int sum;
+    private SizedItemsContainer<String> container;
 
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
@@ -32,36 +27,26 @@ public class RandomAnswer implements UpdateHandler {
                 text = preprocessor.apply(update, text);
             }
         }
-
-        String answer = solveAnswer(text);
+        random.setSeed(text.toLowerCase().hashCode());
+        String answer = container.get(random.nextDouble() * container.size());
         if (answer == null) return false;
 
         sender.execute(MessageHelper.answer(update.getMessage(), answer, true));
         return true;
     }
 
-    private String solveAnswer(String text){
-        random.setSeed(text.toLowerCase().hashCode());
-        int rand = random.nextInt(sum);
-        for (Map.Entry<String, Integer> entry : answers.entrySet()) {
-            if (rand < entry.getValue()){
-                return entry.getKey();
-            }
-            rand -= entry.getValue();
-        }
-        return null;
+    @Autowired
+    public void setRandom(Random random) {
+        this.random = random;
     }
 
-    public void setAnswers(Map<String, Integer> answers) {
-        Assert.notNull(answers, "answers can not be null");
+    @Autowired
+    public void setContainer(SizedItemsContainer<String> container) {
+        this.container = container;
+    }
 
-        int newSum = 0;
-        for (Integer ratio: answers.values()) {
-            Assert.isTrue(ratio >= 0, "ratio of answer can not be negative");
-            newSum += ratio;
-        }
-        sum = newSum;
-        this.answers = answers;
+    public void setAnswers(Map<String, Double> answers){
+        answers.forEach((option, ratio) -> container.put(option, ratio));
     }
 
     public void setPreprocessors(List<BiFunction<Update, String, String>> preprocessors) {

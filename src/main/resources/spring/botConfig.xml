@@ -5,6 +5,7 @@
             http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <import resource="answers.xml"/>
     <import resource="processors.xml"/>
     <import resource="songs.xml"/>
 
@@ -17,17 +18,7 @@
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.RandomAnswer">
                 <property name="preprocessors" ref="preprocessors"/>
-                <property name="answers">
-                    <map>
-                        <entry key="Да" value="4"/>
-                        <entry key="Ага" value="2"/>
-                        <entry key="+" value="1"/>
-                        <entry key="Нет" value="6"/>
-                        <entry key="-" value="1"/>
-                        <entry key="Не знаю" value="2"/>
-                        <entry key="хз" value="1"/>
-                    </map>
-                </property>
+                <property name="answers" ref="yesNo"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -40,15 +31,7 @@
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.RandomAnswer">
-                <property name="answers">
-                    <map>
-                        <entry key="Не знаю" value="8"/>
-                        <entry key="хз" value="3"/>
-                        <entry key="Мне нужно уточнить в офисе" value="1"/>
-                        <entry key="42" value="1"/>
-                        <entry key="ДА НЕ ЗНАЮ Я! ЧЕ ДОЕБАЛСЯ?!" value="1"/>
-                    </map>
-                </property>
+                <property name="answers" ref="doNotKnow"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -177,7 +160,7 @@
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.UpdateInfoProvider">
-                <property name="invalidPathMessage" value="не понял"/>
+                <property name="invalidPathMessageSupplier" ref="doNotUnderstandSupplier"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -231,8 +214,8 @@
         <property name="validationPattern" value="и+го+рь,\s?ск[ао]ж[иы] че?р[еи]?з( .+)"/>
         <property name="daysLimit" value="1827"/>
         <property name="tasksLimit" value="30"/>
-        <property name="successResponse" value="ок"/>
-        <property name="defaultReturnMessage" value="тутц"/>
+        <property name="successResponseSupplier" ref="okSupplier"/>
+        <property name="defaultMessageSupplier" ref="defaultSupplier"/>
     </bean>
 
     <bean id="songSingerModule" class="ru.javazen.telegram.bot.handler.InstanceForChatController">
@@ -371,11 +354,11 @@
     </bean>
     <bean id="subscriptionCreate" class="ru.javazen.telegram.bot.handler.subscriptions.CreateSubscriptionHandler">
         <property name="pattern" value="и+го+рь,? (к[оа]гда|есл?[еи]) (?&lt;userFlag&gt;у меня |я )?(?&lt;trigger&gt;.+?),? (г[оа]вори|ск[оа]ж[иы]) (?&lt;response&gt;.+)"/>
-        <property name="successResponse" value="ок"/>
+        <property name="successResponseSupplier" ref="okSupplier"/>
     </bean>
     <bean id="subscriptionGet" class="ru.javazen.telegram.bot.handler.subscriptions.GetSubscriptionsByKeyHandler">
         <property name="pattern" value="и+го+рь,? [чш]т?[ое] ск[оа]ж[еи]шь?,? (к[оа]гда|есл?[еи]) (?&lt;trigger&gt;.+)\??"/>
-        <property name="onEmptyResponse" value="ничего("/>
+        <property name="onEmptyResponseSupplier" ref="emptySupplier"/>
     </bean>
     <bean id="subscriptionCancel" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
@@ -385,7 +368,7 @@
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.subscriptions.CancelSubscriptionHandler">
-                <property name="successResponse" value="ок("/>
+                <property name="successResponseSupplier" ref="okSupplier"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -410,6 +393,7 @@
         <constructor-arg name="token" value="${bot.token}"/>
 
         <property name="supportChatId" value="-1001063148517"/>
+        <property name="startMessageSupplier" ref="startSupplier"/>
         <property name="updateHandlers">
             <list>
                 <ref bean="anniversaryMessageCongratulations"/>
