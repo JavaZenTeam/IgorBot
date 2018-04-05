@@ -13,12 +13,13 @@ import ru.javazen.telegram.bot.util.MessageHelper;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.Supplier;
 
 public class UpdateInfoProvider implements UpdateHandler {
 
     private ObjectMapper mapper;
 
-    private String invalidPathMessage = "invalid path";
+    private Supplier<String> invalidPathMessageSupplier;
 
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
@@ -35,7 +36,7 @@ public class UpdateInfoProvider implements UpdateHandler {
             sender.execute(message);
             return true;
         } catch (IllegalArgumentException e) {
-            SendMessage message = MessageHelper.answer(update.getMessage(), invalidPathMessage);
+            SendMessage message = MessageHelper.answer(update.getMessage(), invalidPathMessageSupplier.get());
             sender.execute(message);
             return true;
         } catch (IOException | IllegalAccessException | InvocationTargetException e) {
@@ -48,8 +49,12 @@ public class UpdateInfoProvider implements UpdateHandler {
         this.mapper = mapper;
     }
 
-    public void setInvalidPathMessage(String InvalidPathMessage) {
-        this.invalidPathMessage = InvalidPathMessage;
+    public void setInvalidPathMessage(String invalidPathMessage) {
+        setInvalidPathMessageSupplier(() -> invalidPathMessage);
+    }
+
+    public void setInvalidPathMessageSupplier(Supplier<String> invalidPathMessageSupplier) {
+        this.invalidPathMessageSupplier = invalidPathMessageSupplier;
     }
 
     private Object resolveEntity(Object entity, String path) throws InvocationTargetException, IllegalAccessException {

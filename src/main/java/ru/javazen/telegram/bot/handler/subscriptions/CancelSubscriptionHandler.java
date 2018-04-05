@@ -9,9 +9,11 @@ import ru.javazen.telegram.bot.model.MessagePK;
 import ru.javazen.telegram.bot.service.SubscriptionService;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
+import java.util.function.Supplier;
+
 public class CancelSubscriptionHandler implements UpdateHandler {
     private SubscriptionService subscriptionService;
-    private String successResponse = "Canceled Successfully";
+    private Supplier<String> successResponseSupplier;
 
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
@@ -25,7 +27,7 @@ public class CancelSubscriptionHandler implements UpdateHandler {
                 || subscriptionService.cancelSubscriptionByReply(messagePK);
 
         if (!result) return false;
-        sender.execute(MessageHelper.answer(update.getMessage(), successResponse));
+        sender.execute(MessageHelper.answer(update.getMessage(), successResponseSupplier.get()));
         return true;
     }
 
@@ -34,7 +36,11 @@ public class CancelSubscriptionHandler implements UpdateHandler {
         this.subscriptionService = subscriptionService;
     }
 
+    public void setSuccessResponseSupplier(Supplier<String> successResponseSupplier) {
+        this.successResponseSupplier = successResponseSupplier;
+    }
+
     public void setSuccessResponse(String successResponse) {
-        this.successResponse = successResponse;
+        this.successResponseSupplier = () -> successResponse;
     }
 }

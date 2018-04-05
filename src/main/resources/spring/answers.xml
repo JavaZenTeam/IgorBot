@@ -1,0 +1,82 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <util:map id="yesNo">
+        <entry key="Да" value="4"/>
+        <entry key="Ага" value="2"/>
+        <entry key="+" value="1"/>
+        <entry key="Нет" value="6"/>
+        <entry key="-" value="1"/>
+        <entry key="Не знаю" value="2"/>
+        <entry key="хз" value="1"/>
+    </util:map>
+
+    <util:map id="doNotKnow">
+        <entry key="Не знаю" value="8"/>
+        <entry key="хз" value="3"/>
+        <entry key="Мне нужно уточнить в офисе" value="1"/>
+        <entry key="42" value="1"/>
+        <entry key="ДА НЕ ЗНАЮ Я! ЧЕ ДОЕБАЛСЯ?!" value="1"/>
+    </util:map>
+
+    <util:map id="doNotUnderstand">
+        <entry key="не понял" value="4"/>
+        <entry key="что ты говоришь? я не понимаю" value="2"/>
+        <entry key="чиво" value="1"/>
+        <entry key="каво" value="1"/>
+    </util:map>
+    <bean id="doNotUnderstandSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+        <property name="optionRatios" ref="doNotUnderstand"/>
+    </bean>
+
+    <util:map id="ok">
+        <entry key="ок" value="4"/>
+        <entry key="лан" value="2"/>
+        <entry key="будет сделано!" value="1"/>
+    </util:map>
+    <bean id="okSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+        <property name="optionRatios" ref="ok"/>
+    </bean>
+
+    <util:map id="default">
+        <entry key="." value="1"/>
+        <entry key="тутц" value="1"/>
+        <entry key="трыц" value="1"/>
+        <entry key="бумс" value="1"/>
+    </util:map>
+    <bean id="defaultSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+        <property name="optionRatios" ref="default"/>
+    </bean>
+
+    <util:map id="empty">
+        <entry key="ничего(" value="2"/>
+        <entry key="пустота..." value="1"/>
+    </util:map>
+    <bean id="emptySupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+        <property name="optionRatios" ref="empty"/>
+    </bean>
+
+
+    <util:map id="start">
+        <entry key="МНЕ ПОД ДРАМ ВСТАВАТЬ ЛЕГКО" value="1"/>
+        <entry key="┓┏┓┏┓┃ НУ ЧЕ НАРОД ЗАПИСЫВАЕМСЯ НА НОГОТОЧКИ
+                  &#13;&#10;НАХУЙ, ЕБАНЫЙ В РООООТ!!!!!!!
+                  &#13;&#10;┛┗┛┗┛┃＼0／
+                  &#13;&#10;┓┏┓┏┓┃  /
+                  &#13;&#10;┛┗┛┗┛┃ノ)
+                  &#13;&#10;┓┏┓┏┓┃
+                  &#13;&#10;┛┗┛┗┛┃
+                  &#13;&#10;┓┏┓┏┓┃
+                  &#13;&#10;┛┗┛┗┛┃
+                  &#13;&#10;┓┏┓┏┓┃
+                  &#13;&#10;┛┗┛┗┛┃" value="3"/>
+        <entry key="ЧЕ ПАЦАНЫ, АНИМЕ?" value="2"/>
+        <entry key="ДОРОУ" value="1"/>
+        <entry key="О, ПРИВЕТ" value="1"/>
+        <entry key="ВЕЧЕР В ХАТУ" value="1"/>
+    </util:map>
+    <bean id="startSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+        <property name="optionRatios" ref="start"/>
+    </bean>
+</beans>

@@ -16,6 +16,7 @@ import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class CompositeBot extends TelegramLongPollingBot {
@@ -24,6 +25,7 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     private Collection<UpdateHandler> updateHandlers = new ArrayList<>();
     private Long supportChatId;
+    private Supplier<String> startMessageSupplier;
 
     private String name;
     private String token;
@@ -85,6 +87,10 @@ public class CompositeBot extends TelegramLongPollingBot {
         this.supportChatId = supportChatId;
     }
 
+    public void setStartMessageSupplier(Supplier<String> startMessageSupplier) {
+        this.startMessageSupplier = startMessageSupplier;
+    }
+
     static {
         ApiContextInitializer.init();
     }
@@ -94,11 +100,11 @@ public class CompositeBot extends TelegramLongPollingBot {
         TelegramBotsApi botsApi = new TelegramBotsApi();
         session = botsApi.registerBot(this);
 
-        if (supportChatId != null){
+        if (supportChatId != null && startMessageSupplier != null){
 
             SendMessage message = new SendMessage()
                     .setChatId(supportChatId)
-                    .setText("МНЕ ПОД ДРАМ ВСТАВАТЬ ЛЕГКО");
+                    .setText(startMessageSupplier.get());
 
             execute(message);
         }
@@ -110,5 +116,4 @@ public class CompositeBot extends TelegramLongPollingBot {
             session.stop();
         }
     }
-
 }
