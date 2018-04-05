@@ -12,13 +12,14 @@ import ru.javazen.telegram.bot.model.Subscription;
 import ru.javazen.telegram.bot.service.SubscriptionService;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CreateSubscriptionHandler implements UpdateHandler {
     private SubscriptionService subscriptionService;
     private Pattern pattern;
-    private String successResponse = "ok";
+    private Supplier<String> successResponseSupplier;
 
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
@@ -42,7 +43,7 @@ public class CreateSubscriptionHandler implements UpdateHandler {
 
         subscriptionService.createSubscription(template);
 
-        SendMessage answer = MessageHelper.answer(update.getMessage(), successResponse);
+        SendMessage answer = MessageHelper.answer(update.getMessage(), successResponseSupplier.get());
         Message m = sender.execute(answer);
         subscriptionService.saveSubscriptionReply(subscriptionPK, m.getMessageId());
         return true;
@@ -57,7 +58,11 @@ public class CreateSubscriptionHandler implements UpdateHandler {
         this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
     }
 
+    public void setSuccessResponseSupplier(Supplier<String> successResponseSupplier) {
+        this.successResponseSupplier = successResponseSupplier;
+    }
+
     public void setSuccessResponse(String successResponse) {
-        this.successResponse = successResponse;
+        this.successResponseSupplier = () -> successResponse;
     }
 }

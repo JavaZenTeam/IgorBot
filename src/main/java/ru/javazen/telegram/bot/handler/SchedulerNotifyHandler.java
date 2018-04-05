@@ -13,6 +13,7 @@ import ru.javazen.telegram.bot.util.MessageHelper;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +30,8 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     private String validationPattern;
 
     private int daysLimit, tasksLimit;
-    private String successResponse;
-    private String defaultReturnMessage;
+    private Supplier<String> successResponseSupplier;
+    private Supplier<String> defaultMessageSupplier;
 
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
@@ -67,7 +68,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         }
 
         /*userTasks.computeIfPresent(userId, (key, val) -> val + 1);*/
-        sender.execute(MessageHelper.answer(update.getMessage(), successResponse));
+        sender.execute(MessageHelper.answer(update.getMessage(), successResponseSupplier.get()));
 
         MessageTask task = new MessageTask();
         task.setChatId(update.getMessage().getChat().getId());
@@ -132,7 +133,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
             returnMessage = MessageHelper.getActualText(update.getMessage().getReplyToMessage());
         }
         if (isEmpty(returnMessage)) {
-            returnMessage = defaultReturnMessage;
+            returnMessage = defaultMessageSupplier.get();
         }
 
         if (!calendarChanged) {
@@ -167,11 +168,19 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     }
 
     public void setSuccessResponse(String successResponse) {
-        this.successResponse = successResponse;
+        this.successResponseSupplier = () -> successResponse;
     }
 
     public void setDefaultReturnMessage(String defaultReturnMessage) {
-        this.defaultReturnMessage = defaultReturnMessage;
+        this.defaultMessageSupplier = () -> defaultReturnMessage;
+    }
+
+    public void setSuccessResponseSupplier(Supplier<String> successResponseSupplier) {
+        this.successResponseSupplier = successResponseSupplier;
+    }
+
+    public void setDefaultMessageSupplier(Supplier<String> defaultMessageSupplier) {
+        this.defaultMessageSupplier = defaultMessageSupplier;
     }
 
     private static class Parameters {

@@ -13,13 +13,14 @@ import ru.javazen.telegram.bot.service.SubscriptionService;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GetSubscriptionsByKeyHandler implements UpdateHandler {
     private SubscriptionService subscriptionService;
     private Pattern pattern;
-    private String onEmptyResponse = "not found";
+    private Supplier<String> onEmptyResponseSupplier;
 
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
@@ -39,7 +40,7 @@ public class GetSubscriptionsByKeyHandler implements UpdateHandler {
         List<Subscription> subscriptions = subscriptionService.catchSubscriptions(template);
 
         if (subscriptions.isEmpty()){
-            sender.execute(MessageHelper.answer(message, onEmptyResponse));
+            sender.execute(MessageHelper.answer(message, onEmptyResponseSupplier.get()));
         }
 
         for (Subscription s : subscriptions) {
@@ -64,7 +65,11 @@ public class GetSubscriptionsByKeyHandler implements UpdateHandler {
         this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
     }
 
+    public void setOnEmptyResponseSupplier(Supplier<String> onEmptyResponseSupplier) {
+        this.onEmptyResponseSupplier = onEmptyResponseSupplier;
+    }
+
     public void setOnEmptyResponse(String onEmptyResponse) {
-        this.onEmptyResponse = onEmptyResponse;
+        this.onEmptyResponseSupplier = () -> onEmptyResponse;
     }
 }
