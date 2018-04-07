@@ -102,7 +102,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="agitatorOfSuckingTractorDriverStuff" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+    <bean id="jokeAbout300" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
                 <property name="pattern" value=".*([3з][0oо][0oо]|[тt][рp][иu][сc][тt][aаоo0])"/>
@@ -254,20 +254,26 @@
         <property name="errorMessage" value="сам считай"/>
     </bean>
 
+    <bean id="lowLevelJokesToggle" parent="abstractToggle">
+        <property name="configKey" value="lowLevelJokes"/>
+        <property name="pattern2value">
+            <map>
+                <entry key="/dolboeb_mode_on" value="Y"/>
+                <entry key="/dolboeb_mode_off" value="N"/>
+            </map>
+        </property>
+    </bean>
     <bean id="lowLevelJokes" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
-            <bean class="ru.javazen.telegram.bot.filter.DeniedChatFilter">
-                <property name="deniedChatIds">
-                    <list>
-                        <value>-1001084636204</value>
-                    </list>
-                </property>
+            <bean class="ru.javazen.telegram.bot.filter.ChatConfigFilter">
+                <property name="configKey" value="lowLevelJokes"/>
+                <property name="configValue" value="Y"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handlers">
             <list>
                 <ref bean="gayAnswerDetector" />
-                <ref bean="agitatorOfSuckingTractorDriverStuff" />
+                <ref bean="jokeAbout300" />
                 <ref bean="headOfDickDetector" />
             </list>
         </constructor-arg>
@@ -368,9 +374,18 @@
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.subscriptions.CancelSubscriptionHandler">
-                <property name="successResponseSupplier" ref="okSupplier"/>
+                <property name="successResponseSupplier" ref="sadOkSupplier"/>
             </bean>
         </constructor-arg>
+    </bean>
+
+    <bean id="abstractToggle" class="ru.javazen.telegram.bot.handler.ToggleChatConfigHandler" abstract="true">
+        <property name="value2response">
+            <map>
+                <entry key="Y" value-ref="happyOkSupplier"/>
+                <entry key="N" value-ref="sadOkSupplier"/>
+            </map>
+        </property>
     </bean>
 
     <!--Message Collector handlers-->
@@ -378,7 +393,7 @@
         <property name="saveTextKey" value="messageCollector.saveText"/>
         <property name="saveTextValue" value="Y"/>
     </bean>
-    <bean name="messageCollectorSaveTextSwitch" class="ru.javazen.telegram.bot.handler.ToggleChatConfigHandler">
+    <bean name="messageCollectorSaveTextSwitch" parent="abstractToggle">
         <property name="configKey" value="messageCollector.saveText"/>
         <property name="pattern2value">
             <map>
@@ -419,7 +434,8 @@
                 <ref bean="counter"/>
                 <ref bean="getStickerByIdModule"/>
                 <!--<ref bean="randomFacePalmModule"/>-->
-                <!--<ref bean="lowLevelJokes"/>-->
+                <ref bean="lowLevelJokesToggle"/>
+                <ref bean="lowLevelJokes"/>
                 <ref bean="songSingerModule"/>
                 <ref bean="secretAndSacred"/>
                 <ref bean="boysForAll"/>
