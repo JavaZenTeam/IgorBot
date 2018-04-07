@@ -39,6 +39,24 @@
         <property name="optionRatios" ref="ok"/>
     </bean>
 
+    <util:map id="happyOk">
+        <entry key="еееее!" value="4"/>
+        <entry key="наканецта" value="2"/>
+        <entry key="о да, детка" value="1"/>
+    </util:map>
+    <bean id="happyOkSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+        <property name="optionRatios" ref="happyOk"/>
+    </bean>
+
+    <util:map id="sadOk">
+        <entry key="ок(" value="4"/>
+        <entry key="ой всё" value="2"/>
+        <entry key=":(" value="1"/>
+    </util:map>
+    <bean id="sadOkSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+        <property name="optionRatios" ref="sadOk"/>
+    </bean>
+
     <util:map id="default">
         <entry key="." value="1"/>
         <entry key="тутц" value="1"/>

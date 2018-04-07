@@ -10,10 +10,12 @@ import ru.javazen.telegram.bot.repository.ChatConfigRepository;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class ToggleChatConfigHandler implements UpdateHandler {
     private String configKey;
     private Map<String, String> pattern2value;
+    private Map<String, Supplier<String>> value2response;
     private ChatConfigRepository chatConfigRepository;
 
     @Override
@@ -24,6 +26,9 @@ public class ToggleChatConfigHandler implements UpdateHandler {
 
         ChatConfig config = new ChatConfig(update.getMessage().getChatId(), configKey, configValue);
         chatConfigRepository.save(config);
+
+        String response = value2response.getOrDefault(configValue, () -> configKey + "=" + configValue).get();
+        sender.execute(MessageHelper.answer(update.getMessage(), response));
         return true;
     }
 
@@ -35,6 +40,10 @@ public class ToggleChatConfigHandler implements UpdateHandler {
     @Required
     public void setPattern2value(Map<String, String> pattern2value) {
         this.pattern2value = pattern2value;
+    }
+
+    public void setValue2response(Map<String, Supplier<String>> value2response) {
+        this.value2response = value2response;
     }
 
     @Autowired
