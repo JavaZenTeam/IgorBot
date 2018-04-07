@@ -31,8 +31,9 @@ public class MessageCollector implements UpdateHandler {
         entity.setUserId(message.getFrom().getId());
 
         if (saveTextKey != null){
-            ChatConfig config = chatConfigRepository.findOne(new ChatConfigPK(message.getChatId(), saveTextKey));
-            if (config != null && Objects.equals(config.getValue(), saveTextValue)){
+            String value = chatConfigRepository.findOne(new ChatConfigPK(message.getChatId(), saveTextKey))
+                    .map(ChatConfig::getValue).orElse(null);
+            if (Objects.equals(value, saveTextValue)){
                 entity.setText(MessageHelper.getActualText(message));
             }
         }
