@@ -7,10 +7,10 @@ import java.io.Serializable;
 @Embeddable
 public class MessagePK implements Serializable {
 
-    @Column(name = "chatid")
+    @Column
     private long chatId;
 
-    @Column(name = "messageid")
+    @Column
     private int messageId;
 
     public MessagePK() {
