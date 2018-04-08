@@ -5,7 +5,6 @@ import ru.javazen.telegram.bot.util.MessageHelper;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Objects;
 
 @Entity
 @Table
@@ -80,25 +79,13 @@ public class MessageEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MessageEntity message = (MessageEntity) o;
-
-        return Objects.equals(messagePK, message.messagePK)
-                && Objects.equals(user, message.user)
-                && Objects.equals(text, message.text)
-                && Objects.equals(date, message.date);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = messagePK != null ? messagePK.hashCode() : 0;
-        result = 31 * result + (user != null ? user.hashCode() : 0);
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (date != null ? date.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "MessageEntity{" +
+                "messagePK=" + messagePK +
+                ", chat=" + chat +
+                ", user=" + user +
+                ", text='" + text + '\'' +
+                ", date=" + date +
+                '}';
     }
 }

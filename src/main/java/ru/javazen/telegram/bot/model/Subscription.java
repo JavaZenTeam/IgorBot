@@ -1,7 +1,9 @@
 package ru.javazen.telegram.bot.model;
 
-import javax.persistence.*;
-import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table
@@ -51,17 +53,12 @@ public class Subscription {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Subscription that = (Subscription) o;
-
-        return Objects.equals(subscriptionPK, that.subscriptionPK);
-    }
-
-    @Override
-    public int hashCode() {
-        return subscriptionPK != null ? subscriptionPK.hashCode() : 0;
+    public String toString() {
+        return "Subscription{" +
+                "subscriptionPK=" + subscriptionPK +
+                ", userId=" + userId +
+                ", trigger='" + trigger + '\'' +
+                ", response='" + response + '\'' +
+                '}';
     }
 }

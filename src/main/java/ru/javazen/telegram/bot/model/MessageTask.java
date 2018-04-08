@@ -106,4 +106,19 @@ public class MessageTask {
     public void setBotName(String botName) {
         this.botName = botName;
     }
+
+    @Override
+    public String toString() {
+        return "MessageTask{" +
+                "id=" + id +
+                ", timeOfCompletion=" + timeOfCompletion +
+                ", scheduledText='" + scheduledText + '\'' +
+                ", replyMessageId=" + replyMessageId +
+                ", isCompleted=" + isCompleted +
+                ", userId=" + userId +
+                ", chatId=" + chatId +
+                ", messageId=" + messageId +
+                ", botName='" + botName + '\'' +
+                '}';
+    }
 }
