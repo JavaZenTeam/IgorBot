@@ -55,4 +55,12 @@ public class ChatConfigPK implements Serializable {
         result = 31 * result + key.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "ChatConfigPK{" +
+                "chatId=" + chatId +
+                ", key='" + key + '\'' +
+                '}';
+    }
 }

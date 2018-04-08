@@ -62,4 +62,13 @@ public class ChatEntity {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    @Override
+    public String toString() {
+        return "ChatEntity{" +
+                "chatId=" + chatId +
+                ", username='" + username + '\'' +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }

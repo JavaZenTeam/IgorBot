@@ -4,7 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.Objects;
 
 @Entity
 @Table
@@ -45,21 +44,10 @@ public class ChatConfig {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ChatConfig that = (ChatConfig) o;
-
-        return Objects.equals(chatConfigPK, that.chatConfigPK)
-                && Objects.equals(value, that.value);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = chatConfigPK != null ? chatConfigPK.hashCode() : 0;
-        result = 31 * result + (value != null ? value.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "ChatConfig{" +
+                "chatConfigPK=" + chatConfigPK +
+                ", value='" + value + '\'' +
+                '}';
     }
 }
