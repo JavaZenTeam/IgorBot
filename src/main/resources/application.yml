@@ -1,6 +1,9 @@
 spring:
   application.name: bot-platform
   profiles.active: ${IGOR_BOT_ACTIVE_PROFILE:dev}
+  jpa:
+    hibernate:
+      ddl-auto: validate
 bot:
   name: ${IGOR_BOT_USERNAME}
   token: ${IGOR_BOT_TOKEN}
