@@ -53,4 +53,12 @@ public class MessagePK implements Serializable {
         result = 31 * result + messageId;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "MessagePK{" +
+                "chatId=" + chatId +
+                ", messageId=" + messageId +
+                '}';
+    }
 }
