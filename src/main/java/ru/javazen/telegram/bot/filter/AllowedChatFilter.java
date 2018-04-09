@@ -1,10 +1,10 @@
 package ru.javazen.telegram.bot.filter;
 
 
-
 import org.telegram.telegrambots.api.objects.Update;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class AllowedChatFilter implements Filter {
@@ -18,5 +18,9 @@ public class AllowedChatFilter implements Filter {
 
     public void setAllowedChatIds(List<Long> allowedChatIds) {
         this.allowedChatIds = allowedChatIds;
+    }
+
+    public void setAllowedChatId(Long allowedChatId) {
+        this.allowedChatIds = Collections.singletonList(allowedChatId);
     }
 }
