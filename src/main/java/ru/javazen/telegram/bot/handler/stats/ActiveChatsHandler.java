@@ -21,7 +21,7 @@ public class ActiveChatsHandler implements UpdateHandler {
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, -1);
+        calendar.add(Calendar.DATE, -7);
 
         List<ChatEntity> activeChats = chatEntityRepository.findActiveChats(calendar.getTime());
         String chats = activeChats.stream()

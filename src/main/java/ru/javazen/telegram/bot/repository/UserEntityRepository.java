@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface UserEntityRepository extends CrudRepository<UserEntity, Integer> {
-    @Query("select me.user from MessageEntity me where me.date > :date group by me.user")
+    @Query("select distinct me.user from MessageEntity me where me.date > :date")
     List<UserEntity> findActiveUsers(@Param("date") Date date);
 }
 
