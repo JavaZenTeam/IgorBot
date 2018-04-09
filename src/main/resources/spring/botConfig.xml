@@ -9,6 +9,10 @@
     <import resource="processors.xml"/>
     <import resource="songs.xml"/>
 
+    <bean id="supportChatId" class="java.lang.Long">
+        <constructor-arg value="-1001063148517"/>
+    </bean>
+
     <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
@@ -23,10 +27,11 @@
         </constructor-arg>
     </bean>
 
-    <bean id="doNotKnowAnswerModule"  class="ru.javazen.telegram.bot.handler.FilterAdapter">
+    <bean id="doNotKnowAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="и+го+рь,\s*(когда|где|куда|откуда|кто|как|как\w{2}|насколько|сколько|почему|отчего)\s.*\?"/>
+                <property name="pattern"
+                          value="и+го+рь,\s*(когда|где|куда|откуда|кто|как|как\w{2}|насколько|сколько|почему|отчего)\s.*\?"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
@@ -43,7 +48,8 @@
         <property name="preprocessors" ref="preprocessors"/>
     </bean>
 
-    <bean id="choiceMakerWithContext" class="ru.javazen.telegram.bot.handler.ChoiceMakerWithContext" parent="choiceMaker">
+    <bean id="choiceMakerWithContext" class="ru.javazen.telegram.bot.handler.ChoiceMakerWithContext"
+          parent="choiceMaker">
         <property name="pattern" value="и+го+рь,\s*(?&lt;context&gt;.+?):\s*(?&lt;options&gt;.+\s+или\s+.+)\?"/>
     </bean>
 
@@ -52,7 +58,8 @@
     </bean>
 
     <bean id="engCharSet" class="java.lang.String">
-        <constructor-arg value="qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:&quot;ZXCVBNM&lt;&gt;?~@#$%^&amp;"
+        <constructor-arg
+                value="qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:&quot;ZXCVBNM&lt;&gt;?~@#$%^&amp;"
         />
     </bean>
 
@@ -178,9 +185,9 @@
 
     <bean id="chatBridgeWithDenis" class="ru.javazen.telegram.bot.handler.ChatBridge">
         <!--Chat with normal people-->
-        <property name="firstChat" value="-1001045629601" />
+        <property name="firstChat" value="-1001045629601"/>
         <!--Chat with Denis-->
-        <property name="secondChat" value="-1001038770422" />
+        <property name="secondChat" value="-1001038770422"/>
     </bean>
 
     <bean id="getStickerByIdModule" class="ru.javazen.telegram.bot.handler.GetStickerById">
@@ -229,7 +236,8 @@
         <constructor-arg name="songs" ref="songs"/>
     </bean>
 
-    <bean id="anniversaryMessageCongratulations" class="ru.javazen.telegram.bot.handler.AnniversaryMessageCongratulations">
+    <bean id="anniversaryMessageCongratulations"
+          class="ru.javazen.telegram.bot.handler.AnniversaryMessageCongratulations">
         <property name="messageIdPattern" value="\d0{3,}"/>
         <property name="templates">
             <list>
@@ -272,9 +280,9 @@
         </constructor-arg>
         <constructor-arg name="handlers">
             <list>
-                <ref bean="gayAnswerDetector" />
-                <ref bean="jokeAbout300" />
-                <ref bean="headOfDickDetector" />
+                <ref bean="gayAnswerDetector"/>
+                <ref bean="jokeAbout300"/>
+                <ref bean="headOfDickDetector"/>
             </list>
         </constructor-arg>
     </bean>
@@ -295,8 +303,8 @@
         </constructor-arg>
         <constructor-arg name="handlers">
             <list>
-                <ref bean="theAngle" />
-                <ref bean="boysForStas" />
+                <ref bean="theAngle"/>
+                <ref bean="boysForStas"/>
             </list>
         </constructor-arg>
     </bean>
@@ -305,16 +313,16 @@
         <constructor-arg name="filters">
             <list>
                 <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
-                    <property name="probability" value="0.9" />
+                    <property name="probability" value="0.9"/>
                 </bean>
                 <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                    <property name="pattern" value="[^?a-zа-я]*п[ао]ц[ао]ны[^?a-zа-я]*" />
+                    <property name="pattern" value="[^?a-zа-я]*п[ао]ц[ао]ны[^?a-zа-я]*"/>
                 </bean>
             </list>
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.SimpleStickerSender">
-                <property name="sticker" value="CAADAgADrAADWGWJCqKpjTD8hHQzAg" />
+                <property name="sticker" value="CAADAgADrAADWGWJCqKpjTD8hHQzAg"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -323,16 +331,16 @@
         <constructor-arg name="filters">
             <list>
                 <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
-                    <property name="probability" value="0.2" />
+                    <property name="probability" value="0.2"/>
                 </bean>
                 <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                    <property name="pattern" value="(.*угл.*)|(.*угол.*)" />
+                    <property name="pattern" value="(.*угл.*)|(.*угол.*)"/>
                 </bean>
             </list>
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.SimpleStickerSender">
-                <property name="sticker" value="CAADAgADngADWGWJCk1fdCmruZR4Ag" />
+                <property name="sticker" value="CAADAgADngADWGWJCk1fdCmruZR4Ag"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -341,16 +349,16 @@
         <constructor-arg name="filters">
             <list>
                 <bean class="ru.javazen.telegram.bot.filter.RandomFilter">
-                    <property name="probability" value="0.9" />
+                    <property name="probability" value="0.9"/>
                 </bean>
                 <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                    <property name="pattern" value="[^?a-zа-я]*п[ао]ц[ао]ны[^?a-zа-я]*" />
+                    <property name="pattern" value="[^?a-zа-я]*п[ао]ц[ао]ны[^?a-zа-я]*"/>
                 </bean>
             </list>
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.SimpleStickerSender">
-                <property name="sticker" value="CAADAgADAgQAAhmGAwABdyWcY6kAAYt8Ag" />
+                <property name="sticker" value="CAADAgADAgQAAhmGAwABdyWcY6kAAYt8Ag"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -359,17 +367,20 @@
     <bean id="subscriptionListen" class="ru.javazen.telegram.bot.handler.subscriptions.ListenSubscriptionKeysHandler">
     </bean>
     <bean id="subscriptionCreate" class="ru.javazen.telegram.bot.handler.subscriptions.CreateSubscriptionHandler">
-        <property name="pattern" value="и+го+рь,? (к[оа]гда|есл?[еи]) (?&lt;userFlag&gt;у меня |я )?(?&lt;trigger&gt;.+?),? (г[оа]вори|ск[оа]ж[иы]) (?&lt;response&gt;.+)"/>
+        <property name="pattern"
+                  value="и+го+рь,? (к[оа]гда|есл?[еи]) (?&lt;userFlag&gt;у меня |я )?(?&lt;trigger&gt;.+?),? (г[оа]вори|ск[оа]ж[иы]) (?&lt;response&gt;.+)"/>
         <property name="successResponseSupplier" ref="okSupplier"/>
     </bean>
     <bean id="subscriptionGet" class="ru.javazen.telegram.bot.handler.subscriptions.GetSubscriptionsByKeyHandler">
-        <property name="pattern" value="и+го+рь,? [чш]т?[ое] ск[оа]ж[еи]шь?,? (к[оа]гда|есл?[еи]) (?&lt;trigger&gt;.+)\??"/>
+        <property name="pattern"
+                  value="и+го+рь,? [чш]т?[ое] ск[оа]ж[еи]шь?,? (к[оа]гда|есл?[еи]) (?&lt;trigger&gt;.+)\??"/>
         <property name="onEmptyResponseSupplier" ref="emptySupplier"/>
     </bean>
     <bean id="subscriptionCancel" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="(з[ао]+(в[ао]ли|ткнись|мол(кн|ч)и|бу[дт]ь)|ш[ао]+т[ао]+п|пр[еи]крати|п[еи]р[еи]стань)"/>
+                <property name="pattern"
+                          value="(з[ао]+(в[ао]ли|ткнись|мол(кн|ч)и|бу[дт]ь)|ш[ао]+т[ао]+п|пр[еи]крати|п[еи]р[еи]стань)"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
@@ -403,11 +414,43 @@
         </property>
     </bean>
 
+    <bean id="statisticReports" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.AllowedChatFilter">
+                <property name="allowedChatId" ref="supportChatId"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handlers">
+            <list>
+                <bean id="activeChats" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+                    <constructor-arg name="filter">
+                        <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                            <property name="pattern" value="/active_chats"/>
+                        </bean>
+                    </constructor-arg>
+                    <constructor-arg name="handler">
+                        <bean class="ru.javazen.telegram.bot.handler.stats.ActiveChatsHandler"/>
+                    </constructor-arg>
+                </bean>
+                <bean id="activeUsers" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+                    <constructor-arg name="filter">
+                        <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                            <property name="pattern" value="/active_users"/>
+                        </bean>
+                    </constructor-arg>
+                    <constructor-arg name="handler">
+                        <bean class="ru.javazen.telegram.bot.handler.stats.ActiveUsersHandler"/>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
     <bean id="bot" class="ru.javazen.telegram.bot.CompositeBot">
         <constructor-arg name="name" value="${bot.name}"/>
         <constructor-arg name="token" value="${bot.token}"/>
 
-        <property name="supportChatId" value="-1001063148517"/>
+        <property name="supportChatId" ref="supportChatId"/>
         <property name="startMessageSupplier" ref="startSupplier"/>
         <property name="updateHandlers">
             <list>
@@ -416,6 +459,7 @@
                 <ref bean="messageCollectorSaveTextSwitch"/>
                 <ref bean="pinnedForwarder"/>
                 <ref bean="continueRepeatableSequenceModule"/>
+                <ref bean="statisticReports"/>
                 <ref bean="subscriptionCreate"/>
                 <ref bean="subscriptionGet"/>
                 <ref bean="subscriptionCancel"/>
