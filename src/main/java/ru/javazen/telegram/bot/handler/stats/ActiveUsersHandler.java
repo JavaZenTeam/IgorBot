@@ -22,7 +22,7 @@ public class ActiveUsersHandler implements UpdateHandler {
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
+        calendar.add(Calendar.DATE, -7);
 
         List<UserEntity> activeUsers = userEntityRepository.findActiveUsers(calendar.getTime());
         String chats = activeUsers.stream()
