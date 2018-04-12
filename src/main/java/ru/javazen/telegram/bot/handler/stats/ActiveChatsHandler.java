@@ -12,6 +12,7 @@ import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.MessageFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,10 +27,11 @@ public class ActiveChatsHandler implements UpdateHandler {
         List<ChatEntity> activeChats = chatEntityRepository.findActiveChats(calendar.getTime());
         String chats = activeChats.stream()
                 .map(chat -> MoreObjects.firstNonNull(chat.getTitle(), "[id=" + chat.getChatId() + "]"))
-                .collect(Collectors.joining(activeChats.size() > 5 ? ", " : "\n"));
+                .sorted(Comparator.comparing(String::toLowerCase))
+                .collect(Collectors.joining("\n"));
 
-        String report = MessageFormat.format("*Total*: {0}\n{1}", activeChats.size(), chats);
-        sender.execute(MessageHelper.answer(update.getMessage(), report).enableMarkdown(true));
+        String report = MessageFormat.format("Total: {0}\n\n{1}", activeChats.size(), chats);
+        sender.execute(MessageHelper.answer(update.getMessage(), report));
         return true;
     }
 
