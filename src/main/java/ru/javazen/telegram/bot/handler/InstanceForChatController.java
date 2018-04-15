@@ -7,8 +7,8 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class InstanceForChatController implements UpdateHandler {
-    private Map<Long, UpdateHandler> map = new HashMap<>();
+public abstract class InstanceForChatController<T extends UpdateHandler> implements UpdateHandler {
+    private Map<Long, T> map = new HashMap<>();
 
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
@@ -19,5 +19,13 @@ public abstract class InstanceForChatController implements UpdateHandler {
         return map.get(chatId).handle(update, sender);
     }
 
-    protected abstract UpdateHandler newInstance();
+    @Override
+    public String getName() {
+        T instance = map.isEmpty()
+                ? newInstance()
+                : map.values().iterator().next();
+        return instance.getName();
+    }
+
+    protected abstract T newInstance();
 }

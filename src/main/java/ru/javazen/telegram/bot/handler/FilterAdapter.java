@@ -1,5 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
+import org.springframework.beans.factory.BeanNameAware;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -8,9 +9,10 @@ import ru.javazen.telegram.bot.filter.Filter;
 import java.util.Collections;
 import java.util.List;
 
-public class FilterAdapter implements UpdateHandler {
+public class FilterAdapter implements UpdateHandler, BeanNameAware {
     private List<Filter> filters;
     private List<UpdateHandler> handlers;
+    private String beanName;
 
     public FilterAdapter(Filter filter, UpdateHandler handler) {
         this(Collections.singletonList(filter), Collections.singletonList(handler));
@@ -39,5 +41,15 @@ public class FilterAdapter implements UpdateHandler {
                         throw new RuntimeException(e);
                     }
                 });
+    }
+
+    @Override
+    public void setBeanName(String beanName) {
+        this.beanName = beanName;
+    }
+
+    @Override
+    public String getName() {
+        return beanName;
     }
 }
