@@ -2,6 +2,7 @@ package ru.javazen.telegram.bot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -10,6 +11,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.generics.BotSession;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.repository.BotUsageLogRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -30,6 +32,8 @@ public class CompositeBot extends TelegramLongPollingBot {
     private String name;
     private String token;
     private BotSession session;
+
+    private BotUsageLogRepository logRepository;
 
     public CompositeBot(String name, String token) {
         this.name = name;
@@ -56,7 +60,13 @@ public class CompositeBot extends TelegramLongPollingBot {
         if(update.getMessage() == null) { return; }
         try {
             for (UpdateHandler handler : updateHandlers){
-                if (handler.handle(update, this)) return;
+                BotUsageLogWrapper wrapper = new BotUsageLogWrapper();
+                wrapper.setBotUsageLogRepository(logRepository);
+                wrapper.setModuleName(handler.getName());
+                wrapper.setSourceMessage(update.getMessage());
+                wrapper.setTarget(this);
+
+                if (handler.handle(update, wrapper)) return;
             }
             LOGGER.debug("This update is not handled: {}", update);
         } catch (Exception e){
@@ -89,6 +99,11 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     public void setStartMessageSupplier(Supplier<String> startMessageSupplier) {
         this.startMessageSupplier = startMessageSupplier;
+    }
+
+    @Autowired
+    public void setLogRepository(BotUsageLogRepository logRepository) {
+        this.logRepository = logRepository;
     }
 
     static {

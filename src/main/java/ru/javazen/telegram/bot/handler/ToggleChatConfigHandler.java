@@ -32,6 +32,11 @@ public class ToggleChatConfigHandler implements UpdateHandler {
         return true;
     }
 
+    @Override
+    public String getName() {
+        return "ToggleChatConfig:" + configKey;
+    }
+
     @Required
     public void setConfigKey(String configKey) {
         this.configKey = configKey;
