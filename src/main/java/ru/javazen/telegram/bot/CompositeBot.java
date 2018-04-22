@@ -3,10 +3,10 @@ package ru.javazen.telegram.bot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.generics.BotSession;
@@ -35,7 +35,8 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     private BotUsageLogRepository logRepository;
 
-    public CompositeBot(String name, String token) {
+    public CompositeBot(String name, String token, DefaultBotOptions options) {
+        super(options);
         this.name = name;
         this.token = token;
     }
@@ -104,10 +105,6 @@ public class CompositeBot extends TelegramLongPollingBot {
     @Autowired
     public void setLogRepository(BotUsageLogRepository logRepository) {
         this.logRepository = logRepository;
-    }
-
-    static {
-        ApiContextInitializer.init();
     }
 
     @PostConstruct
