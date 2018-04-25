@@ -5,13 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.generics.BotSession;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
-import ru.javazen.telegram.bot.repository.BotUsageLogRepository;
+import ru.javazen.telegram.bot.service.MessageCollectorService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -33,7 +34,8 @@ public class CompositeBot extends TelegramLongPollingBot {
     private String token;
     private BotSession session;
 
-    private BotUsageLogRepository logRepository;
+    private BotUsageLogWrapper wrapper = new BotUsageLogWrapper(this);
+    private MessageCollectorService messageCollectorService;
 
     public CompositeBot(String name, String token, DefaultBotOptions options) {
         super(options);
@@ -58,39 +60,53 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if(update.getMessage() == null) { return; }
+        if (update.getMessage() == null) {
+            return;
+        }
         try {
-            for (UpdateHandler handler : updateHandlers){
-                BotUsageLogWrapper wrapper = new BotUsageLogWrapper();
-                wrapper.setBotUsageLogRepository(logRepository);
-                wrapper.setModuleName(handler.getName());
-                wrapper.setSourceMessage(update.getMessage());
-                wrapper.setTarget(this);
+            Message sentMessage = null;
+            String handlerName = null;
 
-                if (handler.handle(update, wrapper)) return;
-            }
-            LOGGER.debug("This update is not handled: {}", update);
-        } catch (Exception e){
-            LOGGER.error("Error on handling update", e);
-            if (supportChatId != null){
-                String stackTraceString = Arrays.stream(e.getStackTrace())
-                        .filter(el -> el.getClassName().startsWith(ROOT_PACKAGE_NAME))
-                        .map(StackTraceElement::toString)
-                        .collect(Collectors.joining("\n"));
+            for (UpdateHandler handler : updateHandlers) {
+                boolean handled = handler.handle(update, wrapper);
 
-                SendMessage sendMessage = new SendMessage();
-                sendMessage.setChatId(supportChatId.toString());
-
-                String message = String.format("*Error!*\n%s\n```\n%s```", e, stackTraceString);
-                sendMessage.setText(message);
-                sendMessage.setParseMode("MARKDOWN");
-                try {
-                    execute(sendMessage);
-                } catch (TelegramApiException te) {
-                    LOGGER.error("Can't send message to support chat", te);
+                if (handled) {
+                    sentMessage = wrapper.getSentMessage();
+                    handlerName = handler.getName();
+                    LOGGER.debug("Update {} handled by {}", update, handlerName);
+                    break;
                 }
-
             }
+
+            messageCollectorService.saveMessage(update.getMessage());
+            if (sentMessage != null) {
+                messageCollectorService.saveBotUsage(update.getMessage(), sentMessage, handlerName);
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("Error on handling update", e);
+            if (supportChatId != null) {
+                sendErrorToSupport(e);
+            }
+        }
+    }
+
+    private void sendErrorToSupport(Exception e) {
+        String stackTraceString = Arrays.stream(e.getStackTrace())
+                .filter(el -> el.getClassName().startsWith(ROOT_PACKAGE_NAME))
+                .map(StackTraceElement::toString)
+                .collect(Collectors.joining("\n"));
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(supportChatId.toString());
+
+        String message = String.format("*Error!*\n%s\n```\n%s```", e, stackTraceString);
+        sendMessage.setText(message);
+        sendMessage.setParseMode("MARKDOWN");
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException te) {
+            LOGGER.error("Can't send message to support chat", te);
         }
     }
 
@@ -103,8 +119,8 @@ public class CompositeBot extends TelegramLongPollingBot {
     }
 
     @Autowired
-    public void setLogRepository(BotUsageLogRepository logRepository) {
-        this.logRepository = logRepository;
+    public void setMessageCollectorService(MessageCollectorService messageCollectorService) {
+        this.messageCollectorService = messageCollectorService;
     }
 
     @PostConstruct
@@ -112,7 +128,7 @@ public class CompositeBot extends TelegramLongPollingBot {
         TelegramBotsApi botsApi = new TelegramBotsApi();
         session = botsApi.registerBot(this);
 
-        if (supportChatId != null && startMessageSupplier != null){
+        if (supportChatId != null && startMessageSupplier != null) {
 
             SendMessage message = new SendMessage()
                     .setChatId(supportChatId)
