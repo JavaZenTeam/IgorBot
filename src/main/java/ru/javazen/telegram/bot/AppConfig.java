@@ -62,7 +62,7 @@ public class AppConfig {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.setVisibilityChecker(
+        mapper.setVisibility(
                 mapper.getSerializationConfig().getDefaultVisibilityChecker()
                         .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
                         .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
