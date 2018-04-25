@@ -399,11 +399,6 @@
         </property>
     </bean>
 
-    <!--Message Collector handlers-->
-    <bean name="messageCollector" class="ru.javazen.telegram.bot.handler.MessageCollector">
-        <property name="saveTextKey" value="messageCollector.saveText"/>
-        <property name="saveTextValue" value="Y"/>
-    </bean>
     <bean name="messageCollectorSaveTextSwitch" parent="abstractToggle">
         <property name="configKey" value="messageCollector.saveText"/>
         <property name="pattern2value">
@@ -446,7 +441,8 @@
         </constructor-arg>
     </bean>
 
-    <bean id="bot" class="ru.javazen.telegram.bot.CompositeBot">
+    <!--suppress SpringXmlAutowireExplicitlyInspection -->
+    <bean id="bot" class="ru.javazen.telegram.bot.CompositeBot" autowire="constructor">
         <constructor-arg name="name" value="${bot.name}"/>
         <constructor-arg name="token" value="${bot.token}"/>
 
@@ -455,7 +451,6 @@
         <property name="updateHandlers">
             <list>
                 <ref bean="anniversaryMessageCongratulations"/>
-                <ref bean="messageCollector"/>
                 <ref bean="messageCollectorSaveTextSwitch"/>
                 <ref bean="pinnedForwarder"/>
                 <ref bean="continueRepeatableSequenceModule"/>
