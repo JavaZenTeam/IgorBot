@@ -9,9 +9,7 @@ bot:
   token: ${IGOR_BOT_TOKEN}
 http:
   proxy:
-    enabled: ${PROXY_ENABLED:false}
-    host: ${PROXY_HOST}
-    port: ${PROXY_PORT}
+    url: ${PROXY_URL:}
 ---
 spring:
   profiles: dev
