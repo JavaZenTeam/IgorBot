@@ -20,6 +20,7 @@ public class CreateSubscriptionHandler implements UpdateHandler {
     private SubscriptionService subscriptionService;
     private Pattern pattern;
     private Supplier<String> successResponseSupplier;
+    private Supplier<String> tooManyDuplicatesErrorSupplier;
 
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
@@ -37,15 +38,18 @@ public class CreateSubscriptionHandler implements UpdateHandler {
                 update.getMessage().getChat().getId(),
                 update.getMessage().getMessageId());
         template.setSubscriptionPK(subscriptionPK);
-        template.setTrigger("%" + trigger + "%");
+        template.setTrigger(trigger);
         template.setResponse(response);
         if (userFlag != null) template.setUserId(update.getMessage().getFrom().getId());
 
-        subscriptionService.createSubscription(template);
-
-        SendMessage answer = MessageHelper.answer(update.getMessage(), successResponseSupplier.get());
-        Message m = sender.execute(answer);
-        subscriptionService.saveSubscriptionReply(subscriptionPK, m.getMessageId());
+        try {
+            subscriptionService.createSubscription(template);
+            SendMessage answer = MessageHelper.answer(update.getMessage(), successResponseSupplier.get());
+            Message sentMessage = sender.execute(answer);
+            subscriptionService.saveSubscriptionReply(subscriptionPK, sentMessage.getMessageId());
+        } catch (SubscriptionService.TooManyDuplicatesException e){
+            sender.execute(MessageHelper.answer(update.getMessage(), tooManyDuplicatesErrorSupplier.get()));
+        }
         return true;
     }
 
@@ -60,6 +64,10 @@ public class CreateSubscriptionHandler implements UpdateHandler {
 
     public void setSuccessResponseSupplier(Supplier<String> successResponseSupplier) {
         this.successResponseSupplier = successResponseSupplier;
+    }
+
+    public void setTooManyDuplicatesErrorSupplier(Supplier<String> tooManyDuplicatesErrorSupplier) {
+        this.tooManyDuplicatesErrorSupplier = tooManyDuplicatesErrorSupplier;
     }
 
     public void setSuccessResponse(String successResponse) {

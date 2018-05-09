@@ -1,7 +1,5 @@
 package ru.javazen.telegram.bot.service.impl;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +15,7 @@ import java.util.Map;
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
     private SubscriptionRepository repository;
-    private Map<Long, BiMap<Integer, Integer>> chatReplies = new HashMap<>();
+    private Map<Long, Map<Integer, Integer>> chatReplies = new HashMap<>();
 
     @Autowired
     public SubscriptionServiceImpl(SubscriptionRepository repository) {
@@ -28,7 +26,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public Subscription createSubscription(Subscription template) {
         Subscription subscription = new Subscription();
         BeanUtils.copyProperties(template, subscription);
+        validate(subscription);
         return repository.save(subscription);
+    }
+
+    private void validate(Subscription subscription) {
+        Long countDuplicates = repository.countAllBySubscriptionPK_ChatIdAndUserIdAndTrigger(
+                subscription.getSubscriptionPK().getChatId(),
+                subscription.getUserId(),
+                subscription.getTrigger());
+        if (countDuplicates >= 3) {
+            throw new TooManyDuplicatesException();
+        }
     }
 
     @Override
@@ -41,8 +50,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public void saveSubscriptionReply(MessagePK subscriptionPK, int replyMessageId) {
-        BiMap<Integer, Integer> replies = chatReplies.computeIfAbsent(subscriptionPK.getChatId(), (key) -> HashBiMap.create());
-        replies.forcePut(replyMessageId, subscriptionPK.getMessageId());
+        Map<Integer, Integer> replies = chatReplies.computeIfAbsent(subscriptionPK.getChatId(), (key) -> new HashMap<>());
+        replies.put(replyMessageId, subscriptionPK.getMessageId());
     }
 
     @Override
@@ -55,7 +64,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public boolean cancelSubscriptionByReply(MessagePK replyMessagePK) {
-        BiMap<Integer, Integer> replies = chatReplies.get(replyMessagePK.getChatId());
+        Map<Integer, Integer> replies = chatReplies.get(replyMessagePK.getChatId());
         if (replies == null) return false;
         Integer messageId = replies.remove(replyMessagePK.getMessageId());
         return messageId != null &&
