@@ -18,4 +18,6 @@ public interface SubscriptionRepository extends CrudRepository<Subscription, Mes
             @Param("chatId") Long chatId,
             @Param("trigger") String trigger,
             @Param("userId") Integer userId);
+
+    Long countAllBySubscriptionPK_ChatIdAndUserIdAndTrigger(Long chatId, Integer userId, String trigger);
 }
