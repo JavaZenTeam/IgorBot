@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot.service.impl;
+package ru.javazen.telegram.bot.scheduler.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,6 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.CompositeBot;
 import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
-import ru.javazen.telegram.bot.service.MessageSchedulerService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -21,18 +20,20 @@ import java.util.concurrent.ScheduledFuture;
 
 public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
-    private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSchedulerServiceImpl.class);
 
-    @Autowired
-    private CompositeBot telegramBot;
-
-    @Autowired
-    private MessageTaskRepository messageTaskRepository;
+    private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
 
     /*private Map<Long, ScheduledFuture> futureMap = new HashMap<>();*/
     private List<FutureTask> futureTasks = new ArrayList<>();
+
+    private final CompositeBot telegramBot;
+    private final MessageTaskRepository messageTaskRepository;
+
+    public MessageSchedulerServiceImpl(CompositeBot telegramBot, MessageTaskRepository messageTaskRepository) {
+        this.telegramBot = telegramBot;
+        this.messageTaskRepository = messageTaskRepository;
+    }
 
     @Override
     public void scheduleTask(MessageTask task) {

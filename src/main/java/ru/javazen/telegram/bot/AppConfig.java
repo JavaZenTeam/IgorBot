@@ -13,8 +13,6 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -27,8 +25,9 @@ import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.ApiContext;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
-import ru.javazen.telegram.bot.service.MessageSchedulerService;
-import ru.javazen.telegram.bot.service.impl.MessageSchedulerServiceImpl;
+import ru.javazen.telegram.bot.repository.MessageTaskRepository;
+import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
+import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerServiceImpl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -98,8 +97,9 @@ public class AppConfig {
     }
 
     @Bean
-    public MessageSchedulerService messageSchedulerService() {
-        return new MessageSchedulerServiceImpl();
+    public MessageSchedulerService messageSchedulerService(CompositeBot compositeBot,
+                                                           MessageTaskRepository messageTaskRepository) {
+        return new MessageSchedulerServiceImpl(compositeBot, messageTaskRepository);
     }
 
     @Bean
