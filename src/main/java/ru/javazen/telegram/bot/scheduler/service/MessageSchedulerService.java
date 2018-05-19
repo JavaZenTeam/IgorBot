@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot.service;
+package ru.javazen.telegram.bot.scheduler.service;
 
 import ru.javazen.telegram.bot.model.MessageTask;
 
