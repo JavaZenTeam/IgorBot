@@ -7,6 +7,8 @@ import ru.javazen.telegram.bot.CompositeBot;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
 import ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.parser.ShiftTimeParser;
+import ru.javazen.telegram.bot.scheduler.parser.SpecificTimeParser;
+import ru.javazen.telegram.bot.scheduler.parser.service.TimeExtractionService;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerServiceImpl;
 
@@ -19,13 +21,14 @@ public class SchedulerConfig {
     @Bean("scheduler")
     public SchedulerNotifyHandler schedulerNotifyHandler(MessageSchedulerService messageSchedulerService,
                                                          @Qualifier("okSupplier") Supplier<String> okSupplier,
-                                                         ShiftTimeParser shiftTimeParser) {
+                                                         ShiftTimeParser shiftTimeParser,
+                                                         SpecificTimeParser specificTimeParser) {
 
         return new SchedulerNotifyHandler(
                 messageSchedulerService,
                 1827,
                 okSupplier,
-                Arrays.asList(shiftTimeParser));
+                Arrays.asList(shiftTimeParser, specificTimeParser));
     }
 
     @Bean
@@ -39,5 +42,15 @@ public class SchedulerConfig {
         return new ShiftTimeParser(
                 defaultMessageSupplier,
                 "и+го+рь,\\s?ск[ао]ж[иы] че?р[еи]?з( .+)");
+    }
+
+
+    @Bean
+    SpecificTimeParser specificTimeParser(@Qualifier("defaultSupplier") Supplier<String> defaultMessageSupplier,
+                                          TimeExtractionService timeExtractionService) {
+        return new SpecificTimeParser(
+                defaultMessageSupplier,
+                "и+го+рь,\\s?ск[ао]ж[иы]( .+)",
+                timeExtractionService);
     }
 }
