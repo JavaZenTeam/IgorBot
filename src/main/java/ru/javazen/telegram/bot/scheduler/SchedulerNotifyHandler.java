@@ -9,9 +9,12 @@ import ru.javazen.telegram.bot.scheduler.parser.ScheduledMessageParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.function.Supplier;
 
 public class SchedulerNotifyHandler implements UpdateHandler {
@@ -20,6 +23,11 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     private final int daysLimit;
     private final Supplier<String> successResponseSupplier;
     private final List<ScheduledMessageParser> scheduledMessageParsers;
+
+    private DateFormat format = new SimpleDateFormat("HH:mm dd.MM.yy");
+    {
+        format.setTimeZone(TimeZone.getTimeZone("GMT+4:00"));
+    }
 
     public SchedulerNotifyHandler(MessageSchedulerService messageSchedulerService,
                                   int daysLimit,
@@ -60,7 +68,8 @@ public class SchedulerNotifyHandler implements UpdateHandler {
             return true;
         }
 
-        sender.execute(MessageHelper.answer(update.getMessage(), successResponseSupplier.get()));
+        sender.execute(MessageHelper.answer(update.getMessage(), successResponseSupplier.get() + ", завел на " +
+                format.format(result.getDate())));
 
         MessageTask task = new MessageTask();
         task.setChatId(update.getMessage().getChat().getId());
@@ -71,7 +80,6 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         task.setTimeOfCompletion(result.getDate().getTime());
 
         messageSchedulerService.scheduleTask(task);
-
 
         return true;
     }
