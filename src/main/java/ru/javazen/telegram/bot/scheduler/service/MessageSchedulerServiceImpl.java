@@ -2,7 +2,6 @@ package ru.javazen.telegram.bot.scheduler.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -14,7 +13,9 @@ import ru.javazen.telegram.bot.repository.MessageTaskRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
 
@@ -24,7 +25,6 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
     private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
 
-    /*private Map<Long, ScheduledFuture> futureMap = new HashMap<>();*/
     private List<FutureTask> futureTasks = new ArrayList<>();
 
     private final CompositeBot telegramBot;
@@ -58,8 +58,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
     @Override
     public void extendTaskByChatAndMessage(Long chatId, Long messageId, long additionalTime) {
-        //q   g
-/*        MessageTask task = messageTaskRepository.getTaskByChatIdAndMessageId(chatId, messageId);
+        /*MessageTask task = messageTaskRepository.getTaskByChatIdAndMessageId(chatId, messageId);
         ScheduledFuture future = futureMap.get(task.getId());
         futureMap.remove(task.getId());
 
@@ -87,7 +86,8 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
         ScheduledFuture future = taskScheduler.schedule(() -> {
             FutureTask futureTask = futureTasks.stream().filter(fTask -> fTask.getTaskId().equals(task.getId()))
-                    .findFirst().get(); //TODO
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Can't find future for task: " + task.getId()));
 
             try {
                 futureTask.getSender().execute(sendMessage);
@@ -125,9 +125,6 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
         for (FutureTask futureTask : futureTasks) {
             futureTask.getFuture().cancel(true);
         }
-        /*for (Map.Entry<Long, ScheduledFuture> entry : futureMap.entrySet()) {
-            entry.getValue().cancel(true);
-        }*/
     }
 
 
