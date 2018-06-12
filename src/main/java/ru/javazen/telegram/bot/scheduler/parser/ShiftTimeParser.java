@@ -75,7 +75,7 @@ public class ShiftTimeParser implements ScheduledMessageParser {
 
         GregorianCalendar calendar = new GregorianCalendar();
         boolean calendarChanged = false;
-        ParseResult result = new ParseResult();
+
 
         if(matcher.matches()) {
             String time;
@@ -103,9 +103,6 @@ public class ShiftTimeParser implements ScheduledMessageParser {
             throw new IllegalArgumentException("No time span specified");
         }
 
-        result.setMessage(returnMessage);
-        result.setDate(calendar.getTime());
-
-        return result;
+        return new ParseResult(calendar.getTime(), returnMessage);
     }
 }
