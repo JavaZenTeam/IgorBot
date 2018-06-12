@@ -1,6 +1,12 @@
 language: java
+addons:
+  sonarcloud:
+    organization: "javazen"
+    token:
+      secure: $SONARCUBE_TOKEN
 script:
   - mvn clean install
+  - sonar-scanner
 deploy:
   provider: heroku
   api_key:
