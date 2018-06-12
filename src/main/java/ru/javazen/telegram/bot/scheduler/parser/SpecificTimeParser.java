@@ -59,11 +59,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
                     time = findExplicitTime(timeStr);
                 }
 
-                ParseResult result = new ParseResult();
-
-                result.setDate(resolveDateTime(date, time));
-                result.setMessage(text);
-                return result;
+                return new ParseResult(resolveDateTime(date, time), text);
             }
         }
         return null;
