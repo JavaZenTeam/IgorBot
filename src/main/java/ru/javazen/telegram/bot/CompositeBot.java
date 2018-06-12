@@ -9,6 +9,7 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.generics.BotSession;
+import ru.javazen.telegram.bot.handler.InlineQuery;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
 
 import javax.annotation.PostConstruct;
@@ -53,10 +54,13 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if(update.getMessage() == null) { return; }
+        if(update.getMessage() == null && update.getInlineQuery()==null) { return; }
         try {
             for (UpdateHandler handler : updateHandlers){
-                if (handler.handle(update, this)) return;
+                if(handler.getClass()== InlineQuery.class && update.getMessage()==null)
+                    handler.handle(update, this);
+                else
+                    if (update.getMessage() != null && handler.handle(update, this)) return;
             }
             LOGGER.debug("This update is not handled: {}", update);
         } catch (Exception e){

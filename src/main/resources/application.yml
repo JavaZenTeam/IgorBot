@@ -28,3 +28,6 @@ logging:
     org.springframework.web: WARN
     ru.javazen.telegram.bot: WARN
     org.hibernate: WARN
+polly:
+  access-key: ${POLLY_ACCESS_KEY}
+  secret-key: ${POLLY_SECRET_KEY}
