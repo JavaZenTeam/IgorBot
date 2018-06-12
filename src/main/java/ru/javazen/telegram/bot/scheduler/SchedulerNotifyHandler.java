@@ -64,12 +64,19 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
         if (result.getDate().compareTo(calendar.getTime()) > 0) {
-            sender.execute(MessageHelper.answer(update.getMessage(), "Так долго я помнить не смогу, сорри", true));
+            sender.execute(MessageHelper.answer(update.getMessage(),
+                    "Так долго я помнить не смогу, сорри", true));
             return true;
         }
 
-        sender.execute(MessageHelper.answer(update.getMessage(), successResponseSupplier.get() + ", завел на " +
-                format.format(result.getDate())));
+        Calendar clarifyCalendar = Calendar.getInstance();
+        clarifyCalendar.add(Calendar.HOUR_OF_DAY, 1);
+
+        boolean needClarify = result.getDate().compareTo(clarifyCalendar.getTime()) > 0;
+
+        sender.execute(MessageHelper.answer(update.getMessage(),
+                successResponseSupplier.get() + (needClarify ? ", завел на " +
+                format.format(result.getDate()): "")));
 
         MessageTask task = new MessageTask();
         task.setChatId(update.getMessage().getChat().getId());
