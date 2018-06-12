@@ -13,6 +13,8 @@
         <constructor-arg value="-1001063148517"/>
     </bean>
 
+    <bean id="inlineQuery" class="ru.javazen.telegram.bot.handler.InlineQuery"/>
+
     <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
@@ -235,6 +237,13 @@
         <constructor-arg name="encoder" ref="songEncoder"/>
         <constructor-arg name="songs" ref="songs"/>
     </bean>
+    <bean id="InlineQuery" class="ru.javazen.telegram.bot.handler.InlineQuery" scope="prototype">
+        <constructor-arg name="voiceService" ref="voiceService"/>
+    </bean>
+    <bean id="voiceService" class="ru.javazen.telegram.bot.service.impl.VoiceServiceImpl">
+        <constructor-arg name="accessKey" value="${polly.access-key}"/>
+        <constructor-arg name="secretKey" value="${polly.secret-key}"/>
+    </bean>
 
     <bean id="anniversaryMessageCongratulations"
           class="ru.javazen.telegram.bot.handler.AnniversaryMessageCongratulations">
@@ -455,6 +464,7 @@
         <property name="updateHandlers">
             <list>
                 <ref bean="anniversaryMessageCongratulations"/>
+                <ref bean="inlineQuery"/>
                 <ref bean="messageCollector"/>
                 <ref bean="messageCollectorSaveTextSwitch"/>
                 <ref bean="pinnedForwarder"/>
