@@ -1,6 +1,7 @@
 package ru.javazen.telegram.bot.scheduler.parser;
 
 import org.telegram.telegrambots.api.objects.Update;
+import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -13,6 +14,8 @@ import java.util.TimeZone;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.springframework.util.StringUtils.isEmpty;
 
 public class SpecificTimeParser implements ScheduledMessageParser {
 
@@ -44,7 +47,13 @@ public class SpecificTimeParser implements ScheduledMessageParser {
             Matcher matcher = pattern.matcher(command);
 
             if (matcher.matches()) {
-                String text = matcher.group(matcher.groupCount());
+                String returnMessage = matcher.group(matcher.groupCount());
+                if (isEmpty(returnMessage) && update.getMessage().getReplyToMessage() != null){
+                    returnMessage = MessageHelper.getActualText(update.getMessage().getReplyToMessage());
+                }
+                if (isEmpty(returnMessage)) {
+                    returnMessage = defaultMessageSupplier.get();
+                }
 
                 Date date = null;
 
@@ -59,7 +68,10 @@ public class SpecificTimeParser implements ScheduledMessageParser {
                     time = findExplicitTime(timeStr);
                 }
 
-                return new ParseResult(resolveDateTime(date, time), text);
+                Date parsedData = resolveDateTime(date, time);
+                if (parsedData != null) {
+                    return new ParseResult(parsedData, returnMessage.trim());
+                }
             }
         }
         return null;
