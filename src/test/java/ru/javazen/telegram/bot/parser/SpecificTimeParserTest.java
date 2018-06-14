@@ -4,9 +4,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import ru.javazen.telegram.bot.scheduler.parser.ScheduledMessageParser;
@@ -15,7 +13,6 @@ import ru.javazen.telegram.bot.scheduler.parser.SpecificTimeParser;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-@RunWith(PowerMockRunner.class)
 public class SpecificTimeParserTest {
 
     private static SpecificTimeParser parser;
