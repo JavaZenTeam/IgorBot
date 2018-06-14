@@ -3,8 +3,6 @@ package ru.javazen.telegram.bot.preprocessor;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 
@@ -12,7 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Ignore
-@RunWith(PowerMockRunner.class)
 public class ReplaceDateTimeAdverbTest {
     private static final long SAMPLE_DATE = 1471460820;//17.08.2016 22:07:00
 
