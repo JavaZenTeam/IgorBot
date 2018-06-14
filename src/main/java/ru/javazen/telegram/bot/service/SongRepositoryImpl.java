@@ -28,10 +28,12 @@ public class SongRepositoryImpl implements SongRepository {
         if (song == null || song.isEmpty()) return null;
         SongLine firstSongLine = generateSongLine(song);
         SongLine songLine = firstSongLine;
-        do {
+
+        while (songLine != null) {
             String encodedString = encoder.apply(songLine.getString());
             songLineMap.putIfAbsent(encodedString, songLine);
-        } while ((songLine = songLine.getNextLine()) != null);
+            songLine = songLine.getNextLine();
+        }
         return firstSongLine;
     }
 
@@ -55,7 +57,7 @@ public class SongRepositoryImpl implements SongRepository {
         SongRepository.SongLine current = songLine;
         for (int i = 0; i < 4; i++ ){
             if ((current = current.getNextLine()) == null) {
-                return null;
+                break;
             }
             if (encoder.apply(current.getString()).equals(string)){
                 return current;
