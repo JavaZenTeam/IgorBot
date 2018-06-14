@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot.parser;
+package ru.javazen.telegram.bot.scheduler.parser;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -7,8 +7,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
-import ru.javazen.telegram.bot.scheduler.parser.ScheduledMessageParser;
-import ru.javazen.telegram.bot.scheduler.parser.SpecificTimeParser;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -81,5 +79,35 @@ public class SpecificTimeParserTest {
                 = parser.parse("Игорь, скажи 23.06.2050 в 03:00 привет", update);
 
         Assert.assertEquals(dateFormat.format(result.getDate()), "23.06.2050 03:00");
+    }
+
+    @Test
+    public void correctParse() {
+        ScheduledMessageParser.ParseResult result
+                = parser.parse("Игорь, скажи в 21:00 привет", update);
+
+        Assert.assertTrue(result != null && result.getDate() != null && result.getMessage() != null);
+    }
+
+    @Test
+    public void wrongParse() {
+        ScheduledMessageParser.ParseResult result
+                = parser.parse("Игорь, скажи !!! привет", update);
+
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void checkDefaultMessage() {
+        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи в 21:00", update);
+
+        Assert.assertEquals("ok", result.getMessage());
+    }
+
+    @Test
+    public void checkUserMessage() {
+        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи в 21:00 привет", update);
+
+        Assert.assertEquals("привет", result.getMessage());
     }
 }
