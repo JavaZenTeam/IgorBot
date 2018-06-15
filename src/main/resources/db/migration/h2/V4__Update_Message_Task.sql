@@ -1,0 +1,3 @@
+ALTER TABLE message_task
+  ALTER COLUMN time_of_completion
+  TYPE TIMESTAMP WITH TIME ZONE;

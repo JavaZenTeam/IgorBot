@@ -103,6 +103,6 @@ public class ShiftTimeParser implements ScheduledMessageParser {
             throw new IllegalArgumentException("No time span specified");
         }
 
-        return new ParseResult(calendar.getTime(), returnMessage.trim());
+        return new ParseResult(calendar.toInstant(), returnMessage.trim());
     }
 }

@@ -16,9 +16,9 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.scheduler.parser.ScheduledMessageParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
 
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -51,7 +51,6 @@ public class SchedulerNotifyHandlerTest {
 
         update = mock(Update.class);
         Message message = mock(Message.class);
-        when(message.getReplyToMessage()).thenReturn(null);
         when(update.getMessage()).thenReturn(message);
 
         User user = mock(User.class);
@@ -76,7 +75,7 @@ public class SchedulerNotifyHandlerTest {
         when(update.getMessage().getText()).thenReturn(correctMessage);
 
         when(parser.canParse(correctMessage)).thenReturn(true);
-        ScheduledMessageParser.ParseResult result = new ScheduledMessageParser.ParseResult(new Date(), "test");
+        ScheduledMessageParser.ParseResult result = new ScheduledMessageParser.ParseResult(Instant.now(), "test");
         when(parser.parse(correctMessage, update)).thenReturn(result);
 
         Assert.assertTrue(handler.handle(update, sender));
@@ -94,7 +93,7 @@ public class SchedulerNotifyHandlerTest {
         calendar.add(Calendar.DAY_OF_YEAR, DAYS_LIMIT + 1);
 
         ScheduledMessageParser.ParseResult result =
-                new ScheduledMessageParser.ParseResult(calendar.getTime(), "test");
+                new ScheduledMessageParser.ParseResult(calendar.toInstant(), "test");
         when(parser.parse(correctMessage, update)).thenReturn(result);
 
         Assert.assertTrue(handler.handle(update, sender));
@@ -107,10 +106,6 @@ public class SchedulerNotifyHandlerTest {
         when(update.getMessage().getText()).thenReturn("Wrong Message");
 
         when(parser.canParse(Mockito.anyString())).thenReturn(false);
-        when(parser.canParse(correctMessage)).thenReturn(true);
-
-        ScheduledMessageParser.ParseResult result = new ScheduledMessageParser.ParseResult(new Date(), "test");
-        when(parser.parse(correctMessage, update)).thenReturn(result);
 
         Assert.assertFalse(handler.handle(update, sender));
         verify(messageSchedulerService, Mockito.times(0)).scheduleTask(Mockito.any());
@@ -121,9 +116,6 @@ public class SchedulerNotifyHandlerTest {
         String message = "Message";
         when(update.getMessage().getText()).thenReturn(message);
         when(parser.canParse(message)).thenReturn(true);
-
-        ScheduledMessageParser.ParseResult result = new ScheduledMessageParser.ParseResult(new Date(), "test");
-        when(parser.parse("Wait Other", update)).thenReturn(result);
 
         Assert.assertFalse(handler.handle(update, sender));
         verify(messageSchedulerService, Mockito.times(0)).scheduleTask(Mockito.any());

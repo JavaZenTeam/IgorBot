@@ -6,6 +6,7 @@ import ru.javazen.telegram.bot.util.MessageHelper;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -68,7 +69,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
                     time = findExplicitTime(timeStr);
                 }
 
-                Date parsedData = resolveDateTime(date, time);
+                Instant parsedData = resolveDateTime(date, time);
                 if (parsedData != null) {
                     return new ParseResult(parsedData, returnMessage.trim());
                 }
@@ -86,7 +87,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
     }
 
 
-    private Date resolveDateTime(Date date, LocalTime time) {
+    private Instant resolveDateTime(Date date, LocalTime time) {
 
         if (date != null && time != null) {
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+4:00"));
@@ -94,7 +95,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
             calendar.add(Calendar.HOUR_OF_DAY, time.getHour());
             calendar.add(Calendar.MINUTE, time.getMinute());
 
-            return calendar.getTime();
+            return calendar.toInstant();
         } else if (date != null) {
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+4:00"));
 
@@ -108,7 +109,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
             calendar.add(Calendar.MINUTE, minute);
             calendar.add(Calendar.HOUR_OF_DAY, hour);
 
-            return calendar.getTime();
+            return calendar.toInstant();
         } else if (time != null) {
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+4:00"));
             Date current = calendar.getTime();
@@ -123,7 +124,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
                 calendar.add(Calendar.DAY_OF_YEAR, 1);
             }
 
-            return calendar.getTime();
+            return calendar.toInstant();
         }
 
         return null;

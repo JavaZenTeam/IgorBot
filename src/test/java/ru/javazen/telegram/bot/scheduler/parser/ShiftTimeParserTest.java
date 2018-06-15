@@ -56,7 +56,7 @@ public class ShiftTimeParserTest {
         Date now = new Date();
         int twoHours = 1000 * 60 * 120;
 
-        long diff = Math.abs((now.getTime() + twoHours) - result.getDate().getTime());
+        long diff = Math.abs((now.getTime() + twoHours) - result.getDate().toEpochMilli());
 
         Assert.assertTrue(diff < 1000);
     }

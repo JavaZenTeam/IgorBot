@@ -13,5 +13,5 @@ public interface ChatConfigRepository extends Repository<ChatConfig, ChatConfigP
     <S extends ChatConfig> S save(S chatConfig);
 
     @Cacheable(value = "ChatConfig")
-    Optional<ChatConfig> findOne(ChatConfigPK chatConfigPK);
+    Optional<ChatConfig> findByChatConfigPK(ChatConfigPK chatConfigPK);
 }

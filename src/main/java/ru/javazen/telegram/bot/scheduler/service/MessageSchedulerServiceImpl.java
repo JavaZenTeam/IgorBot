@@ -110,7 +110,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
             futureTasks.remove(futureTask);
             messageTaskRepository.delete(task);
-        }, new Date(task.getTimeOfCompletion()));
+        }, new Date(task.getTimeOfCompletion().toInstant().toEpochMilli()));
 
 
         FutureTask futureTask = new FutureTask();

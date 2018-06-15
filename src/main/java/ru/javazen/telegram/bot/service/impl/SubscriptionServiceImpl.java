@@ -56,7 +56,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public boolean cancelSubscriptionByPK(MessagePK subscriptionPK) {
-        Subscription subscription = repository.findOne(subscriptionPK);
+        Subscription subscription = repository.findById(subscriptionPK).orElse(null);
         if (subscription == null) return false;
         repository.delete(subscription);
         return true;

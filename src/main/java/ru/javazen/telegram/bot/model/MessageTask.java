@@ -1,6 +1,7 @@
 package ru.javazen.telegram.bot.model;
 
 import javax.persistence.*;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "MESSAGE_TASK")
@@ -12,7 +13,7 @@ public class MessageTask {
     private Long id;
 
     @Column(name = "TIME_OF_COMPLETION")
-    private Long timeOfCompletion;
+    private OffsetDateTime timeOfCompletion;
 
     @Column(name = "SCHEDULED_TEXT")
     private String scheduledText;
@@ -43,11 +44,11 @@ public class MessageTask {
         this.id = id;
     }
 
-    public Long getTimeOfCompletion() {
+    public OffsetDateTime getTimeOfCompletion() {
         return timeOfCompletion;
     }
 
-    public void setTimeOfCompletion(Long timeOfCompletion) {
+    public void setTimeOfCompletion(OffsetDateTime timeOfCompletion) {
         this.timeOfCompletion = timeOfCompletion;
     }
 
