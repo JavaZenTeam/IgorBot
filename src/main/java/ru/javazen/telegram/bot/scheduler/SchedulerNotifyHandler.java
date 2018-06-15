@@ -11,7 +11,10 @@ import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -63,7 +66,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
-        if (result.getDate().compareTo(calendar.getTime()) > 0) {
+        if (result.getDate().compareTo(calendar.toInstant()) > 0) {
             sender.execute(MessageHelper.answer(update.getMessage(),
                     "Так долго я помнить не смогу, сорри", true));
             return true;
@@ -72,11 +75,11 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         Calendar clarifyCalendar = Calendar.getInstance();
         clarifyCalendar.add(Calendar.HOUR_OF_DAY, 1);
 
-        boolean needClarify = result.getDate().compareTo(clarifyCalendar.getTime()) > 0;
+        boolean needClarify = result.getDate().compareTo(clarifyCalendar.toInstant()) > 0;
 
         sender.execute(MessageHelper.answer(update.getMessage(),
                 successResponseSupplier.get() + (needClarify ? ", завел на " +
-                format.format(result.getDate()): "")));
+                format.format(Date.from(result.getDate())): "")));
 
         MessageTask task = new MessageTask();
         task.setChatId(update.getMessage().getChat().getId());
@@ -84,7 +87,9 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         task.setUserId(userId);
         task.setReplyMessageId(update.getMessage().getMessageId().longValue());
         task.setScheduledText(result.getMessage());
-        task.setTimeOfCompletion(result.getDate().getTime());
+
+        OffsetDateTime dateTime = OffsetDateTime.ofInstant(result.getDate(), ZoneId.systemDefault());
+        task.setTimeOfCompletion(dateTime);
 
         messageSchedulerService.scheduleTask(task);
 

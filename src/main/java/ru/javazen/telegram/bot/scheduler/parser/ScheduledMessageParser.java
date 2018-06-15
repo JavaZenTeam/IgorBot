@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.telegram.telegrambots.api.objects.Update;
 
-import java.util.Date;
+import java.time.Instant;
 
 public interface ScheduledMessageParser {
 
@@ -17,7 +17,7 @@ public interface ScheduledMessageParser {
     @Setter
     @AllArgsConstructor
     class ParseResult {
-        private Date date;
+        private Instant date;
         private String message;
     }
 }

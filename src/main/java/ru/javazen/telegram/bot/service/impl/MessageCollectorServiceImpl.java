@@ -40,7 +40,7 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
 
     private boolean saveTextAllowed(Message userMessage) {
         ChatConfigPK chatConfigPK = new ChatConfigPK(userMessage.getChatId(), saveTextKey);
-        String chatSaveTextValue = chatConfigRepository.findOne(chatConfigPK).map(ChatConfig::getValue).orElse(null);
+        String chatSaveTextValue = chatConfigRepository.findByChatConfigPK(chatConfigPK).map(ChatConfig::getValue).orElse(null);
         return Objects.equals(chatSaveTextValue, saveTextValue);
     }
 
