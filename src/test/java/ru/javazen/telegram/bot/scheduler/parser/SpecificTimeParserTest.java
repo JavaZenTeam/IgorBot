@@ -1,31 +1,46 @@
 package ru.javazen.telegram.bot.scheduler.parser;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.User;
+import ru.javazen.telegram.bot.service.ChatConfigService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SpecificTimeParserTest {
 
-    private static SpecificTimeParser parser;
-    private static Update update;
+    private SpecificTimeParser parser;
+    private Update update;
 
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
-    @BeforeClass
-    public static void initClass() {
+    @Mock
+    private ChatConfigService chatConfigService;
 
-        parser = new SpecificTimeParser(() -> "ok", "и+го+рь,\\s?ск[ао]ж[иы]( .+)");
+    @Before
+    public void init() {
+
+        parser = new SpecificTimeParser(() -> "ok",
+                "и+го+рь,\\s?ск[ао]ж[иы]( .+)",
+                chatConfigService);
 
         update = Mockito.mock(Update.class);
+        User user = Mockito.mock(User.class);
+        Mockito.when(user.getId()).thenReturn(111);
+
         Message message = Mockito.mock(Message.class);
         Mockito.when(message.getReplyToMessage()).thenReturn(null);
+        Mockito.when(message.getFrom()).thenReturn(user);
         Mockito.when(update.getMessage()).thenReturn(message);
     }
 
