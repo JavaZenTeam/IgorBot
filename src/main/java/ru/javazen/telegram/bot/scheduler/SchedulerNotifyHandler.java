@@ -7,6 +7,7 @@ import ru.javazen.telegram.bot.handler.UpdateHandler;
 import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.scheduler.parser.ScheduledMessageParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
+import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.DateFormat;
@@ -19,24 +20,31 @@ import java.util.function.Supplier;
 
 public class SchedulerNotifyHandler implements UpdateHandler {
 
+    private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
+
     private final MessageSchedulerService messageSchedulerService;
     private final int daysLimit;
     private final Supplier<String> successResponseSupplier;
     private final List<ScheduledMessageParser> scheduledMessageParsers;
+    private ChatConfigService chatConfigService;
 
-    private DateFormat format = new SimpleDateFormat("HH:mm dd.MM.yy");
-    {
-        format.setTimeZone(TimeZone.getTimeZone("GMT+4:00"));
-    }
+    //private DateFormat format = new SimpleDateFormat("HH:mm dd.MM.yy");
+    //TimeZone timeZone = TimeZone.getTimeZone(chatConfigService.getProperty(
+    //        update.getMessage().getFrom().getId(),
+    //        TIMEZONE_OFFSET_CONFIG_KEY).orElse("UTC+04:00"));
+    //format.setTimeZone(TimeZone.getTimeZone("GMT+4:00"));
+
 
     public SchedulerNotifyHandler(MessageSchedulerService messageSchedulerService,
                                   int daysLimit,
                                   Supplier<String> successResponseSupplier,
-                                  List<ScheduledMessageParser> scheduledMessageParsers) {
+                                  List<ScheduledMessageParser> scheduledMessageParsers,
+                                  ChatConfigService chatConfigService) {
         this.messageSchedulerService = messageSchedulerService;
         this.daysLimit = daysLimit;
         this.successResponseSupplier = successResponseSupplier;
         this.scheduledMessageParsers = scheduledMessageParsers;
+        this.chatConfigService = chatConfigService;
     }
 
     @Override
@@ -73,6 +81,13 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         clarifyCalendar.add(Calendar.HOUR_OF_DAY, 1);
 
         boolean needClarify = result.getDate().compareTo(clarifyCalendar.getTime()) > 0;
+
+        DateFormat format = new SimpleDateFormat("HH:mm dd.MM.yy");
+        TimeZone timeZone = TimeZone.getTimeZone("GMT" + chatConfigService.getProperty(
+                update.getMessage().getFrom().getId(),
+                TIMEZONE_OFFSET_CONFIG_KEY).orElse("+04:00"));
+
+        format.setTimeZone(timeZone);
 
         sender.execute(MessageHelper.answer(update.getMessage(),
                 successResponseSupplier.get() + (needClarify ? ", завел на " +
