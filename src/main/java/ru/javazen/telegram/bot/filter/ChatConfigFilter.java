@@ -16,7 +16,7 @@ public class ChatConfigFilter implements Filter {
 
     @Override
     public boolean check(Update update) {
-        String value =  chatConfigRepository.findOne(new ChatConfigPK(update.getMessage().getChatId(), configKey))
+        String value = chatConfigRepository.findByChatConfigPK(new ChatConfigPK(update.getMessage().getChatId(), configKey))
                 .map(ChatConfig::getValue).orElse(null);
         return Objects.equals(value, configValue);
     }

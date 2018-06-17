@@ -1,6 +1,7 @@
 package ru.javazen.telegram.bot.scheduler.parser;
 
 import org.telegram.telegrambots.api.objects.Update;
+import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.DateFormat;
@@ -23,17 +24,26 @@ public class SpecificTimeParser implements ScheduledMessageParser {
             "( ?в (\\d{2}:\\d{2}))?" +
             "(.*)?$";
 
+    private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
+
     private final Supplier<String> defaultMessageSupplier;
     private final String validationPattern;
+    private final ChatConfigService chatConfigService;
 
     public SpecificTimeParser(Supplier<String> defaultMessageSupplier,
-                              String validationPattern) {
+                              String validationPattern,
+                              ChatConfigService chatConfigService) {
         this.defaultMessageSupplier = defaultMessageSupplier;
         this.validationPattern = validationPattern;
+        this.chatConfigService = chatConfigService;
     }
 
     @Override
     public ParseResult parse(String message, Update update) {
+
+        TimeZone timeZone = TimeZone.getTimeZone("GMT" + chatConfigService.getProperty(
+                update.getMessage().getFrom().getId(),
+                TIMEZONE_OFFSET_CONFIG_KEY).orElse("+04:00"));
 
         Pattern activationPattern = Pattern.compile(validationPattern,
                 Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
@@ -68,7 +78,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
                     time = findExplicitTime(timeStr);
                 }
 
-                Date parsedData = resolveDateTime(date, time);
+                Date parsedData = resolveDateTime(date, time, timeZone);
                 if (parsedData != null) {
                     return new ParseResult(parsedData, returnMessage.trim());
                 }
@@ -86,17 +96,18 @@ public class SpecificTimeParser implements ScheduledMessageParser {
     }
 
 
-    private Date resolveDateTime(Date date, LocalTime time) {
+    private Date resolveDateTime(Date date, LocalTime time, TimeZone timeZone) {
+
+        Calendar calendar = Calendar.getInstance(timeZone);
 
         if (date != null && time != null) {
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+4:00"));
+
             calendar.setTime(date);
             calendar.add(Calendar.HOUR_OF_DAY, time.getHour());
             calendar.add(Calendar.MINUTE, time.getMinute());
 
             return calendar.getTime();
         } else if (date != null) {
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+4:00"));
 
             int second = calendar.get(Calendar.SECOND);
             int minute = calendar.get(Calendar.MINUTE);
@@ -110,7 +121,6 @@ public class SpecificTimeParser implements ScheduledMessageParser {
 
             return calendar.getTime();
         } else if (time != null) {
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+4:00"));
             Date current = calendar.getTime();
 
             calendar.add(Calendar.HOUR_OF_DAY, -calendar.get(Calendar.HOUR_OF_DAY));
