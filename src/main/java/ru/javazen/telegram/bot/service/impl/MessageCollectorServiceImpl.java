@@ -29,11 +29,11 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     @Override
     public void saveBotUsage(Message userMessage, Message botResponse, String handlerName) {
         BotUsageLog botUsageLog = new BotUsageLog();
-        botUsageLog.setMessagePK(new MessagePK(botResponse.getChatId(), botResponse.getMessageId()));
+        botUsageLog.setTarget(new MessagePK(botResponse.getChatId(), botResponse.getMessageId()));
         if (saveTextAllowed(userMessage)) {
             botUsageLog.setText(botResponse.getText());
         }
-        botUsageLog.setSourceMessageId(userMessage.getMessageId());
+        botUsageLog.setSource(new MessagePK(userMessage.getChatId(), userMessage.getMessageId()));
         botUsageLog.setModuleName(handlerName);
         botUsageLogRepository.save(botUsageLog);
     }

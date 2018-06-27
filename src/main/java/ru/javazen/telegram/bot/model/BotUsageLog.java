@@ -7,13 +7,17 @@ import javax.persistence.*;
 public class BotUsageLog {
     @EmbeddedId
     @AttributeOverrides({
-            @AttributeOverride(name = "chatId", column = @Column(name = "chat_id")),
+            @AttributeOverride(name = "chatId", column = @Column(name = "target_chat_id")),
             @AttributeOverride(name = "messageId", column = @Column(name = "target_message_id")),
     })
-    private MessagePK messagePK;
+    private MessagePK target;
 
-    @Column(name = "source_message_id")
-    private Integer sourceMessageId;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "chatId", column = @Column(name = "source_chat_id")),
+            @AttributeOverride(name = "messageId", column = @Column(name = "source_message_id")),
+    })
+    private MessagePK source;
 
     @Column
     private String moduleName;
@@ -21,20 +25,20 @@ public class BotUsageLog {
     @Column(length = 4096)
     private String text;
 
-    public MessagePK getMessagePK() {
-        return messagePK;
+    public MessagePK getTarget() {
+        return target;
     }
 
-    public void setMessagePK(MessagePK messagePK) {
-        this.messagePK = messagePK;
+    public void setTarget(MessagePK target) {
+        this.target = target;
     }
 
-    public Integer getSourceMessageId() {
-        return sourceMessageId;
+    public MessagePK getSource() {
+        return source;
     }
 
-    public void setSourceMessageId(Integer sourceMessageId) {
-        this.sourceMessageId = sourceMessageId;
+    public void setSource(MessagePK source) {
+        this.source = source;
     }
 
     public String getModuleName() {

@@ -209,12 +209,13 @@
     </bean>
 
     <bean id="pinnedForwarder" class="ru.javazen.telegram.bot.handler.PinnedForwarder">
-        <property name="storeFromChatIds">
-            <list>
-                <value>-1001038770422</value>
-            </list>
-        </property>
-        <property name="storeChatId" value="-1001066106029"/>
+        <property name="configKey" value="pinnedForwarder.targetChatId"/>
+    </bean>
+
+    <bean id="pinnedForwarderSwitch" class="ru.javazen.telegram.bot.handler.toggle.ToggleChatConfigPatternValueHandler">
+        <property name="configKey" value="pinnedForwarder.targetChatId"/>
+        <property name="pattern" value="/forward_pinned (?&lt;configValue&gt;-?\d+)"/>
+        <property name="response" value="Схороняю ваши pinned в {0}"/>
     </bean>
 
     <bean id="songSingerModule" class="ru.javazen.telegram.bot.handler.InstanceForChatController">
@@ -394,7 +395,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="abstractToggle" class="ru.javazen.telegram.bot.handler.ToggleChatConfigHandler" abstract="true">
+    <bean id="abstractToggle" class="ru.javazen.telegram.bot.handler.toggle.ToggleChatConfigMappedValuesHandler" abstract="true">
         <property name="value2response">
             <map>
                 <entry key="Y" value-ref="happyOkSupplier"/>
@@ -456,6 +457,7 @@
             <list>
                 <ref bean="anniversaryMessageCongratulations"/>
                 <ref bean="messageCollectorSaveTextSwitch"/>
+                <ref bean="pinnedForwarderSwitch"/>
                 <ref bean="pinnedForwarder"/>
                 <ref bean="continueRepeatableSequenceModule"/>
                 <ref bean="statisticReports"/>

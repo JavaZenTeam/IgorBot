@@ -1,10 +1,11 @@
-package ru.javazen.telegram.bot.handler;
+package ru.javazen.telegram.bot.handler.toggle;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handler.UpdateHandler;
 import ru.javazen.telegram.bot.model.ChatConfig;
 import ru.javazen.telegram.bot.repository.ChatConfigRepository;
 import ru.javazen.telegram.bot.util.MessageHelper;
@@ -12,7 +13,7 @@ import ru.javazen.telegram.bot.util.MessageHelper;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class ToggleChatConfigHandler implements UpdateHandler {
+public class ToggleChatConfigMappedValuesHandler implements UpdateHandler {
     private String configKey;
     private Map<String, String> pattern2value;
     private Map<String, Supplier<String>> value2response;
