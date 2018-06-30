@@ -6,9 +6,7 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.model.ChatConfig;
-import ru.javazen.telegram.bot.model.ChatConfigPK;
-import ru.javazen.telegram.bot.repository.ChatConfigRepository;
+import ru.javazen.telegram.bot.service.ChatConfigService;
 
 /**
  * Created by egor on 18.05.2016.
@@ -16,7 +14,7 @@ import ru.javazen.telegram.bot.repository.ChatConfigRepository;
  */
 
 public class PinnedForwarder implements UpdateHandler {
-    private ChatConfigRepository chatConfigRepository;
+    private ChatConfigService chatConfigService;
     private String configKey;
 
     @Override
@@ -24,9 +22,7 @@ public class PinnedForwarder implements UpdateHandler {
         Message pinnedMessage = update.getMessage().getPinnedMessage();
         if (pinnedMessage == null) return false;
 
-        ChatConfigPK configPK = new ChatConfigPK(update.getMessage().getChatId(), configKey);
-        String targetChatId = chatConfigRepository.findOne(configPK)
-                .map(ChatConfig::getValue)
+        String targetChatId = chatConfigService.getProperty(update.getMessage().getChatId(), configKey)
                 .orElse(null);
         if (targetChatId == null) return false;
 
@@ -40,8 +36,8 @@ public class PinnedForwarder implements UpdateHandler {
     }
 
     @Autowired
-    public void setChatConfigRepository(ChatConfigRepository chatConfigRepository) {
-        this.chatConfigRepository = chatConfigRepository;
+    public void setChatConfigService(ChatConfigService chatConfigService) {
+        this.chatConfigService = chatConfigService;
     }
 
     public void setConfigKey(String configKey) {
