@@ -428,6 +428,19 @@
         </property>
     </bean>
 
+    <bean id="chatStatLinkProvider" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="/chat_stats"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.stats.LinkToChatPageHandler">
+                <constructor-arg name="linkTemplate" value="${bot.baseUrl}/chat/{0,number,#}"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <bean id="statisticReports" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.AllowedChatFilter">
@@ -475,6 +488,7 @@
                 <ref bean="pinnedForwarder"/>
                 <ref bean="continueRepeatableSequenceModule"/>
                 <ref bean="statisticReports"/>
+                <ref bean="chatStatLinkProvider"/>
                 <ref bean="subscriptionCreate"/>
                 <ref bean="subscriptionGet"/>
                 <ref bean="subscriptionCancel"/>
