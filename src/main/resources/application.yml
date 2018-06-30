@@ -7,6 +7,7 @@ spring:
 bot:
   name: ${IGOR_BOT_USERNAME}
   token: ${IGOR_BOT_TOKEN}
+  baseUrl: ${BASE_URL}
 http:
   proxy:
     url: ${PROXY_URL:}
