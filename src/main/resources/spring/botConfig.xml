@@ -172,6 +172,20 @@
         </constructor-arg>
     </bean>
 
+
+    <bean id="setTimezone" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="таймзона (.*)"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.UserTimezoneHandler">
+                <constructor-arg name="chatConfigService" ref="chatConfigServiceImpl" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <bean id="forwardMessageBridge" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
@@ -465,6 +479,7 @@
                 <ref bean="subscriptionGet"/>
                 <ref bean="subscriptionCancel"/>
                 <ref bean="subscriptionListen"/>
+                <ref bean="setTimezone"/>
                 <ref bean="scheduler"/>
                 <ref bean="updateInfoProvider"/>
                 <ref bean="replyLayoutSwitcherModuleRus"/>
