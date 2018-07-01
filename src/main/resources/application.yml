@@ -14,6 +14,8 @@ http:
 ---
 spring:
   profiles: dev
+  thymeleaf:
+    cache: false
 logging:
   level:
     org.springframework.web: DEBUG
