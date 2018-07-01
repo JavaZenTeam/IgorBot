@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!--/*@thymesVar id="chat" type="ru.javazen.telegram.bot.model.ChatEntity"*/-->
+<!--/*@thymesVar id="chat" type="org.telegram.telegrambots.api.objects.Chat"*/-->
 <head>
     <title th:text="${chat.title}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <body>
+    <img th:src="${'/file/' + chat.photo.smallFileId}">
     <h1 th:text="${chat.title}"></h1>
 </body>
 </html>
