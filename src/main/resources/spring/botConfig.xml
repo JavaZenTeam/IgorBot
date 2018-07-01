@@ -10,7 +10,7 @@
     <import resource="songs.xml"/>
 
     <bean id="supportChatId" class="java.lang.Long">
-        <constructor-arg value="-1001063148517"/>
+        <constructor-arg value="${bot.supportChat}"/>
     </bean>
 
     <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
@@ -436,7 +436,7 @@
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.stats.LinkToChatPageHandler">
-                <constructor-arg name="linkTemplate" value="${bot.baseUrl}/chat/{0,number,#}"/>
+                <constructor-arg name="linkTemplate" value="${bot.baseUrl}/stats/{0}"/>
             </bean>
         </constructor-arg>
     </bean>
