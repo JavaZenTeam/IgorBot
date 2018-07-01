@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.telegram.telegrambots.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.api.objects.Chat;
+import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
@@ -25,5 +27,10 @@ public class ChatStatController {
         Chat chat = bot.execute(new GetChat(chatId));
         model.addAttribute("chat", chat);
         return "chat";
+    }
+
+    @ModelAttribute("bot")
+    public User getBot() throws TelegramApiException {
+        return bot.getMe();
     }
 }
