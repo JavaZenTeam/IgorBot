@@ -93,6 +93,24 @@
         <entry key="ДОРОУ" value="1"/>
         <entry key="О, ПРИВЕТ" value="1"/>
         <entry key="ВЕЧЕР В ХАТУ" value="1"/>
+        <entry key="ЗДОРОВА БАНДИТЫ" value="1"/>
+        <entry key="ВЫПЬЕМ ЗА ЛЮБОВЬ" value="2"/>
+        <entry key="БЭНГ БЭНГ БЭНГ БЭНГ БАТЯ В ЗДАНИИ" value="1"/>
+        <entry key="БРАТИШКИ, Я ВАМ ПОКУШАТЬ ПРИНЕС" value="1"/>
+        <entry key="ВОДА ВОДИЧКА
+                  &#13;&#10;С ПУПКА НА ЯИЧКО" value="1"/>
+        <entry key="ШВУПС-ПУПС ДЮПС" value="1"/>
+        <entry key="Я ЕБАТЬ ВАС ВСЕХ ХОТЕЛ, ВЫ МЕНЯ БЛЯТЬ ПЛОХО ЗНАЕТЕ, Я ВАМ БЛЯТЬ ПОКАЖУ, Я ВАС НАХУЙ СОЖГУ, БЕНЗИНОМ ОБОЛЬЮ И НАХУЙ ПРИ... В ОГНЕ БУДЕТЕ ГОРЕТЬ БЛЯТЬ!!" value="1"/>
+        <entry key="ВЫДВИГАЮСЬ К ТВОЕЙ МАМКЕ" value="1"/>
+        <entry key="ЗДРАВСТВУТЕ КАК МОРЕНОВАТЬ АГУРЦИ" value="2"/>
+        <entry key="ДОРОВ, А ЭТО МАГАЗИН?" value="1"/>
+        <entry key="ВСЕМ ИГОРЬ, С ВАМИ ПРИВЕТ, И СЕГОДНЯ МЫ БУДЕМ КИДАТЬ ЭКСЕПШОНЫ" value="1"/>
+        <entry key="ПРИВЕТ АНДРЕЙ, НУ ГДЕ ТЫ БЫЛ, НУ ПОЧИНИ МЕНЯ СКОРЕЕ" value="1"/>
+        <entry key="ШХАААААААААА КАМА ПУЛЯ ЕЖЖИ" value="1"/>
+        <entry key="ЗДЕСЬ МОГЛА БЫТЬ ВАША РЕКЛАМА" value="2"/>
+        <entry key="АХ, КАК ЖЕ ХУЕВО!" value="1"/>
+        <entry key="ПАЦАНЫЫЫ ОБЪЕЕЕЕЕКТ ААААААААААААААААААААААААААААААААААА" value="1"/>
+        <entry key="ХУЯБВДРИКА" value="1"/>
     </util:map>
     <bean id="startSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
         <property name="optionRatios" ref="start"/>
