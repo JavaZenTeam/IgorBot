@@ -66,7 +66,6 @@ public class SpecificTimeParser implements ScheduledMessageParser {
                 }
 
                 Date date = null;
-
                 String dateStr = matcher.group(1);
                 if (dateStr != null) {
                     date = findExplicitDate(dateStr);
