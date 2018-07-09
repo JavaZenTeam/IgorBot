@@ -9,6 +9,7 @@
     <import resource="processors.xml"/>
     <import resource="songs.xml"/>
 
+
     <bean id="supportChatId" class="java.lang.Long">
         <constructor-arg value="-1001063148517"/>
     </bean>
@@ -409,7 +410,6 @@
             </map>
         </property>
     </bean>
-
     <bean name="messageCollectorSaveTextSwitch" parent="abstractToggle">
         <property name="configKey" value="messageCollector.saveText"/>
         <property name="pattern2value">
@@ -462,6 +462,7 @@
         <property name="updateHandlers">
             <list>
                 <ref bean="anniversaryMessageCongratulations"/>
+                <ref bean="sayTextHandler"/>
                 <ref bean="messageCollectorSaveTextSwitch"/>
                 <ref bean="pinnedForwarderSwitch"/>
                 <ref bean="pinnedForwarder"/>
