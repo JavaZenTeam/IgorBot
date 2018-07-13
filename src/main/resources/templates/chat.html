@@ -14,7 +14,11 @@
 <div class="bg-white border-bottom p-3 clearfix">
     <img th:src="${'/file/' + chat.photo.smallFileId}"
          class="rounded float-left mr-3" style="height: 120px;">
-    <h1 th:text="${chat.title}" class="display-4"></h1>
+    <h1 class="display-4">
+        <span th:text="${chat.title}"></span>
+        <span th:text="${chat.firstName}"></span>
+        <span th:text="${chat.lastName}"></span>
+    </h1>
     <p class="text-secondary font-weight-bold">
         <span th:if="${chat.isChannelChat()}">channel</span>
         <span th:if="${chat.isGroupChat()}">group</span>
