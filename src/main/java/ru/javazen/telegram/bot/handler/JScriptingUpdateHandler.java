@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handling.annotation.Handling;
+import ru.javazen.telegram.bot.handling.annotation.UpdateType;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import javax.script.Invocable;
@@ -14,6 +16,7 @@ import javax.script.ScriptException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Handling(UpdateType.MESSAGE)
 public class JScriptingUpdateHandler implements UpdateHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JScriptingUpdateHandler.class);

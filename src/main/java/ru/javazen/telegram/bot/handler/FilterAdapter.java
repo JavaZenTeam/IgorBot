@@ -5,10 +5,13 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.filter.Filter;
+import ru.javazen.telegram.bot.handling.annotation.Handling;
+import ru.javazen.telegram.bot.handling.annotation.UpdateType;
 
 import java.util.Collections;
 import java.util.List;
 
+@Handling(UpdateType.MESSAGE)
 public class FilterAdapter implements UpdateHandler, BeanNameAware {
     private List<Filter> filters;
     private List<UpdateHandler> handlers;

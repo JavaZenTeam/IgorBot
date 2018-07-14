@@ -5,6 +5,8 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.container.SizedItemsContainer;
+import ru.javazen.telegram.bot.handling.annotation.Handling;
+import ru.javazen.telegram.bot.handling.annotation.UpdateType;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.BiFunction;
 
+@Handling(UpdateType.MESSAGE)
 public class RandomAnswer implements UpdateHandler {
     private Random random;
     private List<BiFunction<Update, String, String>> preprocessors;

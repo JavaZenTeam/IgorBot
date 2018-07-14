@@ -60,9 +60,6 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.getMessage() == null) {
-            return;
-        }
         try {
             Message sentMessage = null;
             String handlerName = null;

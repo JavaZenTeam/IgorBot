@@ -6,6 +6,8 @@ import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handling.annotation.Handling;
+import ru.javazen.telegram.bot.handling.annotation.UpdateType;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.MessageFormat;
@@ -13,6 +15,7 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.regex.Pattern;
 
+@Handling(UpdateType.MESSAGE)
 public class AnniversaryMessageCongratulations implements UpdateHandler {
     private Random random;
     private Pattern messageIdPattern;

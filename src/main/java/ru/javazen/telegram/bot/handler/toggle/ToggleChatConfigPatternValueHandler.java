@@ -5,6 +5,8 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.handling.annotation.Handling;
+import ru.javazen.telegram.bot.handling.annotation.UpdateType;
 import ru.javazen.telegram.bot.model.ChatConfig;
 import ru.javazen.telegram.bot.repository.ChatConfigRepository;
 import ru.javazen.telegram.bot.util.MessageHelper;
@@ -14,6 +16,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Handling(UpdateType.MESSAGE)
 public class ToggleChatConfigPatternValueHandler implements UpdateHandler {
     private static final String CONFIG_VALUE_GROUP_NAME = "configValue";
 
