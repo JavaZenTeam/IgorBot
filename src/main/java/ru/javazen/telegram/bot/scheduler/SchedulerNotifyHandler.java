@@ -4,6 +4,8 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.handling.annotation.Handling;
+import ru.javazen.telegram.bot.handling.annotation.UpdateType;
 import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.scheduler.parser.ScheduledMessageParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.function.Supplier;
 
+@Handling(UpdateType.MESSAGE)
 public class SchedulerNotifyHandler implements UpdateHandler {
 
     private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";

@@ -7,15 +7,17 @@ import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handling.annotation.Handling;
+import ru.javazen.telegram.bot.handling.annotation.UpdateType;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+@Handling(UpdateType.MESSAGE)
 public class Counter implements UpdateHandler {
     private Pattern pattern;
     private String errorMessage;
