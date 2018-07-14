@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
@@ -39,6 +40,7 @@ import java.util.function.Function;
 
 @Configuration
 @EnableCaching
+@EnableAspectJAutoProxy
 public class AppConfig {
 
     /*@Bean(destroyMethod = "destroy")

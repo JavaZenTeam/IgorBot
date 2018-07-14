@@ -3,6 +3,8 @@ package ru.javazen.telegram.bot.handler;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handling.annotation.Handling;
+import ru.javazen.telegram.bot.handling.annotation.UpdateType;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
@@ -10,6 +12,7 @@ import java.time.ZoneOffset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Handling(UpdateType.MESSAGE)
 public class UserTimezoneHandler implements UpdateHandler {
 
     private static final String PATTERN = "таймзона ([+-]?[0-9][0-9]?)(:([0-9][0-9]?))?";
