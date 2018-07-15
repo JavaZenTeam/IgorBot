@@ -1,9 +1,11 @@
 package ru.javazen.telegram.bot.filter;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
+import ru.javazen.telegram.bot.util.MessageHelper;
+
 import java.util.regex.Pattern;
 
-public class RegexpFilter implements Filter {
+public class RegexpFilter implements MessageFilter {
     private static final Pattern DEFAULT_PATTERN = Pattern.compile(".*");
     private Pattern pattern = DEFAULT_PATTERN;
 
@@ -12,8 +14,8 @@ public class RegexpFilter implements Filter {
     }
 
     @Override
-    public boolean check(Update update) {
-        String text = update.getMessage().getText(); // TODO MessageHelper.getActualText(update.getMessage());
+    public boolean check(Message message) {
+        String text = MessageHelper.getActualText(message);
         return text != null && pattern.matcher(text).matches();
     }
 }
