@@ -7,8 +7,7 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
-import ru.javazen.telegram.bot.model.ChatConfig;
-import ru.javazen.telegram.bot.repository.ChatConfigRepository;
+import ru.javazen.telegram.bot.service.ChatConfigService;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -17,15 +16,14 @@ public class ToggleChatConfigMappedValuesHandler implements TextMessageHandler {
     private String configKey;
     private Map<String, String> pattern2value;
     private Map<String, Supplier<String>> value2response;
-    private ChatConfigRepository chatConfigRepository;
+    private ChatConfigService chatConfigService;
 
     @Override
     public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
         String configValue = pattern2value.get(text);
         if (configValue == null) return false;
 
-        ChatConfig config = new ChatConfig(message.getChatId(), configKey, configValue);
-        chatConfigRepository.save(config);
+        chatConfigService.setProperty(message.getChatId(), configKey, configValue);
 
         String response = value2response.getOrDefault(configValue, () -> configKey + "=" + configValue).get();
         sender.execute(new SendMessage(message.getChatId(), response));
@@ -52,7 +50,7 @@ public class ToggleChatConfigMappedValuesHandler implements TextMessageHandler {
     }
 
     @Autowired
-    public void setChatConfigRepository(ChatConfigRepository chatConfigRepository) {
-        this.chatConfigRepository = chatConfigRepository;
+    public void setChatConfigService(ChatConfigService chatConfigService) {
+        this.chatConfigService = chatConfigService;
     }
 }

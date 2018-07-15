@@ -3,16 +3,16 @@ package ru.javazen.telegram.bot.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
-import ru.javazen.telegram.bot.model.*;
+import ru.javazen.telegram.bot.model.BotUsageLog;
+import ru.javazen.telegram.bot.model.MessageEntity;
+import ru.javazen.telegram.bot.model.MessagePK;
 import ru.javazen.telegram.bot.repository.BotUsageLogRepository;
-import ru.javazen.telegram.bot.repository.ChatConfigRepository;
 import ru.javazen.telegram.bot.repository.MessageRepository;
+import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.service.MessageCollectorService;
 
-import java.util.Objects;
-
 public class MessageCollectorServiceImpl implements MessageCollectorService {
-    private ChatConfigRepository chatConfigRepository;
+    private ChatConfigService chatConfigService;
     private MessageRepository messageRepository;
     private BotUsageLogRepository botUsageLogRepository;
     private String saveTextKey;
@@ -45,14 +45,13 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     }
 
     private boolean saveTextAllowed(Message userMessage) {
-        ChatConfigPK chatConfigPK = new ChatConfigPK(userMessage.getChatId(), saveTextKey);
-        String chatSaveTextValue = chatConfigRepository.findByChatConfigPK(chatConfigPK).map(ChatConfig::getValue).orElse(null);
-        return Objects.equals(chatSaveTextValue, saveTextValue);
+        return chatConfigService.getProperty(userMessage.getChatId(), saveTextKey)
+                .map(saveTextValue::equals).orElse(false);
     }
 
     @Autowired
-    public void setChatConfigRepository(ChatConfigRepository chatConfigRepository) {
-        this.chatConfigRepository = chatConfigRepository;
+    public void setChatConfigService(ChatConfigService chatConfigService) {
+        this.chatConfigService = chatConfigService;
     }
 
     @Autowired
