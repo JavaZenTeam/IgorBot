@@ -1,5 +1,10 @@
 package ru.javazen.telegram.bot;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.polly.AmazonPolly;
+import com.amazonaws.services.polly.AmazonPollyClientBuilder;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,10 +29,14 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.ApiContext;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
+import ru.javazen.telegram.bot.client.FileServiceClient;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
+import ru.javazen.telegram.bot.handler.SayTextHandler;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerServiceImpl;
+import ru.javazen.telegram.bot.service.VoiceService;
+import ru.javazen.telegram.bot.service.impl.VoiceServiceImpl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -139,5 +148,29 @@ public class AppConfig {
         }
         return botOptions;
     }
+
+    @Bean
+    FileServiceClient fileServiceClient(@Value("${file-service.url}") String fileServiceUrl) {
+        return new FileServiceClient(fileServiceUrl);
+    }
+
+    @Bean
+    VoiceService voiceService(FileServiceClient fileServiceClient,
+                              @Value("${polly.access-key}") String accessKey,
+                              @Value("${polly.secret-key}") String secretKey) {
+        AmazonPolly amazonClient;
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        amazonClient = AmazonPollyClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion("eu-west-2").build();
+
+        return new VoiceServiceImpl(fileServiceClient, amazonClient);
+    }
+
+    @Bean
+    SayTextHandler sayTextHandler(VoiceService voiceService) {
+        return new SayTextHandler(voiceService);
+    }
+
+
 
 }
