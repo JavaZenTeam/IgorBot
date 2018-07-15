@@ -1,7 +1,7 @@
 package ru.javazen.telegram.bot.scheduler.parser;
 
 import org.springframework.util.StringUtils;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Calendar;
@@ -44,17 +44,14 @@ public class ShiftTimeParser implements ScheduledMessageParser {
     }
 
     @Override
-    public ParseResult parse(String message, Update update) {
+    public ParseResult parse(String text, Message message) {
 
         Pattern pattern = Pattern.compile(validationPattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(message);
+        Matcher matcher = pattern.matcher(text);
 
         if (matcher.matches()) {
             String command = matcher.group(1);
-
-            ParseResult result = parseParameters(command, update);
-
-            return result;
+            return parseParameters(command, message);
         }
 
         return null;
@@ -68,10 +65,10 @@ public class ShiftTimeParser implements ScheduledMessageParser {
         return matcher.matches();
     }
 
-    private ParseResult parseParameters(String message, Update update) {
+    private ParseResult parseParameters(String text, Message message) {
 
         Pattern pattern = Pattern.compile(TIME_UNITS_REGEXP, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-        Matcher matcher = pattern.matcher(message);
+        Matcher matcher = pattern.matcher(text);
 
         GregorianCalendar calendar = new GregorianCalendar();
         boolean calendarChanged = false;
@@ -92,8 +89,8 @@ public class ShiftTimeParser implements ScheduledMessageParser {
         }
 
         String returnMessage = matcher.group(matcher.groupCount());
-        if (isEmpty(returnMessage) && update.getMessage().getReplyToMessage() != null){
-            returnMessage = MessageHelper.getActualText(update.getMessage().getReplyToMessage());
+        if (isEmpty(returnMessage) && message.getReplyToMessage() != null) {
+            returnMessage = MessageHelper.getActualText(message.getReplyToMessage());
         }
         if (isEmpty(returnMessage)) {
             returnMessage = defaultMessageSupplier.get();

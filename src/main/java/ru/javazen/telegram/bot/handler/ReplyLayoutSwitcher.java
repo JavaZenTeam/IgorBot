@@ -1,26 +1,27 @@
 package ru.javazen.telegram.bot.handler;
 
+import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
-public class ReplyLayoutSwitcher implements UpdateHandler {
+public class ReplyLayoutSwitcher implements MessageHandler {
 
     private String sourceCharSet = "";
     private String targetCharSet = "";
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        Message replyMessage = update.getMessage().getReplyToMessage();
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        Message replyMessage = message.getReplyToMessage();
         if (replyMessage == null) return false;
 
         String targetText = MessageHelper.getActualText(replyMessage);
         if (targetText == null) return false;
 
         String result = switchLayout(targetText);
-        sender.execute(MessageHelper.answer(replyMessage, result, true));
+        sender.execute(new SendMessage(message.getChatId(), result).setReplyToMessageId(replyMessage.getMessageId()));
         return true;
     }
 

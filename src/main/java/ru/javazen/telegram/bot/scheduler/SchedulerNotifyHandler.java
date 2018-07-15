@@ -1,14 +1,14 @@
 package ru.javazen.telegram.bot.scheduler;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.scheduler.parser.ScheduledMessageParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.service.ChatConfigService;
-import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.function.Supplier;
 
-public class SchedulerNotifyHandler implements UpdateHandler {
+public class SchedulerNotifyHandler implements TextMessageHandler {
 
     private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
 
@@ -48,20 +48,15 @@ public class SchedulerNotifyHandler implements UpdateHandler {
     }
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        String message = MessageHelper.getActualText(update.getMessage());
-        if (message == null || message.isEmpty()) {
-            return false;
-        }
-
-        final long userId = update.getMessage().getFrom().getId();
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
+        final long userId = message.getFrom().getId();
 
 
         final ScheduledMessageParser.ParseResult result = scheduledMessageParsers
                 .stream()
-                .filter(parser -> parser.canParse(message))
+                .filter(parser -> parser.canParse(text))
                 .findAny()
-                .map(parser -> parser.parse(message, update))
+                .map(parser -> parser.parse(text, message))
                 .orElse(null);
 
         if (result == null) {
@@ -72,8 +67,7 @@ public class SchedulerNotifyHandler implements UpdateHandler {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
         if (result.getDate().compareTo(calendar.getTime()) > 0) {
-            sender.execute(MessageHelper.answer(update.getMessage(),
-                    "Так долго я помнить не смогу, сорри", true));
+            sender.execute(new SendMessage(message.getChatId(), "Так долго я помнить не смогу, сорри"));
             return true;
         }
 
@@ -84,20 +78,20 @@ public class SchedulerNotifyHandler implements UpdateHandler {
 
         DateFormat format = new SimpleDateFormat("HH:mm dd.MM.yy");
         TimeZone timeZone = TimeZone.getTimeZone("GMT" + chatConfigService.getProperty(
-                update.getMessage().getFrom().getId(),
+                message.getFrom().getId(),
                 TIMEZONE_OFFSET_CONFIG_KEY).orElse("+04:00"));
 
         format.setTimeZone(timeZone);
 
-        sender.execute(MessageHelper.answer(update.getMessage(),
+        sender.execute(new SendMessage(message.getChatId(),
                 successResponseSupplier.get() + (needClarify ? ", завел на " +
                 format.format(result.getDate()): "")));
 
         MessageTask task = new MessageTask();
-        task.setChatId(update.getMessage().getChat().getId());
-        task.setMessageId(update.getMessage().getMessageId().longValue());
+        task.setChatId(message.getChatId());
+        task.setMessageId(message.getMessageId().longValue());
         task.setUserId(userId);
-        task.setReplyMessageId(update.getMessage().getMessageId().longValue());
+        task.setReplyMessageId(message.getMessageId().longValue());
         task.setScheduledText(result.getMessage());
         task.setTimeOfCompletion(result.getDate().getTime());
 

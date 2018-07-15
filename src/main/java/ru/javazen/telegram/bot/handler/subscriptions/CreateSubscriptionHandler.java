@@ -3,29 +3,25 @@ package ru.javazen.telegram.bot.handler.subscriptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 import ru.javazen.telegram.bot.model.MessagePK;
 import ru.javazen.telegram.bot.model.Subscription;
 import ru.javazen.telegram.bot.service.SubscriptionService;
-import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CreateSubscriptionHandler implements UpdateHandler {
+public class CreateSubscriptionHandler implements TextMessageHandler {
     private SubscriptionService subscriptionService;
     private Pattern pattern;
     private Supplier<String> successResponseSupplier;
     private Supplier<String> tooManyDuplicatesErrorSupplier;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        String text = MessageHelper.getActualText(update.getMessage());
-        if (text == null) return false;
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
         Matcher matcher = pattern.matcher(text);
         if (!matcher.matches()) return false;
 
@@ -35,20 +31,20 @@ public class CreateSubscriptionHandler implements UpdateHandler {
 
         Subscription template = new Subscription();
         MessagePK subscriptionPK = new MessagePK(
-                update.getMessage().getChat().getId(),
-                update.getMessage().getMessageId());
+                message.getChat().getId(),
+                message.getMessageId());
         template.setSubscriptionPK(subscriptionPK);
         template.setTrigger(trigger);
         template.setResponse(response);
-        if (userFlag != null) template.setUserId(update.getMessage().getFrom().getId());
+        if (userFlag != null) template.setUserId(message.getFrom().getId());
 
         try {
             subscriptionService.createSubscription(template);
-            SendMessage answer = MessageHelper.answer(update.getMessage(), successResponseSupplier.get());
+            SendMessage answer = new SendMessage(message.getChatId(), successResponseSupplier.get());
             Message sentMessage = sender.execute(answer);
             subscriptionService.saveSubscriptionReply(subscriptionPK, sentMessage.getMessageId());
-        } catch (SubscriptionService.TooManyDuplicatesException e){
-            sender.execute(MessageHelper.answer(update.getMessage(), tooManyDuplicatesErrorSupplier.get()));
+        } catch (SubscriptionService.TooManyDuplicatesException e) {
+            sender.execute(new SendMessage(message.getChatId(), tooManyDuplicatesErrorSupplier.get()));
         }
         return true;
     }

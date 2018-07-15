@@ -2,6 +2,7 @@ package ru.javazen.telegram.bot.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.Update;
 import ru.javazen.telegram.bot.model.*;
 import ru.javazen.telegram.bot.repository.BotUsageLogRepository;
 import ru.javazen.telegram.bot.repository.ChatConfigRepository;
@@ -18,22 +19,27 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     private String saveTextValue;
 
     @Override
-    public void saveMessage(Message userMessage) {
-        MessageEntity entity = new MessageEntity(userMessage);
-        if (!saveTextAllowed(userMessage)) {
+    public void saveUpdate(Update update) {
+        if (update.getMessage() == null) return; //TODO save not only messages
+
+        MessageEntity entity = new MessageEntity(update.getMessage());
+        if (!saveTextAllowed(update.getMessage())) {
             entity.setText(null);
         }
         messageRepository.save(entity);
     }
 
     @Override
-    public void saveBotUsage(Message userMessage, Message botResponse, String handlerName) {
+    public void saveBotUsage(Update update, Message botResponse, String handlerName) {
+        Message message = update.getMessage();
+        if (message == null) return; //TODO save not only messages
+
         BotUsageLog botUsageLog = new BotUsageLog();
         botUsageLog.setTarget(new MessagePK(botResponse.getChatId(), botResponse.getMessageId()));
-        if (saveTextAllowed(userMessage)) {
+        if (saveTextAllowed(message)) {
             botUsageLog.setText(botResponse.getText());
         }
-        botUsageLog.setSource(new MessagePK(userMessage.getChatId(), userMessage.getMessageId()));
+        botUsageLog.setSource(new MessagePK(message.getChatId(), message.getMessageId()));
         botUsageLog.setModuleName(handlerName);
         botUsageLogRepository.save(botUsageLog);
     }

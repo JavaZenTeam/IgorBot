@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 import ru.javazen.telegram.bot.comparator.ContextWrapperComparator;
 
 import java.util.Comparator;
@@ -11,10 +11,10 @@ public class ChoiceMakerWithContext extends ChoiceMaker {
     private ContextWrapperComparator wrapperComparator = new ContextWrapperComparator();
 
     @Override
-    protected void parseParameters(Update update, Matcher matcher) {
-        super.parseParameters(update, matcher);
+    protected void parseParameters(Message message, Matcher matcher) {
+        super.parseParameters(message, matcher);
         String context = matcher.group(CONTEXT_GROUP_NAME);
-        wrapperComparator.setContext(process(context, update));
+        wrapperComparator.setContext(process(context, message));
     }
 
     @Override

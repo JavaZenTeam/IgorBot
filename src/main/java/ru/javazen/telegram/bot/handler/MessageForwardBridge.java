@@ -1,28 +1,29 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.telegram.telegrambots.api.methods.ForwardMessage;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MessageForwardBridge implements UpdateHandler {
+public class MessageForwardBridge implements TextMessageHandler {
 
     private static final Pattern DEFAULT_PATTERN = Pattern.compile("/forward_to (.+)");
     private Pattern pattern = DEFAULT_PATTERN;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        String text = update.getMessage().getText();
-        if (text == null || update.getMessage().getReplyToMessage() == null) return false;
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
+        if (!message.isReply()) return false;
+
         Matcher matcher = pattern.matcher(text);
         if (!matcher.matches() || matcher.groupCount() < 1) return false;
 
         ForwardMessage forwardMessage = new ForwardMessage();
-        forwardMessage.setFromChatId(Long.toString(update.getMessage().getChat().getId()));
-        forwardMessage.setMessageId(update.getMessage().getReplyToMessage().getMessageId());
+        forwardMessage.setFromChatId(message.getChatId());
+        forwardMessage.setMessageId(message.getReplyToMessage().getMessageId());
         forwardMessage.setChatId(matcher.group(1));
         sender.execute(forwardMessage);
 

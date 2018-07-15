@@ -5,14 +5,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 
 import java.util.Date;
 
 public class ShiftTimeParserTest {
 
     private static ShiftTimeParser parser;
-    private static Update update;
+    private static Message message;
 
 
     @BeforeClass
@@ -20,10 +19,8 @@ public class ShiftTimeParserTest {
 
         parser = new ShiftTimeParser(() -> "ok", "и+го+рь,\\s?ск[ао]ж[иы] через( .+)");
 
-        update = Mockito.mock(Update.class);
-        Message message = Mockito.mock(Message.class);
+        message = Mockito.mock(Message.class);
         Mockito.when(message.getReplyToMessage()).thenReturn(null);
-        Mockito.when(update.getMessage()).thenReturn(message);
     }
 
     @Test
@@ -38,21 +35,21 @@ public class ShiftTimeParserTest {
 
     @Test
     public void checkDefaultMessage() {
-        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи через 2 часа", update);
+        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи через 2 часа", message);
 
         Assert.assertEquals("ok", result.getMessage());
     }
 
     @Test
     public void checkUserMessage() {
-        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи через 2 часа привет", update);
+        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи через 2 часа привет", message);
 
         Assert.assertEquals("привет", result.getMessage());
     }
 
     @Test
     public void checkTime() {
-        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи через 2 часа привет", update);
+        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи через 2 часа привет", message);
         Date now = new Date();
         int twoHours = 1000 * 60 * 120;
 

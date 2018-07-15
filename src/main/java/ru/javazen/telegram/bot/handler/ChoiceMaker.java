@@ -1,10 +1,11 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Required;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.util.MessageHelper;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -12,16 +13,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ChoiceMaker implements UpdateHandler{
+public class ChoiceMaker implements TextMessageHandler {
     private static final String OPTIONS_GROUP_NAME = "options";
 
     private Pattern pattern;
     private String splitPattern;
     private Comparator<String> comparator;
     private List<String> options;
-    private List<BiFunction<Update, String, String>> preprocessors;
+    private List<BiFunction<Message, String, String>> preprocessors;
 
-    public void setPreprocessors(List<BiFunction<Update, String, String>> preprocessors) {
+    public void setPreprocessors(List<BiFunction<Message, String, String>> preprocessors) {
         this.preprocessors = preprocessors;
     }
 
@@ -45,23 +46,20 @@ public class ChoiceMaker implements UpdateHandler{
     }
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        String text = MessageHelper.getActualText(update.getMessage());
-        if (text == null) return false;
-
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
         Matcher matcher = pattern.matcher(text);
         if (!matcher.matches()) return false;
 
-        parseParameters(update, matcher);
-        String choice = makeChoice(update);
+        parseParameters(message, matcher);
+        String choice = makeChoice(message);
 
         if (choice == null) return false;
 
-        sender.execute(MessageHelper.answer(update.getMessage(), choice));
+        sender.execute(new SendMessage(message.getChatId(), choice));
         return true;
     }
 
-    private String makeChoice(Update update) {
+    private String makeChoice(Message message) {
         if (options == null || options.isEmpty()) return null;
 
         if (preprocessors == null || preprocessors.isEmpty()){
@@ -70,7 +68,7 @@ public class ChoiceMaker implements UpdateHandler{
 
         Map<String, String> processedOptions = options.stream()
                 .collect(Collectors.toMap(
-                        o -> process(o, update),
+                        o -> process(o, message),
                         o -> o,
                         (o1, o2) -> o1
                 ));
@@ -79,14 +77,14 @@ public class ChoiceMaker implements UpdateHandler{
         return processedOptions.get(choice);
     }
 
-    protected String process(String string, Update update){
-        for (BiFunction<Update, String, String> preprocessor : preprocessors) {
-            string = preprocessor.apply(update, string);
+    protected String process(String string, Message message) {
+        for (BiFunction<Message, String, String> preprocessor : preprocessors) {
+            string = preprocessor.apply(message, string);
         }
         return string;
     }
 
-    protected void parseParameters(Update update, Matcher matcher) {
+    protected void parseParameters(Message message, Matcher matcher) {
         String optionsGroup = matcher.group(OPTIONS_GROUP_NAME);
         if (optionsGroup == null) return;
         options = Arrays.asList(optionsGroup.split(splitPattern));
