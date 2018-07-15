@@ -1,33 +1,33 @@
 package ru.javazen.telegram.bot.handler.subscriptions;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 import ru.javazen.telegram.bot.model.MessagePK;
 import ru.javazen.telegram.bot.service.SubscriptionService;
-import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.function.Supplier;
 
-public class CancelSubscriptionHandler implements UpdateHandler {
+public class CancelSubscriptionHandler implements MessageHandler {
     private SubscriptionService subscriptionService;
     private Supplier<String> successResponseSupplier;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        if (update.getMessage().getReplyToMessage() == null) return false;
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        if (message.getReplyToMessage() == null) return false;
 
         MessagePK messagePK = new MessagePK(
-                update.getMessage().getChat().getId(),
-                update.getMessage().getReplyToMessage().getMessageId());
+                message.getChatId(),
+                message.getReplyToMessage().getMessageId());
 
-        boolean result = subscriptionService.cancelSubscriptionByPK(messagePK)
+        boolean canceled = subscriptionService.cancelSubscriptionByPK(messagePK)
                 || subscriptionService.cancelSubscriptionByReply(messagePK);
 
-        if (!result) return false;
-        sender.execute(MessageHelper.answer(update.getMessage(), successResponseSupplier.get()));
+        if (!canceled) return false;
+        sender.execute(new SendMessage(message.getChatId(), successResponseSupplier.get()));
         return true;
     }
 

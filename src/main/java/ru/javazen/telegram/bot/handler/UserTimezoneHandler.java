@@ -1,16 +1,16 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 import ru.javazen.telegram.bot.service.ChatConfigService;
-import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.time.ZoneOffset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class UserTimezoneHandler implements UpdateHandler {
+public class UserTimezoneHandler implements TextMessageHandler {
 
     private static final String PATTERN = "таймзона ([+-]?[0-9][0-9]?)(:([0-9][0-9]?))?";
     private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
@@ -22,17 +22,11 @@ public class UserTimezoneHandler implements UpdateHandler {
     }
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        if (!update.hasMessage()) {
-            return false;
-        }
-
-        String message = MessageHelper.getActualText(update.getMessage());
-
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
         Pattern activationPattern = Pattern.compile(PATTERN,
                 Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 
-        Matcher activation = activationPattern.matcher(message);
+        Matcher activation = activationPattern.matcher(text);
 
         if (activation.matches()) {
             String timezone = activation.group(1);
@@ -56,7 +50,7 @@ public class UserTimezoneHandler implements UpdateHandler {
                 ZoneOffset zoneOffset = ZoneOffset.of(hf + ":" + mf);
 
                 chatConfigService.setProperty(
-                        update.getMessage().getFrom().getId(),
+                        message.getFrom().getId(),
                         TIMEZONE_OFFSET_CONFIG_KEY,
                         zoneOffset.getId());
 

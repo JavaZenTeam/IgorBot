@@ -1,13 +1,13 @@
 package ru.javazen.telegram.bot.preprocessor;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ReplaceFirstPersonPronouns implements BiFunction<Update, String, String> {
+public class ReplaceFirstPersonPronouns implements BiFunction<Message, String, String> {
     private List<Pattern> pronounPatterns;
 
     public ReplaceFirstPersonPronouns(List<String> pronouns) {
@@ -18,8 +18,8 @@ public class ReplaceFirstPersonPronouns implements BiFunction<Update, String, St
     }
 
     @Override
-    public String apply(Update update, String text) {
-        String userId = Long.toString(update.getMessage().getFrom().getId());
+    public String apply(Message message, String text) {
+        String userId = Long.toString(message.getFrom().getId());
         for (Pattern pattern : pronounPatterns) {
             text = pattern.matcher(text).replaceAll(userId);
         }

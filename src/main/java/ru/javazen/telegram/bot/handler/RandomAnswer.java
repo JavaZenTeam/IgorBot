@@ -1,37 +1,35 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.container.SizedItemsContainer;
-import ru.javazen.telegram.bot.util.MessageHelper;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.BiFunction;
 
-public class RandomAnswer implements UpdateHandler {
+public class RandomAnswer implements TextMessageHandler {
     private Random random;
-    private List<BiFunction<Update, String, String>> preprocessors;
+    private List<BiFunction<Message, String, String>> preprocessors;
     private SizedItemsContainer<String> container;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        String text = MessageHelper.getActualText(update.getMessage());
-        if (text == null) return false;
-
-        if (preprocessors != null && !preprocessors.isEmpty()){
-            for (BiFunction<Update, String, String> preprocessor : preprocessors) {
-                text = preprocessor.apply(update, text);
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
+        if (preprocessors != null && !preprocessors.isEmpty()) {
+            for (BiFunction<Message, String, String> preprocessor : preprocessors) {
+                text = preprocessor.apply(message, text);
             }
         }
         random.setSeed(text.toLowerCase().hashCode());
         String answer = container.get(random.nextDouble() * container.size());
         if (answer == null) return false;
 
-        sender.execute(MessageHelper.answer(update.getMessage(), answer, true));
+        sender.execute(new SendMessage(message.getChatId(), answer));
         return true;
     }
 
@@ -45,11 +43,11 @@ public class RandomAnswer implements UpdateHandler {
         this.container = container;
     }
 
-    public void setAnswers(Map<String, Double> answers){
+    public void setAnswers(Map<String, Double> answers) {
         answers.forEach((option, ratio) -> container.put(option, ratio));
     }
 
-    public void setPreprocessors(List<BiFunction<Update, String, String>> preprocessors) {
+    public void setPreprocessors(List<BiFunction<Message, String, String>> preprocessors) {
         this.preprocessors = preprocessors;
     }
 }

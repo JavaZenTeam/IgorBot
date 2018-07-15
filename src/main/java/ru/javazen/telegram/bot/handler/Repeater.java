@@ -1,19 +1,16 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.util.MessageHelper;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 
-public class Repeater implements UpdateHandler {
+public class Repeater implements TextMessageHandler {
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        String text = update.getMessage().getText();
-        if (text == null) return false;
-
-        sender.execute(MessageHelper.answer(update.getMessage(), text));
-
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
+        sender.execute(new SendMessage(message.getChatId(), text));
         return true;
     }
 }

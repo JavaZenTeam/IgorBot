@@ -2,28 +2,27 @@ package ru.javazen.telegram.bot.handler;
 
 
 import org.telegram.telegrambots.api.methods.ForwardMessage;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 
-public class ChatBridge implements UpdateHandler {
+public class ChatBridge implements MessageHandler {
 
     private long firstChat;
 
     private long secondChat;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        if (update.getMessage().getChat().getId() != firstChat
-                && update.getMessage().getChat().getId() != secondChat) return false;
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        if (message.getChatId() != firstChat && message.getChatId() != secondChat) return false;
 
-        long chatTo = update.getMessage().getChat().getId() == firstChat ? secondChat : firstChat;
+        long chatTo = message.getChatId() == firstChat ? secondChat : firstChat;
 
         ForwardMessage forwardMessage = new ForwardMessage();
-        forwardMessage.setFromChatId(Long.toString(update.getMessage().getChat().getId()));
-        forwardMessage.setMessageId(update.getMessage().getMessageId());
-
-        forwardMessage.setChatId(Long.toString(chatTo));
+        forwardMessage.setFromChatId(message.getChatId());
+        forwardMessage.setMessageId(message.getMessageId());
+        forwardMessage.setChatId(chatTo);
         sender.execute(forwardMessage);
 
         return false;

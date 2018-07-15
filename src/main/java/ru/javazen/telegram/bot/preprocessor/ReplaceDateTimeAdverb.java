@@ -1,13 +1,13 @@
 package ru.javazen.telegram.bot.preprocessor;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
-public class ReplaceDateTimeAdverb implements BiFunction<Update, String, String> {
+public class ReplaceDateTimeAdverb implements BiFunction<Message, String, String> {
     private SimpleDateFormat formatter;
     private Pattern adverbPattern;
     private int offsetField;
@@ -25,9 +25,9 @@ public class ReplaceDateTimeAdverb implements BiFunction<Update, String, String>
     }
 
     @Override
-    public String apply(Update update, String text) {
+    public String apply(Message message, String text) {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(update.getMessage().getDate() * 1000);
+        calendar.setTimeInMillis(message.getDate() * 1000);
         calendar.add(offsetField, offsetAmount);
         String dateTime = formatter.format(calendar.getTime());
 

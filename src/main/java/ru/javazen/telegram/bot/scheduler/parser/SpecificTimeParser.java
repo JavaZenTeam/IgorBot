@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.scheduler.parser;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
@@ -39,16 +39,16 @@ public class SpecificTimeParser implements ScheduledMessageParser {
     }
 
     @Override
-    public ParseResult parse(String message, Update update) {
+    public ParseResult parse(String text, Message message) {
 
         TimeZone timeZone = TimeZone.getTimeZone("GMT" + chatConfigService.getProperty(
-                update.getMessage().getFrom().getId(),
+                message.getFrom().getId(),
                 TIMEZONE_OFFSET_CONFIG_KEY).orElse("+04:00"));
 
         Pattern activationPattern = Pattern.compile(validationPattern,
                 Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 
-        Matcher activation = activationPattern.matcher(message);
+        Matcher activation = activationPattern.matcher(text);
 
         if (activation.matches()) {
             String command = activation.group(1);
@@ -58,8 +58,8 @@ public class SpecificTimeParser implements ScheduledMessageParser {
 
             if (matcher.matches()) {
                 String returnMessage = matcher.group(matcher.groupCount());
-                if (isEmpty(returnMessage) && update.getMessage().getReplyToMessage() != null){
-                    returnMessage = MessageHelper.getActualText(update.getMessage().getReplyToMessage());
+                if (isEmpty(returnMessage) && message.getReplyToMessage() != null) {
+                    returnMessage = MessageHelper.getActualText(message.getReplyToMessage());
                 }
                 if (isEmpty(returnMessage)) {
                     returnMessage = defaultMessageSupplier.get();
