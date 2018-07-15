@@ -1,13 +1,13 @@
 package ru.javazen.telegram.bot.handler.stats;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 import ru.javazen.telegram.bot.model.UserEntity;
 import ru.javazen.telegram.bot.repository.UserEntityRepository;
-import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.MessageFormat;
 import java.util.Calendar;
@@ -17,11 +17,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ActiveUsersHandler implements UpdateHandler {
+public class ActiveUsersHandler implements MessageHandler {
     private UserEntityRepository userEntityRepository;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -7);
 
@@ -37,7 +37,7 @@ public class ActiveUsersHandler implements UpdateHandler {
                 .collect(Collectors.joining("\n"));
 
         String report = MessageFormat.format("Total: {0}\n\n{1}", activeUsers.size(), chats);
-        sender.execute(MessageHelper.answer(update.getMessage(), report));
+        sender.execute(new SendMessage(message.getChatId(), report));
         return true;
     }
 

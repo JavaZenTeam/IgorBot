@@ -4,26 +4,26 @@ package ru.javazen.telegram.bot.handler;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendSticker;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.util.MessageHelper;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ContinueRepeatableSequence implements UpdateHandler {
+public class ContinueRepeatableSequence implements MessageHandler {
     private static final int BUFFER_SIZE = 5;
     private final Queue<Message> messageQueue = new ConcurrentLinkedQueue<>();
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        Message msg = update.getMessage();
-        messageQueue.add(msg);
-        if (messageQueue.size() > BUFFER_SIZE){
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        messageQueue.add(message);
+        if (messageQueue.size() > BUFFER_SIZE) {
             messageQueue.remove();
         }
         int required = generateRequiredLength();
@@ -38,18 +38,18 @@ public class ContinueRepeatableSequence implements UpdateHandler {
         if (!allUsersUnique(messages)) {
             return false;
         }
-        if (allTextsEquals(messages)){
+        if (allTextsEquals(messages)) {
             SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(msg.getChat().getId().toString());
-            sendMessage.setText(MessageHelper.getActualText(msg));
+            sendMessage.setChatId(message.getChatId());
+            sendMessage.setText(message.getText());
             sender.execute(sendMessage);
             messageQueue.clear();
             return true;
         }
-        if (allStickersEquals(messages)){
+        if (allStickersEquals(messages)) {
             SendSticker sendSticker = new SendSticker();
-            sendSticker.setChatId(msg.getChat().getId().toString());
-            sendSticker.setSticker(msg.getSticker().getFileId());
+            sendSticker.setChatId(message.getChatId());
+            sendSticker.setSticker(message.getSticker().getFileId());
             sender.sendSticker(sendSticker);
             messageQueue.clear();
             return true;
@@ -57,7 +57,7 @@ public class ContinueRepeatableSequence implements UpdateHandler {
         return false;
     }
 
-    private boolean allUsersUnique(List<Message> messages){
+    private boolean allUsersUnique(List<Message> messages) {
         long uniqueUsers = messages.stream()
                 .map(Message::getFrom)
                 .map(User::getId)
@@ -66,21 +66,17 @@ public class ContinueRepeatableSequence implements UpdateHandler {
         return uniqueUsers == messages.size();
     }
 
-    private boolean allTextsEquals(List<Message> messages){
-        List<String> uniqueTexts = messages.stream()
-                .map(MessageHelper::getActualText)
-                .distinct()
-                .collect(Collectors.toList());
-        return uniqueTexts.size() == 1 && uniqueTexts.get(0) != null;
+    private boolean allTextsEquals(List<Message> messages) {
+        return allEquals(messages, Message::getText);
     }
 
     private boolean allStickersEquals(List<Message> messages) {
-        List<String> uniqueStickers = messages.stream()
-            .map(Message::getSticker)
-            .map(sticker -> sticker == null ? null : sticker.getFileId())
-            .distinct()
-            .collect(Collectors.toList());
-        return uniqueStickers.size() == 1 && uniqueStickers.get(0) != null;
+        return allEquals(messages, message -> message.getSticker() != null ? message.getSticker().getFileId() : null);
+    }
+
+    private <T, V> boolean allEquals(Collection<T> items, Function<T, V> path) {
+        Object[] unique = items.stream().map(path).distinct().toArray();
+        return unique.length == 1 && unique[0] != null;
     }
 
     private int generateRequiredLength() {

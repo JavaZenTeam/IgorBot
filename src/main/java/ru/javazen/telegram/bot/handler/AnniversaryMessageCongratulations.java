@@ -1,31 +1,25 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.util.MessageHelper;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.Random;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-public class AnniversaryMessageCongratulations implements UpdateHandler {
-    private Random random;
+public class AnniversaryMessageCongratulations implements MessageHandler {
     private Pattern messageIdPattern;
-    private MessageFormat[] templates;
+    private Supplier<String> templateSupplier;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        String messageId = update.getMessage().getMessageId().toString();
-        if (messageIdPattern.matcher(messageId).matches()) {
-            MessageFormat congratulationsTemplate = templates[random.nextInt(templates.length)];
-            String text = congratulationsTemplate.format(new Object[]{messageId});
-            SendMessage sendMessage = MessageHelper.answer(update.getMessage(), text, true);
-            sender.execute(sendMessage);
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        if (messageIdPattern.matcher(message.getMessageId().toString()).matches()) {
+            String text = MessageFormat.format(templateSupplier.get(), message.getMessageId());
+            sender.execute(new SendMessage(message.getChatId(), text).setReplyToMessageId(message.getMessageId()));
         }
         return false;
     }
@@ -36,14 +30,7 @@ public class AnniversaryMessageCongratulations implements UpdateHandler {
     }
 
     @Required
-    public void setTemplates(Collection<String> templates) {
-        this.templates = templates.stream()
-                .map(MessageFormat::new)
-                .toArray(MessageFormat[]::new);
-    }
-
-    @Autowired
-    public void setRandom(Random random) {
-        this.random = random;
+    public void setTemplateSupplier(Supplier<String> templateSupplier) {
+        this.templateSupplier = templateSupplier;
     }
 }

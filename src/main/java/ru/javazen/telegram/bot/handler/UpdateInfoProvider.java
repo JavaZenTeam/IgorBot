@@ -5,39 +5,35 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.util.MessageHelper;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
 
-public class UpdateInfoProvider implements UpdateHandler {
+public class UpdateInfoProvider implements TextMessageHandler {
 
     private ObjectMapper mapper;
 
     private Supplier<String> invalidPathMessageSupplier;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
         try {
-            Message replyToMessage = update.getMessage().getReplyToMessage();
-            Object requestedEntity = replyToMessage == null ? update : replyToMessage;
+            Message reply = message.getReplyToMessage();
+            Object requestedEntity = reply == null ? message : reply;
 
-            String[] args = MessageHelper.getActualText(update.getMessage()).split(" ");
+            String[] args = text.split(" ");
             if (args.length > 1) requestedEntity = resolveEntity(requestedEntity, args[1]);
 
             String answer = mapper.writeValueAsString(requestedEntity);
-            SendMessage message = MessageHelper.answer(update.getMessage(), "```\n" + answer + "```");
-            message.setParseMode("MARKDOWN");
-            sender.execute(message);
+            sender.execute(new SendMessage(message.getChatId(), "```\n" + answer + "```").setParseMode("MARKDOWN"));
             return true;
         } catch (IllegalArgumentException e) {
-            SendMessage message = MessageHelper.answer(update.getMessage(), invalidPathMessageSupplier.get());
-            sender.execute(message);
+            sender.execute(new SendMessage(message.getChatId(), invalidPathMessageSupplier.get()));
             return true;
         } catch (IOException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);

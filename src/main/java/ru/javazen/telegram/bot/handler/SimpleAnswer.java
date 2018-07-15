@@ -1,12 +1,13 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.util.Assert;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.util.MessageHelper;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 
-public class SimpleAnswer implements UpdateHandler{
+public class SimpleAnswer implements MessageHandler {
 
     private String answer;
 
@@ -16,8 +17,8 @@ public class SimpleAnswer implements UpdateHandler{
     }
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        sender.execute(MessageHelper.answer(update.getMessage(), answer));
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        sender.execute(new SendMessage(message.getChatId(), answer));
         return true;
     }
 }

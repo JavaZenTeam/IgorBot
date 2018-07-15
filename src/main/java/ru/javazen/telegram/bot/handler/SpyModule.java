@@ -2,22 +2,23 @@ package ru.javazen.telegram.bot.handler;
 
 
 import org.telegram.telegrambots.api.methods.ForwardMessage;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 
-public class SpyModule implements UpdateHandler {
+public class SpyModule implements MessageHandler {
 
     private long spyOnChatId;
     private long forwardToChatId;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        if (update.getMessage().getChat().getId() != spyOnChatId) return false;
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        if (message.getChatId() != spyOnChatId) return false;
 
         ForwardMessage forwardMessage = new ForwardMessage();
-        forwardMessage.setFromChatId(Long.toString(update.getMessage().getChat().getId()));
-        forwardMessage.setMessageId(update.getMessage().getMessageId());
+        forwardMessage.setFromChatId(message.getChatId());
+        forwardMessage.setMessageId(message.getMessageId());
 
         forwardMessage.setChatId(Long.toString(forwardToChatId));
         sender.execute(forwardMessage);

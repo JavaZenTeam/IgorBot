@@ -10,9 +10,6 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import ru.javazen.telegram.bot.AbsSenderStub;
 
-import java.util.Arrays;
-import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -35,8 +32,7 @@ public class AnniversaryMessageCongratulationsTest {
         when(update.getMessage()).thenReturn(message);
 
         congratulations = new AnniversaryMessageCongratulations();
-        congratulations.setRandom(new Random());
-        congratulations.setTemplates(Arrays.asList("{0}", "{0}"));
+        congratulations.setTemplateSupplier(() -> "{0}");
         congratulations.setMessageIdPattern("\\d0{3,}");
     }
 

@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 
@@ -20,7 +19,7 @@ import java.text.SimpleDateFormat;
 public class SpecificTimeParserTest {
 
     private SpecificTimeParser parser;
-    private Update update;
+    private Message message;
 
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
@@ -34,14 +33,12 @@ public class SpecificTimeParserTest {
                 "и+го+рь,\\s?ск[ао]ж[иы]( .+)",
                 chatConfigService);
 
-        update = Mockito.mock(Update.class);
+        message = Mockito.mock(Message.class);
         User user = Mockito.mock(User.class);
         Mockito.when(user.getId()).thenReturn(111);
 
-        Message message = Mockito.mock(Message.class);
         Mockito.when(message.getReplyToMessage()).thenReturn(null);
         Mockito.when(message.getFrom()).thenReturn(user);
-        Mockito.when(update.getMessage()).thenReturn(message);
     }
 
     @Test
@@ -69,7 +66,7 @@ public class SpecificTimeParserTest {
     public void parseTime() {
 
         ScheduledMessageParser.ParseResult result
-                = parser.parse("Игорь, скажи в 03:00 привет", update);
+                = parser.parse("Игорь, скажи в 03:00 привет", message);
 
         Assert.assertTrue("Expected: 03:00 in " + dateFormat.format(result.getDate()),
                 dateFormat.format(result.getDate()).contains("03:00"));
@@ -80,7 +77,7 @@ public class SpecificTimeParserTest {
     public void parseDate() {
 
         ScheduledMessageParser.ParseResult result
-                = parser.parse("Игорь, скажи 23.06.2050 привет", update);
+                = parser.parse("Игорь, скажи 23.06.2050 привет", message);
 
         Assert.assertTrue("Expected: 23.06.2050 in " + dateFormat.format(result.getDate()),
                 dateFormat.format(result.getDate()).contains("23.06.2050"));
@@ -91,7 +88,7 @@ public class SpecificTimeParserTest {
     public void parseDateTime() {
 
         ScheduledMessageParser.ParseResult result
-                = parser.parse("Игорь, скажи 23.06.2050 в 03:00 привет", update);
+                = parser.parse("Игорь, скажи 23.06.2050 в 03:00 привет", message);
 
         Assert.assertEquals(dateFormat.format(result.getDate()), "23.06.2050 03:00");
     }
@@ -99,7 +96,7 @@ public class SpecificTimeParserTest {
     @Test
     public void correctParse() {
         ScheduledMessageParser.ParseResult result
-                = parser.parse("Игорь, скажи в 21:00 привет", update);
+                = parser.parse("Игорь, скажи в 21:00 привет", message);
 
         Assert.assertTrue(result != null && result.getDate() != null && result.getMessage() != null);
     }
@@ -107,21 +104,21 @@ public class SpecificTimeParserTest {
     @Test
     public void wrongParse() {
         ScheduledMessageParser.ParseResult result
-                = parser.parse("Игорь, скажи !!! привет", update);
+                = parser.parse("Игорь, скажи !!! привет", message);
 
         Assert.assertNull(result);
     }
 
     @Test
     public void checkDefaultMessage() {
-        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи в 21:00", update);
+        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи в 21:00", message);
 
         Assert.assertEquals("ok", result.getMessage());
     }
 
     @Test
     public void checkUserMessage() {
-        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи в 21:00 привет", update);
+        ScheduledMessageParser.ParseResult result = parser.parse("Игорь, скажи в 21:00 привет", message);
 
         Assert.assertEquals("привет", result.getMessage());
     }
