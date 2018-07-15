@@ -57,9 +57,7 @@ public class SchedulerNotifyHandlerTest {
         when(user.getId()).thenReturn(111);
         when(message.getFrom()).thenReturn(user);
 
-        Chat chat = mock(Chat.class);
-        when(chat.getId()).thenReturn(222L);
-        when(message.getChat()).thenReturn(chat);
+        when(message.getChatId()).thenReturn(222L);
 
     }
 
