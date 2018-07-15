@@ -10,6 +10,11 @@ bot:
 http:
   proxy:
     url: ${PROXY_URL:}
+polly:
+  access-key: ${POLLY_ACCESS_KEY}
+  secret-key: ${POLLY_SECRET_KEY}
+file-service:
+  url: ${FILE_SERVICE_URL}
 ---
 spring:
   profiles: dev
@@ -28,6 +33,6 @@ spring:
     driver-class-name: org.postgresql.Driver
 logging:
   level:
-    org.springframework.web: WARN
-    ru.javazen.telegram.bot: WARN
-    org.hibernate: WARN
+    org.springframework.web: INFO
+    ru.javazen.telegram.bot: INFO
+    org.hibernate: INFO
