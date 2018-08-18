@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 @Slf4j
 public class SayTextHandler implements InlineQueryHandler {
-    private static final int QUERY_LENGTH_THRESHOLD = 3;
+    private static final int MIN_QUERY_LENGTH = 1;
     private static final int VOICE_GENERATION_PAUSE = 2;
     private static final int RANDOM_LENGTH = 10;
 
@@ -32,7 +32,7 @@ public class SayTextHandler implements InlineQueryHandler {
 
     @Override
     public boolean handle(InlineQuery inlineQuery, AbsSender sender) throws TelegramApiException {
-        if (inlineQuery.getQuery().length() > QUERY_LENGTH_THRESHOLD) {
+        if (inlineQuery.getQuery().length() >= MIN_QUERY_LENGTH) {
             queries.put(inlineQuery.getFrom().getId(), inlineQuery.getQuery());
             scheduleTask(inlineQuery, sender);
             return true;
