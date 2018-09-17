@@ -1,5 +1,6 @@
 package ru.javazen.telegram.bot.service.impl;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
@@ -15,15 +16,22 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     private ChatConfigService chatConfigService;
     private MessageRepository messageRepository;
     private BotUsageLogRepository botUsageLogRepository;
+    private ModelMapper modelMapper;
     private String saveTextKey;
     private String saveTextValue;
 
     @Override
     public void saveUpdate(Update update) {
-        if (update.getMessage() == null) return; //TODO save not only messages
+        if (update.getMessage() != null) {
+            saveMessage(update.getMessage());
+        }
+        //TODO save not only messages
+    }
 
-        MessageEntity entity = new MessageEntity(update.getMessage());
-        if (!saveTextAllowed(update.getMessage())) {
+    @Override
+    public void saveMessage(Message message) {
+        MessageEntity entity = modelMapper.map(message, MessageEntity.class);
+        if (hideText(message)) {
             entity.setText(null);
         }
         messageRepository.save(entity);
@@ -35,16 +43,16 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
         if (message == null) return; //TODO save not only messages
 
         BotUsageLog botUsageLog = new BotUsageLog();
-        botUsageLog.setTarget(new MessagePK(botResponse.getChatId(), botResponse.getMessageId()));
-        if (saveTextAllowed(message)) {
+        botUsageLog.setTarget(modelMapper.map(botResponse, MessagePK.class));
+        botUsageLog.setSource(modelMapper.map(update.getMessage(), MessagePK.class));
+        if (hideText(message)) {
             botUsageLog.setText(botResponse.getText());
         }
-        botUsageLog.setSource(new MessagePK(message.getChatId(), message.getMessageId()));
         botUsageLog.setModuleName(handlerName);
         botUsageLogRepository.save(botUsageLog);
     }
 
-    private boolean saveTextAllowed(Message userMessage) {
+    private boolean hideText(Message userMessage) {
         return chatConfigService.getProperty(userMessage.getChatId(), saveTextKey)
                 .map(saveTextValue::equals).orElse(false);
     }
@@ -62,6 +70,11 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     @Autowired
     public void setBotUsageLogRepository(BotUsageLogRepository botUsageLogRepository) {
         this.botUsageLogRepository = botUsageLogRepository;
+    }
+
+    @Autowired
+    public void setModelMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
     }
 
     public void setSaveTextKey(String saveTextKey) {
