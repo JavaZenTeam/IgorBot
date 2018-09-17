@@ -22,7 +22,7 @@ public class ModelMapperConfig {
         return new PropertyMap<Message, MessageEntity>() {
             @Override
             protected void configure() {
-                using(messagePKConverter).map(source, destination.getMessagePK());
+                map(source, destination.getMessagePK());
                 using(textConverter).map(source, destination.getText());
                 using(dateConverter).map(source.getDate(), destination.getDate());
                 map(source.getChat(), destination.getChat());
@@ -59,8 +59,16 @@ public class ModelMapperConfig {
         };
     }
 
-    private Converter<Message, MessagePK> messagePKConverter =
-            ctx -> new MessagePK(ctx.getSource().getChatId(), ctx.getSource().getMessageId());
+    @Bean
+    public PropertyMap<Message, MessagePK> messagePkPropertyMap() {
+        return new PropertyMap<Message, MessagePK>() {
+            @Override
+            protected void configure() {
+                map().setChatId(source.getChatId());
+                map().setMessageId(source.getMessageId());
+            }
+        };
+    }
 
     private Converter<Message, String> textConverter = ctx -> ctx.getSource().getText() != null
             ? ctx.getSource().getText()
