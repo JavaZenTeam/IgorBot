@@ -1,15 +1,9 @@
 package ru.javazen.telegram.bot.model;
 
-import org.telegram.telegrambots.api.objects.Chat;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Objects;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.joining;
 
 @Entity
 @Table
@@ -22,22 +16,6 @@ public class ChatEntity {
 
     @Column(length = 512)
     private String title;
-
-    public ChatEntity() {
-    }
-
-    public ChatEntity(long chatId, String username, String title) {
-        this.chatId = chatId;
-        this.username = username;
-        this.title = title;
-    }
-
-    public ChatEntity(Chat chat) {
-        this.chatId = chat.getId();
-        this.username = chat.getUserName();
-        this.title = !chat.isUserChat() ? chat.getTitle() :
-                Stream.of(chat.getFirstName(), chat.getLastName()).filter(Objects::nonNull).collect(joining(" "));
-    }
 
     public long getChatId() {
         return chatId;

@@ -5,6 +5,6 @@ import org.telegram.telegrambots.api.objects.Update;
 
 public interface MessageCollectorService {
     void saveUpdate(Update update);
-
+    void saveMessage(Message message);
     void saveBotUsage(Update update, Message botResponse, String handlerName);
 }
