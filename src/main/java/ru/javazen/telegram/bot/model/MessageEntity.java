@@ -1,8 +1,5 @@
 package ru.javazen.telegram.bot.model;
 
-import org.telegram.telegrambots.api.objects.Message;
-import ru.javazen.telegram.bot.util.MessageHelper;
-
 import javax.persistence.*;
 import java.util.Date;
 
@@ -27,16 +24,17 @@ public class MessageEntity {
     @Column
     private Date date;
 
-    public MessageEntity() {
-    }
+    @Column(length = 4096)
+    private String fileId;
 
-    public MessageEntity(Message message) {
-        this.messagePK = new MessagePK(message.getChatId(), message.getMessageId());
-        this.chat = new ChatEntity(message.getChat());
-        this.user = new UserEntity(message.getFrom());
-        this.text = MessageHelper.getActualText(message);
-        this.date = new Date(1000L * message.getDate());
-    }
+    @Column(length = 10)
+    @Enumerated(EnumType.STRING)
+    private FileType fileType;
+
+    @JoinColumn(name="forward_user_id")
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private UserEntity forwardFrom;
+
 
     public MessagePK getMessagePK() {
         return messagePK;
@@ -78,6 +76,30 @@ public class MessageEntity {
         this.date = date;
     }
 
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public FileType getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(FileType fileType) {
+        this.fileType = fileType;
+    }
+
+    public UserEntity getForwardFrom() {
+        return forwardFrom;
+    }
+
+    public void setForwardFrom(UserEntity forwardFrom) {
+        this.forwardFrom = forwardFrom;
+    }
+
     @Override
     public String toString() {
         return "MessageEntity{" +
@@ -86,6 +108,9 @@ public class MessageEntity {
                 ", user=" + user +
                 ", text='" + text + '\'' +
                 ", date=" + date +
+                ", fileId='" + fileId + '\'' +
+                ", fileType=" + fileType +
+                ", forwardFrom=" + forwardFrom +
                 '}';
     }
 }

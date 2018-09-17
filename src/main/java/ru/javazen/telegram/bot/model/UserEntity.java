@@ -1,7 +1,5 @@
 package ru.javazen.telegram.bot.model;
 
-import org.telegram.telegrambots.api.objects.User;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -21,23 +19,6 @@ public class UserEntity {
 
     @Column(length = 32)
     private String username;
-
-    public UserEntity() {
-    }
-
-    public UserEntity(Integer userId, String firstName, String lastName, String username) {
-        this.userId = userId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.username = username;
-    }
-
-    public UserEntity(User user) {
-        this.userId = user.getId();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
-        this.username = user.getUserName();
-    }
 
     public Integer getUserId() {
         return userId;
