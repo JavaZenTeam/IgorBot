@@ -39,20 +39,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Ivan</td>
-                    <td>1000</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Oleg</td>
-                    <td>500</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Vasiliy</td>
-                    <td>300</td>
+                <tr th:each="user, iter : ${topActiveUsers}">
+                    <td th:text="${iter.index} + 1"></td>
+                    <td>
+                        <span th:text="${user.user.firstName}"></span>
+                        <span th:text="${user.user.lastName}"></span>
+                    </td>
+                    <td th:text="${user.count}"></td>
                 </tr>
                 </tbody>
             </table>
