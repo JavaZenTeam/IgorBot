@@ -3,29 +3,25 @@ package ru.javazen.telegram.bot.handler.subscriptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 import ru.javazen.telegram.bot.model.MessagePK;
 import ru.javazen.telegram.bot.model.Subscription;
 import ru.javazen.telegram.bot.service.SubscriptionService;
-import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GetSubscriptionsByKeyHandler implements UpdateHandler {
+public class GetSubscriptionsByKeyHandler implements TextMessageHandler {
     private SubscriptionService subscriptionService;
     private Pattern pattern;
     private Supplier<String> onEmptyResponseSupplier;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        Message message = update.getMessage();
-        String text = MessageHelper.getActualText(message);
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
         if (text == null) return false;
         Matcher matcher = pattern.matcher(text);
         if (!matcher.matches()) return false;
@@ -40,7 +36,7 @@ public class GetSubscriptionsByKeyHandler implements UpdateHandler {
         List<Subscription> subscriptions = subscriptionService.catchSubscriptions(template);
 
         if (subscriptions.isEmpty()){
-            sender.execute(MessageHelper.answer(message, onEmptyResponseSupplier.get()));
+            sender.execute(new SendMessage(message.getChatId(), onEmptyResponseSupplier.get()));
         }
 
         for (Subscription s : subscriptions) {

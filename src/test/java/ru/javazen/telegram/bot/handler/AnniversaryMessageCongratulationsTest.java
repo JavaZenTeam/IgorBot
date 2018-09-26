@@ -10,10 +10,9 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import ru.javazen.telegram.bot.AbsSenderStub;
 
-import java.util.Arrays;
-import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,34 +27,32 @@ public class AnniversaryMessageCongratulationsTest {
 
         update = mock(Update.class);
         Message message = mock(Message.class);
-        Chat chat = mock(Chat.class);
 
-        when(chat.getId()).thenReturn(-7777777777777L);
-        when(message.getChat()).thenReturn(chat);
+        when(message.getChatId()).thenReturn(-7777777777777L);
         when(update.getMessage()).thenReturn(message);
+        when(update.hasMessage()).thenReturn(true);
 
         congratulations = new AnniversaryMessageCongratulations();
-        congratulations.setRandom(new Random());
-        congratulations.setTemplates(Arrays.asList("{0}", "{0}"));
-        congratulations.setMessageIdPattern("\\d0{3,}");
+        congratulations.setTemplateSupplier(() -> "EEE!");
+        congratulations.setMessageIdPattern("\\d0{2,}");
     }
 
     @Test
     public void testMatched() throws Exception {
         when(update.getMessage().getMessageId()).thenReturn((1000));
-        congratulations.handle(update, botMethodExecutor);
+        assertFalse(congratulations.handle(update, botMethodExecutor));
         BotApiMethod apiMethod = botMethodExecutor.getApiMethod();
-        Assert.assertTrue(apiMethod instanceof SendMessage);
+        assertTrue(apiMethod instanceof SendMessage);
         SendMessage sendMessage = (SendMessage) apiMethod;
-        assertEquals(update.getMessage().getChat().getId().toString(), sendMessage.getChatId());
+        assertEquals(update.getMessage().getChatId().toString(), sendMessage.getChatId());
         assertEquals(update.getMessage().getMessageId(), sendMessage.getReplyToMessageId());
-        assertEquals(update.getMessage().getMessageId().toString(), sendMessage.getText());
+        assertEquals("EEE!", sendMessage.getText());
     }
 
     @Test
     public void testNotMatched() throws Exception {
         when(update.getMessage().getMessageId()).thenReturn(6666);
-        congratulations.handle(update, botMethodExecutor);
+        assertFalse(congratulations.handle(update, botMethodExecutor));
         BotApiMethod apiMethod = botMethodExecutor.getApiMethod();
         Assert.assertNull(apiMethod);
     }

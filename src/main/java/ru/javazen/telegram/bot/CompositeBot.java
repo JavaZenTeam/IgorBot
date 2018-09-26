@@ -11,7 +11,7 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.generics.BotSession;
-import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.handler.base.UpdateHandler;
 import ru.javazen.telegram.bot.service.MessageCollectorService;
 
 import javax.annotation.PostConstruct;
@@ -60,9 +60,6 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.getMessage() == null) {
-            return;
-        }
         try {
             Message sentMessage = null;
             String handlerName = null;
@@ -78,9 +75,9 @@ public class CompositeBot extends TelegramLongPollingBot {
                 }
             }
 
-            messageCollectorService.saveMessage(update.getMessage());
+            messageCollectorService.saveUpdate(update);
             if (sentMessage != null) {
-                messageCollectorService.saveBotUsage(update.getMessage(), sentMessage, handlerName);
+                messageCollectorService.saveBotUsage(update, sentMessage, handlerName);
             }
 
         } catch (Exception e) {

@@ -9,7 +9,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -21,9 +20,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SchedulerNotifyHandlerTest {
@@ -43,7 +40,7 @@ public class SchedulerNotifyHandlerTest {
     @Mock
     private ChatConfigService chatConfigService;
 
-    private Update update;
+    private Message message;
 
     @Before
     public void init() {
@@ -54,43 +51,39 @@ public class SchedulerNotifyHandlerTest {
                 Collections.singletonList(parser),
                 chatConfigService);
 
-        update = mock(Update.class);
-        Message message = mock(Message.class);
-        when(update.getMessage()).thenReturn(message);
+        message = mock(Message.class);
 
         User user = mock(User.class);
         when(user.getId()).thenReturn(111);
         when(message.getFrom()).thenReturn(user);
 
-        Chat chat = mock(Chat.class);
-        when(chat.getId()).thenReturn(222L);
-        when(message.getChat()).thenReturn(chat);
+        when(message.getChatId()).thenReturn(222L);
 
     }
 
     @Test
     public void testNullMessage() throws TelegramApiException {
-        when(update.getMessage().getText()).thenReturn(null);
-        Assert.assertFalse(handler.handle(update, sender));;
+        when(message.getText()).thenReturn(null);
+        Assert.assertFalse(handler.handle(message, sender));
     }
 
     @Test
     public void testCorrectMessage() throws TelegramApiException {
         String correctMessage = "Correct Message";
-        when(update.getMessage().getText()).thenReturn(correctMessage);
+        when(message.getText()).thenReturn(correctMessage);
 
         when(parser.canParse(correctMessage)).thenReturn(true);
         ScheduledMessageParser.ParseResult result = new ScheduledMessageParser.ParseResult(new Date(), "test");
-        when(parser.parse(correctMessage, update)).thenReturn(result);
+        when(parser.parse(correctMessage, message)).thenReturn(result);
 
-        Assert.assertTrue(handler.handle(update, sender));
+        Assert.assertTrue(handler.handle(message, sender));
         verify(messageSchedulerService, Mockito.times(1)).scheduleTask(Mockito.any());
     }
 
     @Test
     public void testTooLongDate() throws TelegramApiException {
         String correctMessage = "Correct Message";
-        when(update.getMessage().getText()).thenReturn(correctMessage);
+        when(message.getText()).thenReturn(correctMessage);
 
         when(parser.canParse(correctMessage)).thenReturn(true);
 
@@ -99,52 +92,52 @@ public class SchedulerNotifyHandlerTest {
 
         ScheduledMessageParser.ParseResult result =
                 new ScheduledMessageParser.ParseResult(calendar.getTime(), "test");
-        when(parser.parse(correctMessage, update)).thenReturn(result);
+        when(parser.parse(correctMessage, message)).thenReturn(result);
 
-        Assert.assertTrue(handler.handle(update, sender));
+        Assert.assertTrue(handler.handle(message, sender));
         verify(messageSchedulerService, Mockito.times(0)).scheduleTask(Mockito.any());
     }
 
     @Test
     public void testWrongMessage() throws TelegramApiException {
         String correctMessage = "Correct Message";
-        when(update.getMessage().getText()).thenReturn("Wrong Message");
+        when(message.getText()).thenReturn("Wrong Message");
 
         when(parser.canParse(Mockito.anyString())).thenReturn(false);
 
-        Assert.assertFalse(handler.handle(update, sender));
+        Assert.assertFalse(handler.handle(message, sender));
         verify(messageSchedulerService, Mockito.times(0)).scheduleTask(Mockito.any());
     }
 
     @Test
     public void testWrongParsing() throws TelegramApiException {
         String message = "Message";
-        when(update.getMessage().getText()).thenReturn(message);
+        when(this.message.getText()).thenReturn(message);
         when(parser.canParse(message)).thenReturn(true);
 
-        Assert.assertFalse(handler.handle(update, sender));
+        Assert.assertFalse(handler.handle(this.message, sender));
         verify(messageSchedulerService, Mockito.times(0)).scheduleTask(Mockito.any());
     }
 
     @Test
     public void checkFilteringWithCanParse() throws TelegramApiException {
         String message = "Message";
-        when(update.getMessage().getText()).thenReturn(message);
+        when(this.message.getText()).thenReturn(message);
         when(parser.canParse(message)).thenReturn(true);
 
-        handler.handle(update, sender);
+        handler.handle(this.message, sender);
 
-        Mockito.verify(parser, Mockito.times(1)).parse(Mockito.anyString(), Mockito.anyObject());
+        Mockito.verify(parser, Mockito.times(1)).parse(Mockito.anyString(), Mockito.any());
     }
 
     @Test
     public void checkFilteringWithCanNotParse() throws TelegramApiException {
         String message = "Message";
-        when(update.getMessage().getText()).thenReturn(message);
+        when(this.message.getText()).thenReturn(message);
         when(parser.canParse(message)).thenReturn(false);
 
-        handler.handle(update, sender);
+        handler.handle(this.message, sender);
 
-        Mockito.verify(parser, Mockito.times(0)).parse(Mockito.anyString(), Mockito.anyObject());
+        Mockito.verify(parser, Mockito.times(0)).parse(Mockito.anyString(), Mockito.any());
     }
 }
