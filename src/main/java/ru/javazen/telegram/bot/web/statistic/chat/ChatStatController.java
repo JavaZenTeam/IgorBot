@@ -5,75 +5,58 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.telegram.telegrambots.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.datasource.ChatDataSource;
-import ru.javazen.telegram.bot.datasource.model.UserStatistic;
-import ru.javazen.telegram.bot.security.authentication.AuthenticationToken;
-import ru.javazen.telegram.bot.security.authentication.service.AuthenticationTokenService;
 
-import java.util.Calendar;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ChatStatController {
     private DefaultAbsSender bot;
-    private AuthenticationTokenService authenticationTokenService;
     private ChatDataSource chatDataSource;
 
     @Autowired
-    public ChatStatController(DefaultAbsSender bot, AuthenticationTokenService authenticationTokenService, ChatDataSource chatDataSource) {
+    public ChatStatController(DefaultAbsSender bot, ChatDataSource chatDataSource) {
         this.bot = bot;
-        this.authenticationTokenService = authenticationTokenService;
         this.chatDataSource = chatDataSource;
     }
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
     @GetMapping("/chat/{chatId}")
-    public String getChatView(@PathVariable("chatId") String chatIdStr, Model model) throws TelegramApiException {
+    public String getChatView(@PathVariable("chatId") String chatIdStr, Model model,
+                              @RequestParam(value = "from", required = false)
+                              @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                      ZonedDateTime from,
+                              @RequestParam(value = "to", required = false)
+                              @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                      ZonedDateTime to) {
         Long chatId = Long.valueOf(chatIdStr);
-        Chat chat = bot.execute(new GetChat(chatId));
-        model.addAttribute("chat", chat);
+
+        to = Optional.ofNullable(to).orElse(ZonedDateTime.now());
+        from = Optional.ofNullable(from).orElse(to.minus(1, ChronoUnit.MONTHS));
+
+        Date toDate = Date.from(to.toInstant());
+        Date fromDate = Date.from(from.toInstant());
+
+        model.addAttribute("topActiveUsers", chatDataSource.topActiveUsers(chatId, fromDate, toDate));
+
         return "chat";
     }
 
-    @PreAuthorize("hasAuthority(#chatIdStr)")
-    @GetMapping("/chat/{chatId}/topActiveUsers")
-    @ResponseBody
-    public List<UserStatistic> topActiveUsers(
-            @PathVariable("chatId")
-                    String chatIdStr,
-            @RequestParam(value = "fromDate", required = false)
-            @DateTimeFormat(pattern = "dd.MM.yyyy")
-                    Date fromDate,
-            @RequestParam(value = "toDate", required = false)
-            @DateTimeFormat(pattern = "dd.MM.yyyy")
-                    Date toDate) {
-
-        Long chatId = Long.valueOf(chatIdStr);
-
-        if (toDate == null) {
-            toDate = new Date();
-        }
-        if (fromDate == null) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(toDate);
-            calendar.add(Calendar.MONTH, -1);
-            fromDate = calendar.getTime();
-        }
-
-        return chatDataSource.topActiveUsers(chatId, fromDate, toDate);
-    }
-
-    @GetMapping("/stats/{token}")
-    public String redirectToStat(@PathVariable("token") String token) {
-        AuthenticationToken authenticationToken = authenticationTokenService.findByToken(token);
-        return "redirect:/chat/" + authenticationToken.getChatId();
+    @ModelAttribute("chat")
+    public Chat getChat(@ModelAttribute("chatId") Long chatId) throws TelegramApiException {
+        return bot.execute(new GetChat(chatId));
     }
 
     @ModelAttribute("bot")
