@@ -1,22 +1,22 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class InstanceForChatController<T extends UpdateHandler> implements UpdateHandler {
+public abstract class InstanceForChatController<T extends MessageHandler> implements MessageHandler {
     private Map<Long, T> map = new HashMap<>();
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        Long chatId = update.getMessage().getChat().getId();
-        if (!map.containsKey(chatId)){
-            map.put(chatId, newInstance());
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        if (!map.containsKey(message.getChatId())) {
+            map.put(message.getChatId(), newInstance());
         }
-        return map.get(chatId).handle(update, sender);
+        return map.get(message.getChatId()).handle(message, sender);
     }
 
     @Override

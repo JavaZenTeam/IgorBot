@@ -1,14 +1,15 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.util.MessageHelper;
+import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RepeaterAdvanced implements UpdateHandler{
+public class RepeaterAdvanced implements TextMessageHandler {
 
     private static final Pattern DEFAULT_PATTERN = Pattern.compile("/repeat (.*)");
     private Pattern pattern = DEFAULT_PATTERN;
@@ -18,14 +19,11 @@ public class RepeaterAdvanced implements UpdateHandler{
     }
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        String text = MessageHelper.getActualText(update.getMessage());
-        if (text == null) return false;
-
+    public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
         String answer = solveAnswer(text);
         if (answer == null) return false;
 
-        sender.execute(MessageHelper.answer(update.getMessage(), answer));
+        sender.execute(new SendMessage(message.getChatId(), answer));
         return true;
     }
 

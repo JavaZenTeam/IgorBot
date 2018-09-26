@@ -3,9 +3,9 @@ package ru.javazen.telegram.bot.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.api.methods.ForwardMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 
 /**
@@ -13,22 +13,21 @@ import ru.javazen.telegram.bot.service.ChatConfigService;
  * kto prochital, tot andrey
  */
 
-public class PinnedForwarder implements UpdateHandler {
+public class PinnedForwarder implements MessageHandler {
     private ChatConfigService chatConfigService;
     private String configKey;
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        Message pinnedMessage = update.getMessage().getPinnedMessage();
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        Message pinnedMessage = message.getPinnedMessage();
         if (pinnedMessage == null) return false;
 
-        String targetChatId = chatConfigService.getProperty(update.getMessage().getChatId(), configKey)
-                .orElse(null);
+        String targetChatId = chatConfigService.getProperty(message.getChatId(), configKey).orElse(null);
         if (targetChatId == null) return false;
 
         ForwardMessage forwardMessage = new ForwardMessage();
-        forwardMessage.setFromChatId(Long.toString(update.getMessage().getChat().getId()));
-        forwardMessage.setMessageId(update.getMessage().getPinnedMessage().getMessageId());
+        forwardMessage.setFromChatId(message.getChatId());
+        forwardMessage.setMessageId(message.getPinnedMessage().getMessageId());
         forwardMessage.setChatId(targetChatId);
         sender.execute(forwardMessage);
 

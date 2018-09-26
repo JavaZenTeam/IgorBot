@@ -1,17 +1,17 @@
 package ru.javazen.telegram.bot.filter;
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeniedChatFilter implements Filter {
+public class DeniedChatFilter implements MessageFilter {
 
     private List<Long> deniedChatIds = new ArrayList<>();
 
     @Override
-    public boolean check(Update update) {
-        return !deniedChatIds.contains(update.getMessage().getChat().getId());
+    public boolean check(Message message) {
+        return !deniedChatIds.contains(message.getChatId());
     }
 
     public void setDeniedChatIds(List<Long> deniedChatIds) {

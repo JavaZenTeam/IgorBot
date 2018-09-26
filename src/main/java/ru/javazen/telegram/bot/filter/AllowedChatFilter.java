@@ -1,19 +1,19 @@
 package ru.javazen.telegram.bot.filter;
 
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.Message;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AllowedChatFilter implements Filter {
+public class AllowedChatFilter implements MessageFilter {
 
     private List<Long> allowedChatIds = new ArrayList<>();
 
     @Override
-    public boolean check(Update update) {
-        return allowedChatIds.contains(update.getMessage().getChat().getId());
+    public boolean check(Message message) {
+        return allowedChatIds.contains(message.getChatId());
     }
 
     public void setAllowedChatIds(List<Long> allowedChatIds) {

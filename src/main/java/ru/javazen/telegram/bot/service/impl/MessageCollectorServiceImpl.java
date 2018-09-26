@@ -1,52 +1,65 @@
 package ru.javazen.telegram.bot.service.impl;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.api.objects.Message;
-import ru.javazen.telegram.bot.model.*;
+import org.telegram.telegrambots.api.objects.Update;
+import ru.javazen.telegram.bot.model.BotUsageLog;
+import ru.javazen.telegram.bot.model.MessageEntity;
+import ru.javazen.telegram.bot.model.MessagePK;
 import ru.javazen.telegram.bot.repository.BotUsageLogRepository;
-import ru.javazen.telegram.bot.repository.ChatConfigRepository;
 import ru.javazen.telegram.bot.repository.MessageRepository;
+import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.service.MessageCollectorService;
 
-import java.util.Objects;
-
 public class MessageCollectorServiceImpl implements MessageCollectorService {
-    private ChatConfigRepository chatConfigRepository;
+    private ChatConfigService chatConfigService;
     private MessageRepository messageRepository;
     private BotUsageLogRepository botUsageLogRepository;
+    private ModelMapper modelMapper;
     private String saveTextKey;
     private String saveTextValue;
 
     @Override
-    public void saveMessage(Message userMessage) {
-        MessageEntity entity = new MessageEntity(userMessage);
-        if (!saveTextAllowed(userMessage)) {
+    public void saveUpdate(Update update) {
+        if (update.getMessage() != null) {
+            saveMessage(update.getMessage());
+        }
+        //TODO save not only messages
+    }
+
+    @Override
+    public void saveMessage(Message message) {
+        MessageEntity entity = modelMapper.map(message, MessageEntity.class);
+        if (hideText(message)) {
             entity.setText(null);
         }
         messageRepository.save(entity);
     }
 
     @Override
-    public void saveBotUsage(Message userMessage, Message botResponse, String handlerName) {
+    public void saveBotUsage(Update update, Message botResponse, String handlerName) {
+        Message message = update.getMessage();
+        if (message == null) return; //TODO save not only messages
+
         BotUsageLog botUsageLog = new BotUsageLog();
-        botUsageLog.setTarget(new MessagePK(botResponse.getChatId(), botResponse.getMessageId()));
-        if (saveTextAllowed(userMessage)) {
+        botUsageLog.setTarget(modelMapper.map(botResponse, MessagePK.class));
+        botUsageLog.setSource(modelMapper.map(update.getMessage(), MessagePK.class));
+        if (!hideText(message)) {
             botUsageLog.setText(botResponse.getText());
         }
-        botUsageLog.setSource(new MessagePK(userMessage.getChatId(), userMessage.getMessageId()));
         botUsageLog.setModuleName(handlerName);
         botUsageLogRepository.save(botUsageLog);
     }
 
-    private boolean saveTextAllowed(Message userMessage) {
-        ChatConfigPK chatConfigPK = new ChatConfigPK(userMessage.getChatId(), saveTextKey);
-        String chatSaveTextValue = chatConfigRepository.findByChatConfigPK(chatConfigPK).map(ChatConfig::getValue).orElse(null);
-        return Objects.equals(chatSaveTextValue, saveTextValue);
+    private boolean hideText(Message userMessage) {
+        return chatConfigService.getProperty(userMessage.getChatId(), saveTextKey)
+                .map(saveTextValue::equals).orElse(false);
     }
 
     @Autowired
-    public void setChatConfigRepository(ChatConfigRepository chatConfigRepository) {
-        this.chatConfigRepository = chatConfigRepository;
+    public void setChatConfigService(ChatConfigService chatConfigService) {
+        this.chatConfigService = chatConfigService;
     }
 
     @Autowired
@@ -57,6 +70,11 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     @Autowired
     public void setBotUsageLogRepository(BotUsageLogRepository botUsageLogRepository) {
         this.botUsageLogRepository = botUsageLogRepository;
+    }
+
+    @Autowired
+    public void setModelMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
     }
 
     public void setSaveTextKey(String saveTextKey) {
