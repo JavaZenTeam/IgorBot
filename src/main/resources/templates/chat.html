@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="chat" type="org.telegram.telegrambots.api.objects.Chat"*/-->
+<!--/*@thymesVar id="bot" type="org.telegram.telegrambots.api.objects.User"*/-->
+<head>
+    <title th:text="${chat.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
+    <script type="text/javascript" src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/popper.js/1.14.1/umd/popper.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="bg-white border-bottom p-3 clearfix">
+    <img th:src="${'/file/' + chat.photo.smallFileId}"
+         class="rounded float-left mr-3" style="height: 120px;">
+    <h1 class="display-4">
+        <span th:text="${chat.title}"></span>
+        <span th:text="${chat.firstName}"></span>
+        <span th:text="${chat.lastName}"></span>
+    </h1>
+    <p class="text-secondary font-weight-bold">
+        <span th:if="${chat.isChannelChat()}">channel</span>
+        <span th:if="${chat.isGroupChat()}">group</span>
+        <span th:if="${chat.isSuperGroupChat()}">super group</span>
+        <span th:if="${chat.isUserChat()}">user</span>
+    </p>
+</div>
+<div class="container-fluid bg-light p-3 ">
+    <div class="row">
+        <div class="col-6">
+            <h4>Top Active Users</h4>
+            <table class="table table-bordered bg-white">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Messages</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user, iter : ${topActiveUsers}">
+                    <td th:text="${iter.index} + 1"></td>
+                    <td>
+                        <span th:text="${user.user.firstName}"></span>
+                        <span th:text="${user.user.lastName}"></span>
+                    </td>
+                    <td th:text="${user.count}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-6">
+            <h4>Top Used Modules</h4>
+            <table class="table table-bordered bg-white">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Module</th>
+                    <th>Usages</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="usage, iter : ${botUsagesByModule}">
+                    <td th:text="${iter.index} + 1"></td>
+                    <td th:text="${usage.moduleName}"></td>
+                    <td th:text="${usage.count}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="bg-white border-top p-3">
+    <a class="float-right"
+       th:href="${'https://t.me/' + bot.userName}"
+       th:text="${'@' + bot.userName}"></a>
+</div>
+</body>
+</html>
