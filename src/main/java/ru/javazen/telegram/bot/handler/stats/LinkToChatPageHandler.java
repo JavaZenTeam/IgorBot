@@ -1,16 +1,16 @@
 package ru.javazen.telegram.bot.handler.stats;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.handler.UpdateHandler;
+import ru.javazen.telegram.bot.handler.base.MessageHandler;
 import ru.javazen.telegram.bot.security.authentication.service.AuthenticationTokenService;
-import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.text.MessageFormat;
 
-public class LinkToChatPageHandler implements UpdateHandler {
+public class LinkToChatPageHandler implements MessageHandler {
     private String linkTemplate;
 
     @Autowired
@@ -21,11 +21,11 @@ public class LinkToChatPageHandler implements UpdateHandler {
     }
 
     @Override
-    public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        String token = authenticationTokenService.generateToken(update.getMessage().getChatId()).getToken();
+    public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        String token = authenticationTokenService.generateToken(message.getChatId()).getToken();
 
         String link = MessageFormat.format(linkTemplate, token);
-        sender.execute(MessageHelper.answer(update.getMessage(), link));
+        sender.execute(new SendMessage(message.getChatId(), link));
         return true;
     }
 }
