@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.web.statistic.chat;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -22,15 +22,10 @@ import java.util.Date;
 import java.util.Optional;
 
 @Controller
+@AllArgsConstructor
 public class ChatStatController {
     private DefaultAbsSender bot;
     private ChatDataSource chatDataSource;
-
-    @Autowired
-    public ChatStatController(DefaultAbsSender bot, ChatDataSource chatDataSource) {
-        this.bot = bot;
-        this.chatDataSource = chatDataSource;
-    }
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
     @GetMapping("/chat/{chatId}")
@@ -50,6 +45,7 @@ public class ChatStatController {
         Date fromDate = Date.from(from.toInstant());
 
         model.addAttribute("topActiveUsers", chatDataSource.topActiveUsers(chatId, fromDate, toDate));
+        model.addAttribute("botUsagesByModule", chatDataSource.botUsagesByModule(chatId, fromDate, toDate));
 
         return "chat";
     }
