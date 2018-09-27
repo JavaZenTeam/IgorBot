@@ -7,6 +7,8 @@ spring:
 bot:
   name: ${IGOR_BOT_USERNAME}
   token: ${IGOR_BOT_TOKEN}
+  baseUrl: ${BASE_URL}
+  supportChat: ${IGOR_BOT_SUPPORT_CHAT:-1001063148517}
 http:
   proxy:
     url: ${PROXY_URL:}
@@ -18,6 +20,8 @@ file-service:
 ---
 spring:
   profiles: dev
+  thymeleaf:
+    cache: false
 logging:
   level:
     org.springframework.web: DEBUG

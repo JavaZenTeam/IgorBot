@@ -44,7 +44,7 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
 
         BotUsageLog botUsageLog = new BotUsageLog();
         botUsageLog.setTarget(modelMapper.map(botResponse, MessagePK.class));
-        botUsageLog.setSource(modelMapper.map(update.getMessage(), MessagePK.class));
+        botUsageLog.setSource(modelMapper.map(update.getMessage(), MessageEntity.class));
         if (!hideText(message)) {
             botUsageLog.setText(botResponse.getText());
         }

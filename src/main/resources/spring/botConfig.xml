@@ -11,7 +11,7 @@
 
 
     <bean id="supportChatId" class="java.lang.Long">
-        <constructor-arg value="-1001063148517"/>
+        <constructor-arg value="${bot.supportChat}"/>
     </bean>
 
     <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
@@ -420,6 +420,19 @@
         </property>
     </bean>
 
+    <bean id="chatStatLinkProvider" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern" value="/chat_stats"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.stats.LinkToChatPageHandler">
+                <constructor-arg name="linkTemplate" value="${bot.baseUrl}/stats/{0}"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <bean id="statisticReports" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.AllowedChatFilter">
@@ -468,6 +481,7 @@
                 <ref bean="pinnedForwarder"/>
                 <ref bean="continueRepeatableSequenceModule"/>
                 <ref bean="statisticReports"/>
+                <ref bean="chatStatLinkProvider"/>
                 <ref bean="subscriptionCreate"/>
                 <ref bean="subscriptionGet"/>
                 <ref bean="subscriptionCancel"/>
