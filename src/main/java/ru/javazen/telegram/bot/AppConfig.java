@@ -15,6 +15,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.ApiContext;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
+import org.telegram.telegrambots.facilities.TelegramHttpClientBuilder;
 import ru.javazen.telegram.bot.client.FileServiceClient;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 import ru.javazen.telegram.bot.handler.SayTextHandler;
@@ -171,6 +173,10 @@ public class AppConfig {
         return new SayTextHandler(voiceService);
     }
 
+    @Bean
+    HttpClient httpClient(DefaultBotOptions options) {
+        return TelegramHttpClientBuilder.build(options);
+    }
 
 
 }
