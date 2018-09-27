@@ -1,7 +1,7 @@
 package ru.javazen.telegram.bot.service.impl;
 
+import lombok.Setter;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import ru.javazen.telegram.bot.model.BotUsageLog;
@@ -12,6 +12,7 @@ import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.service.MessageCollectorService;
 
+@Setter
 public class MessageCollectorServiceImpl implements MessageCollectorService {
     private ChatConfigService chatConfigService;
     private MessageRepository messageRepository;
@@ -44,7 +45,7 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
 
         BotUsageLog botUsageLog = new BotUsageLog();
         botUsageLog.setTarget(modelMapper.map(botResponse, MessagePK.class));
-        botUsageLog.setSource(modelMapper.map(update.getMessage(), MessagePK.class));
+        botUsageLog.setSource(modelMapper.map(update.getMessage(), MessageEntity.class));
         if (!hideText(message)) {
             botUsageLog.setText(botResponse.getText());
         }
@@ -55,33 +56,5 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     private boolean hideText(Message userMessage) {
         return chatConfigService.getProperty(userMessage.getChatId(), saveTextKey)
                 .map(saveTextValue::equals).orElse(false);
-    }
-
-    @Autowired
-    public void setChatConfigService(ChatConfigService chatConfigService) {
-        this.chatConfigService = chatConfigService;
-    }
-
-    @Autowired
-    public void setMessageRepository(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
-    }
-
-    @Autowired
-    public void setBotUsageLogRepository(BotUsageLogRepository botUsageLogRepository) {
-        this.botUsageLogRepository = botUsageLogRepository;
-    }
-
-    @Autowired
-    public void setModelMapper(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
-
-    public void setSaveTextKey(String saveTextKey) {
-        this.saveTextKey = saveTextKey;
-    }
-
-    public void setSaveTextValue(String saveTextValue) {
-        this.saveTextValue = saveTextValue;
     }
 }
