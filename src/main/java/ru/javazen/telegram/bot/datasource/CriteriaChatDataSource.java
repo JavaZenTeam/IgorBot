@@ -26,7 +26,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
         query.where(
                 builder.equal(messages.get(MessageEntity_.chat), chatId),
                 builder.between(messages.get(MessageEntity_.date), after, before));
-        query.groupBy(messages.get(MessageEntity_.user));
+        query.groupBy(userJoin);
 
         Expression<Long> count = builder.count(messages);
         Expression<Long> length = builder.sum(builder.toLong(builder.length(messages.get(MessageEntity_.text))));
