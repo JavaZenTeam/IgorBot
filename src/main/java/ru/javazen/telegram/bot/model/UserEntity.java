@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @Table
@@ -60,5 +61,18 @@ public class UserEntity {
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(getUserId(), that.getUserId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUserId());
     }
 }
