@@ -17,7 +17,6 @@ public class BotUsageLog {
     })
     private MessagePK target;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @AttributeOverrides({
             @AttributeOverride(name = "chatId", column = @Column(name = "source_chat_id")),
             @AttributeOverride(name = "messageId", column = @Column(name = "source_message_id")),
