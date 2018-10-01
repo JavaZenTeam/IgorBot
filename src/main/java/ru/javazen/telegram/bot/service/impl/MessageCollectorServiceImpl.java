@@ -34,6 +34,9 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
         if (hideText(message)) {
             entity.setText(null);
         }
+        if (entity.getUser().equals(entity.getForwardFrom())) {
+            entity.setForwardFrom(entity.getUser());
+        }
         messageRepository.save(entity);
     }
 
