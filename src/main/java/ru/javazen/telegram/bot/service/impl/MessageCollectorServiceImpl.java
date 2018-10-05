@@ -33,7 +33,7 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     @Override
     public void saveMessage(Message message) {
         MessageEntity entity = modelMapper.map(message, MessageEntity.class);
-        if (hideText(message)) {
+        if (!saveText(message)) {
             entity.setText(null);
             entity.setWords(Collections.emptyList());
         }
@@ -51,14 +51,14 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
         BotUsageLog botUsageLog = new BotUsageLog();
         botUsageLog.setTarget(modelMapper.map(botResponse, MessagePK.class));
         botUsageLog.setSource(modelMapper.map(update.getMessage(), MessageEntity.class));
-        if (!hideText(message)) {
+        if (!saveText(message)) {
             botUsageLog.setText(botResponse.getText());
         }
         botUsageLog.setModuleName(handlerName);
         botUsageLogRepository.save(botUsageLog);
     }
 
-    private boolean hideText(Message userMessage) {
+    private boolean saveText(Message userMessage) {
         return chatConfigService.getProperty(userMessage.getChatId(), saveTextKey)
                 .map(saveTextValue::equals).orElse(false);
     }
