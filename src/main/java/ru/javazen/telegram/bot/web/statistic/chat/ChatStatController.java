@@ -46,6 +46,7 @@ public class ChatStatController {
 
         model.addAttribute("topActiveUsers", chatDataSource.topActiveUsers(chatId, fromDate, toDate));
         model.addAttribute("botUsagesByModule", chatDataSource.botUsagesByModule(chatId, fromDate, toDate));
+        model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, fromDate, toDate));
 
         return "chat";
     }

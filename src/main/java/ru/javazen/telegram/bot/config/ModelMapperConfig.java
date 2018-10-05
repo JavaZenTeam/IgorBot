@@ -13,6 +13,7 @@ import ru.javazen.telegram.bot.model.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -30,6 +31,7 @@ public class ModelMapperConfig {
                 map(source.getForwardFrom(), destination.getForwardFrom());
                 using(fileTypeConverter).map(source, destination.getFileType());
                 using(fileIdConverter).map(source, destination.getFileId());
+                using(wordsConverter).map(source.getText(), destination.getWords());
             }
         };
     }
@@ -75,6 +77,15 @@ public class ModelMapperConfig {
             : ctx.getSource().getCaption();
 
     private Converter<Integer, Date> dateConverter = ctx -> new Date(1000L * ctx.getSource());
+
+    private static final Pattern SPLIT_PATTERN = Pattern.compile("\\P{L}*(^|\\s+|$)\\P{L}*", Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern FILTER_PATTERN = Pattern.compile("^[-\\p{L}]+$", Pattern.UNICODE_CHARACTER_CLASS);
+
+    private Converter<String, List<String>> wordsConverter = ctx ->
+            SPLIT_PATTERN.splitAsStream(ctx.getSource())
+                    .filter(FILTER_PATTERN.asPredicate())
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toList());
 
     private Converter<Message, FileType> fileTypeConverter = ctx -> {
         if (ctx.getSource().getPhoto() != null) return FileType.PHOTO;
