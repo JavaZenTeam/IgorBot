@@ -11,6 +11,7 @@ import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.User;
 import ru.javazen.telegram.bot.model.*;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -82,10 +83,12 @@ public class ModelMapperConfig {
     private static final Pattern FILTER_PATTERN = Pattern.compile("^[-\\p{L}]+$", Pattern.UNICODE_CHARACTER_CLASS);
 
     private Converter<String, List<String>> wordsConverter = ctx ->
-            SPLIT_PATTERN.splitAsStream(ctx.getSource())
-                    .filter(FILTER_PATTERN.asPredicate())
-                    .map(String::toLowerCase)
-                    .collect(Collectors.toList());
+            ctx.getSource() == null
+                    ? Collections.emptyList()
+                    : SPLIT_PATTERN.splitAsStream(ctx.getSource())
+                            .filter(FILTER_PATTERN.asPredicate())
+                            .map(String::toLowerCase)
+                            .collect(Collectors.toList());
 
     private Converter<Message, FileType> fileTypeConverter = ctx -> {
         if (ctx.getSource().getPhoto() != null) return FileType.PHOTO;
