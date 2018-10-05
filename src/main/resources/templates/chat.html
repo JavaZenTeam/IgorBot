@@ -10,6 +10,12 @@
     <script type="text/javascript" src="/webjars/popper.js/1.14.1/umd/popper.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 </head>
+<style>
+    .fix-height {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+</style>
 <body>
 <div class="bg-white border-bottom p-3 clearfix">
     <img th:src="${'/file/' + chat.photo.smallFileId}"
@@ -29,45 +35,68 @@
 <div class="container-fluid bg-light p-3 ">
     <div class="row">
         <div class="col-6">
-            <h4>Top Active Users</h4>
-            <table class="table table-bordered bg-white">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>User</th>
-                    <th>Messages</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="user, iter : ${topActiveUsers}">
-                    <td th:text="${iter.index} + 1"></td>
-                    <td>
-                        <span th:text="${user.user.firstName}"></span>
-                        <span th:text="${user.user.lastName}"></span>
-                    </td>
-                    <td th:text="${user.count}"></td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="fix-height">
+                <h4>Top Active Users</h4>
+                <table class="table table-bordered bg-white">
+                    <thead>
+                    <tr>
+                        <th width="10%">#</th>
+                        <th width="45%">User</th>
+                        <th width="45%">Messages</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user, iter : ${topActiveUsers}">
+                        <td th:text="${iter.index} + 1"></td>
+                        <td>
+                            <span th:text="${user.user.firstName}"></span>
+                            <span th:text="${user.user.lastName}"></span>
+                        </td>
+                        <td th:text="${user.count}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="fix-height">
+                <h4>Top Used Modules</h4>
+                <table class="table table-bordered bg-white">
+                    <thead>
+                    <tr>
+                        <th width="10%">#</th>
+                        <th width="45%">Module</th>
+                        <th width="45%">Usages</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="usage, iter : ${botUsagesByModule}">
+                        <td th:text="${iter.index} + 1"></td>
+                        <td th:text="${usage.key}"></td>
+                        <td th:text="${usage.count}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="col-6">
-            <h4>Top Used Modules</h4>
-            <table class="table table-bordered bg-white">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Module</th>
-                    <th>Usages</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="usage, iter : ${botUsagesByModule}">
-                    <td th:text="${iter.index} + 1"></td>
-                    <td th:text="${usage.moduleName}"></td>
-                    <td th:text="${usage.count}"></td>
-                </tr>
-                </tbody>
-            </table>
+            <h4>Top Used Words</h4>
+            <div class="fix-height">
+                <table class="table table-bordered bg-white">
+                    <thead>
+                    <tr>
+                        <th width="10%">#</th>
+                        <th width="45%">Word</th>
+                        <th width="45%">Usages</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="usage, iter : ${wordsUsageStatistic}">
+                        <td th:text="${iter.index} + 1"></td>
+                        <td th:text="${usage.key}"></td>
+                        <td th:text="${usage.count}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
