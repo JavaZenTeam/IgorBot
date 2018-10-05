@@ -2,7 +2,7 @@ package ru.javazen.telegram.bot.datasource;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.javazen.telegram.bot.datasource.model.BotUsageStatistic;
+import ru.javazen.telegram.bot.datasource.model.CountStatistic;
 import ru.javazen.telegram.bot.datasource.model.UserStatistic;
 import ru.javazen.telegram.bot.model.*;
 
@@ -37,9 +37,9 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
-    public List<BotUsageStatistic> botUsagesByModule(Long chatId, Date after, Date before) {
+    public List<CountStatistic> botUsagesByModule(Long chatId, Date after, Date before) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<BotUsageStatistic> query = builder.createQuery(BotUsageStatistic.class);
+        CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
 
         Root<BotUsageLog> botUsages = query.from(BotUsageLog.class);
         Join<BotUsageLog, MessageEntity> messageJoin = botUsages.join(BotUsageLog_.source);
@@ -50,8 +50,29 @@ public class CriteriaChatDataSource implements ChatDataSource {
         query.groupBy(botUsages.get(BotUsageLog_.moduleName));
 
         Expression<Long> count = builder.count(botUsages);
-        query.select(builder.construct(BotUsageStatistic.class, botUsages.get(BotUsageLog_.moduleName), count));
+        query.select(builder.construct(CountStatistic.class, botUsages.get(BotUsageLog_.moduleName), count));
         query.orderBy(builder.desc(count));
         return entityManager.createQuery(query).getResultList();
+    }
+
+    @Override
+    public List<CountStatistic> wordsUsageStatistic(Long chatId, Date after, Date before) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
+
+        Root<MessageEntity> messages = query.from(MessageEntity.class);
+        Join<MessageEntity, String> wordJoin = messages.join(MessageEntity_.words);
+
+        query.where(
+                builder.equal(messages.get(MessageEntity_.chat), chatId),
+                builder.between(messages.get(MessageEntity_.date), after, before));
+        query.groupBy(wordJoin);
+
+        Expression<Long> count = builder.count(messages);
+        query.select(builder.construct(CountStatistic.class, wordJoin, count));
+        query.orderBy(builder.desc(count));
+        return entityManager.createQuery(query)
+                .setMaxResults(50)
+                .getResultList();
     }
 }

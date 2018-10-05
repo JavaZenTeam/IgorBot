@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class BotUsageStatistic {
-    private String moduleName;
+public class CountStatistic {
+    private String key;
     private Long count;
 }
