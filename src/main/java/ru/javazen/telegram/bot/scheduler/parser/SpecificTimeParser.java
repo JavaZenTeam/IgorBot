@@ -27,14 +27,15 @@ public class SpecificTimeParser implements ScheduledMessageParser {
     private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
 
     private final Supplier<String> defaultMessageSupplier;
-    private final String validationPattern;
+    private final Pattern activationPattern;
     private final ChatConfigService chatConfigService;
 
     public SpecificTimeParser(Supplier<String> defaultMessageSupplier,
-                              String validationPattern,
+                              String activationPattern,
                               ChatConfigService chatConfigService) {
         this.defaultMessageSupplier = defaultMessageSupplier;
-        this.validationPattern = validationPattern;
+        this.activationPattern = Pattern.compile(activationPattern,
+                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);;
         this.chatConfigService = chatConfigService;
     }
 
@@ -45,8 +46,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
                 message.getFrom().getId(),
                 TIMEZONE_OFFSET_CONFIG_KEY).orElse("+04:00"));
 
-        Pattern activationPattern = Pattern.compile(validationPattern,
-                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
+
 
         Matcher activation = activationPattern.matcher(text);
 
@@ -88,8 +88,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
 
     @Override
     public boolean canParse(String message) {
-        Pattern pattern = Pattern.compile(validationPattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(message);
+        Matcher matcher = activationPattern.matcher(message);
 
         return matcher.matches();
     }

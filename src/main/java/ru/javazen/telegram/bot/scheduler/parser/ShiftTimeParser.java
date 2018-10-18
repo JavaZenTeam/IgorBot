@@ -34,23 +34,23 @@ public class ShiftTimeParser implements ScheduledMessageParser {
             /* 7 */Calendar.SECOND
     };
 
+    private final static Pattern TIME_UNITS_PATTERN = Pattern.compile(TIME_UNITS_REGEXP, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private final static int COMMAND_GROUP = 1;
 
     private final Supplier<String> defaultMessageSupplier;
-    private final String validationPattern;
+    private final Pattern activationPattern;
 
-    public ShiftTimeParser(Supplier<String> defaultMessageSupplier, String validationPattern) {
+    public ShiftTimeParser(Supplier<String> defaultMessageSupplier, String activationPattern) {
         this.defaultMessageSupplier = defaultMessageSupplier;
-        this.validationPattern = validationPattern;
+        this.activationPattern = Pattern.compile(activationPattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
     }
 
     @Override
     public ParseResult parse(String text, Message message) {
-
-        Pattern pattern = Pattern.compile(validationPattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(text);
+        Matcher matcher = activationPattern.matcher(text);
 
         if (matcher.matches()) {
-            String command = matcher.group(1);
+            String command = matcher.group(COMMAND_GROUP);
             return parseParameters(command, message);
         }
 
@@ -59,16 +59,21 @@ public class ShiftTimeParser implements ScheduledMessageParser {
 
     @Override
     public boolean canParse(String message) {
-        Pattern pattern = Pattern.compile(validationPattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(message);
 
-        return matcher.matches();
+        Matcher matcher = activationPattern.matcher(message);
+        if (matcher.matches()) {
+            String command = matcher.group(COMMAND_GROUP);
+            Matcher commandMatcher = TIME_UNITS_PATTERN.matcher(command);
+            return commandMatcher.matches() && matchedCount(commandMatcher) > 1;
+        }
+
+        return false;
     }
 
     private ParseResult parseParameters(String text, Message message) {
 
-        Pattern pattern = Pattern.compile(TIME_UNITS_REGEXP, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-        Matcher matcher = pattern.matcher(text);
+
+        Matcher matcher = TIME_UNITS_PATTERN.matcher(text);
 
         GregorianCalendar calendar = new GregorianCalendar();
         boolean calendarChanged = false;
@@ -101,5 +106,15 @@ public class ShiftTimeParser implements ScheduledMessageParser {
         }
 
         return new ParseResult(calendar.getTime(), returnMessage.trim());
+    }
+
+    private int matchedCount(Matcher matcher) {
+        int count = 0;
+        for (int i = 0; i < matcher.groupCount(); i++) {
+            if (matcher.group(i) != null) {
+                count++;
+            }
+        }
+        return count;
     }
 }
