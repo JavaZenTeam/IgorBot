@@ -9,11 +9,6 @@
     <import resource="processors.xml"/>
     <import resource="songs.xml"/>
 
-
-    <bean id="supportChatId" class="java.lang.Long">
-        <constructor-arg value="${bot.supportChat}"/>
-    </bean>
-
     <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
@@ -436,7 +431,7 @@
     <bean id="statisticReports" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.AllowedChatFilter">
-                <property name="allowedChatId" ref="supportChatId"/>
+                <property name="allowedChatId" value="${bot.supportChat}"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handlers">
@@ -470,7 +465,7 @@
         <constructor-arg name="name" value="${bot.name}"/>
         <constructor-arg name="token" value="${bot.token}"/>
 
-        <property name="supportChatId" ref="supportChatId"/>
+        <property name="supportChatId" value="${bot.supportChat}"/>
         <property name="startMessageSupplier" ref="startSupplier"/>
         <property name="updateHandlers">
             <list>
