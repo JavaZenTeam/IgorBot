@@ -75,4 +75,15 @@ public class CriteriaChatDataSource implements ChatDataSource {
                 .setMaxResults(50)
                 .getResultList();
     }
+
+    @Override
+    public Long messagesCount(Long chatId, Date after, Date before) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        Root<MessageEntity> messages = query.from(MessageEntity.class);
+        query.select(builder.count(messages));
+        List<Long> resultList = entityManager.createQuery(query)
+                .getResultList();
+        return resultList.isEmpty() ? 0L : resultList.get(0);
+    }
 }
