@@ -9,7 +9,7 @@ spring:
 bot:
   name: ${IGOR_BOT_USERNAME}
   token: ${IGOR_BOT_TOKEN}
-  baseUrl: ${BASE_URL}
+  baseUrl: ${BASE_URL:http://127.0.0.1:8080}
   supportChat: ${IGOR_BOT_SUPPORT_CHAT:}
 http:
   proxy:
