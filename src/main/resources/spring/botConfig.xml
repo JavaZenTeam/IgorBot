@@ -417,8 +417,9 @@
 
     <bean id="chatStatLinkProvider" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
-            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                <property name="pattern" value="/chat_stats"/>
+            <bean class="ru.javazen.telegram.bot.filter.CommandFilter">
+                <constructor-arg name="command" value="/chat_stats"/>
+                <constructor-arg name="botName" value="${bot.name}"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
