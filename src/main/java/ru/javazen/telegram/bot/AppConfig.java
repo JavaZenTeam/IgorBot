@@ -24,6 +24,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
@@ -34,6 +35,7 @@ import org.telegram.telegrambots.facilities.TelegramHttpClientBuilder;
 import ru.javazen.telegram.bot.client.FileServiceClient;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 import ru.javazen.telegram.bot.handler.SayTextHandler;
+import ru.javazen.telegram.bot.handler.base.InlineQueryHandler;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerServiceImpl;
@@ -45,7 +47,6 @@ import java.net.URL;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.function.Function;
-
 
 
 @Configuration
@@ -61,22 +62,22 @@ public class AppConfig {
 
     @Bean
     @Scope("prototype")
-    public Random random(){
+    public Random random() {
         return new Random();
     }
 
     @Bean
-    public CacheManager cacheManager(){
+    public CacheManager cacheManager() {
         return new ConcurrentMapCacheManager("ChatConfig");
     }
 
     @Bean
-    public RandomComparator randomComparator(){
+    public RandomComparator randomComparator() {
         return new RandomComparator(random());
     }
 
     @Bean
-    public ObjectMapper objectMapper(){
+    public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -91,19 +92,19 @@ public class AppConfig {
     }
 
     @Bean
-    public DoubleMetaphone doubleMetaphone(){
+    public DoubleMetaphone doubleMetaphone() {
         DoubleMetaphone metaphone = new DoubleMetaphone();
         metaphone.setMaxCodeLen(30);
         return metaphone;
     }
 
     @Bean
-    public Function<String, String> songEncoder(){
+    public Function<String, String> songEncoder() {
         return s -> doubleMetaphone().encode(Junidecode.unidecode(s));
     }
 
     @Bean
-    public TaskScheduler taskScheduler(){
+    public TaskScheduler taskScheduler() {
         return new ConcurrentTaskScheduler();
     }
 
@@ -152,25 +153,39 @@ public class AppConfig {
     }
 
     @Bean
+    @Profile("say-text")
     FileServiceClient fileServiceClient(@Value("${file-service.url}") String fileServiceUrl) {
         return new FileServiceClient(fileServiceUrl);
     }
 
     @Bean
-    VoiceService voiceService(FileServiceClient fileServiceClient,
-                              @Value("${polly.access-key}") String accessKey,
-                              @Value("${polly.secret-key}") String secretKey) {
-        AmazonPolly amazonClient;
+    @Profile("say-text")
+    AmazonPolly amazonPolly(@Value("${polly.access-key}") String accessKey,
+                            @Value("${polly.secret-key}") String secretKey) {
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        amazonClient = AmazonPollyClientBuilder.standard()
-                .withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion("eu-west-2").build();
+        AWSStaticCredentialsProvider provider = new AWSStaticCredentialsProvider(credentials);
+        return AmazonPollyClientBuilder.standard()
+                .withCredentials(provider)
+                .withRegion("eu-west-2")
+                .build();
+    }
 
+    @Bean
+    @Profile("say-text")
+    VoiceService voiceService(FileServiceClient fileServiceClient, AmazonPolly amazonClient) {
         return new VoiceServiceImpl(fileServiceClient, amazonClient);
     }
 
     @Bean
+    @Profile("say-text")
     SayTextHandler sayTextHandler(VoiceService voiceService) {
         return new SayTextHandler(voiceService);
+    }
+
+    @Bean("sayTextHandler")
+    @Profile("!say-text")
+    InlineQueryHandler sayTextHandlerStub() {
+        return (inlineQuery, sender) -> false;
     }
 
     @Bean

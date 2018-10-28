@@ -14,6 +14,9 @@ bot:
 http:
   proxy:
     url: ${PROXY_URL:}
+---
+spring:
+  profiles: say-text
 polly:
   access-key: ${POLLY_ACCESS_KEY}
   secret-key: ${POLLY_SECRET_KEY}
