@@ -73,14 +73,12 @@
                     </table>
                 </div>
             </div>
-            <div class="col-lg-6" th:if=" ${wordsUsageStatistic.isEmpty()}">
-                <div class="alert-warning">
-                    We don't have word usage statistic for this chat
-                </div>
-            </div>
-            <div class="col-lg-6" th:if=" ${!wordsUsageStatistic.isEmpty()}">
+            <div class="col-lg-6">
                 <h4>Top Used Words</h4>
-                <div class="fix-height">
+                <div class="alert-warning p-3" th:if=" ${wordsUsageStatistic.isEmpty()}">
+                    Word usage statistic is disabled for this chat
+                </div>
+                <div class="fix-height" th:if=" ${!wordsUsageStatistic.isEmpty()}">
                     <table class="table table-bordered table-sm bg-white">
                         <thead class="thead-light text-center">
                         <tr>
