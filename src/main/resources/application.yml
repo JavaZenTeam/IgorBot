@@ -9,11 +9,14 @@ spring:
 bot:
   name: ${IGOR_BOT_USERNAME}
   token: ${IGOR_BOT_TOKEN}
-  baseUrl: ${BASE_URL}
-  supportChat: ${IGOR_BOT_SUPPORT_CHAT:-1001063148517}
+  baseUrl: ${BASE_URL:http://127.0.0.1:8080}
+  supportChat: ${IGOR_BOT_SUPPORT_CHAT:}
 http:
   proxy:
     url: ${PROXY_URL:}
+---
+spring:
+  profiles: say-text
 polly:
   access-key: ${POLLY_ACCESS_KEY}
   secret-key: ${POLLY_SECRET_KEY}

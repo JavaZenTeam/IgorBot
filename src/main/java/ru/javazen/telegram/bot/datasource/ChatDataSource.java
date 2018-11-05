@@ -12,4 +12,6 @@ public interface ChatDataSource {
     List<CountStatistic> botUsagesByModule(Long chatId, Date after, Date before);
 
     List<CountStatistic> wordsUsageStatistic(Long chatId, Date after, Date before);
+
+    Long messagesCount(Long chatId, Date after, Date before);
 }
