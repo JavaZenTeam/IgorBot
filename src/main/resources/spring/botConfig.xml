@@ -484,6 +484,7 @@
                 <ref bean="subscriptionListen"/>
                 <ref bean="setTimezone"/>
                 <ref bean="scheduler"/>
+                <ref bean="unscheduler"/>
                 <ref bean="updateInfoProvider"/>
                 <ref bean="replyLayoutSwitcherModuleRus"/>
                 <ref bean="replyLayoutSwitcherModuleEng"/>
