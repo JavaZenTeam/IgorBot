@@ -13,9 +13,9 @@ import ru.javazen.telegram.bot.repository.MessageTaskRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 
@@ -25,7 +25,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
     private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
 
-    private List<FutureTask> futureTasks = new ArrayList<>();
+    private Map<Long, FutureTask> futureTasks = new HashMap<>();
 
     private final CompositeBot telegramBot;
     private final MessageTaskRepository messageTaskRepository;
@@ -45,15 +45,18 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
     }
 
     @Override
-    public void cancelTaskByChatAndMessage(Long chatId, Long messageId) {
-        /*MessageTask task = messageTaskRepository.getTaskByChatIdAndMessageId(chatId, messageId);
+    public boolean cancelTaskByChatAndMessage(Long chatId, Integer messageId) {
+        MessageTask task = messageTaskRepository.getTaskByChatIdAndMessageId(chatId, messageId.longValue());
 
-        ScheduledFuture future = futureMap.get(task.getId());
-        futureMap.remove(task.getId());
+        if (task == null) { return false; }
 
-        future.cancel(false);
+        FutureTask future = futureTasks.get(task.getId());
+        futureTasks.remove(task.getId());
 
-        messageTaskRepository.delete(task);*/ //TODO
+        future.getFuture().cancel(false);
+
+        messageTaskRepository.delete(task);
+        return true;
     }
 
     @Override
@@ -85,9 +88,10 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
 
         ScheduledFuture future = taskScheduler.schedule(() -> {
-            FutureTask futureTask = futureTasks.stream().filter(fTask -> fTask.getTaskId().equals(task.getId()))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Can't find future for task: " + task.getId()));
+            FutureTask futureTask = futureTasks.get(task.getId());
+            if (futureTask == null) {
+                throw  new RuntimeException("Can't find future for task: " + task.getId());
+            }
 
             try {
                 futureTask.getSender().execute(sendMessage);
@@ -108,7 +112,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                 throw new RuntimeException(e);
             }
 
-            futureTasks.remove(futureTask);
+            futureTasks.remove(futureTask.taskId);
             messageTaskRepository.delete(task);
         }, new Date(task.getTimeOfCompletion()));
 
@@ -117,12 +121,12 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
         futureTask.setTaskId(task.getId());
         futureTask.setFuture(future);
         futureTask.setSender(sender);
-        futureTasks.add(futureTask);
+        futureTasks.put(task.getId(), futureTask);
     }
 
     @PreDestroy
     public void destroy() {
-        for (FutureTask futureTask : futureTasks) {
+        for (FutureTask futureTask : futureTasks.values()) {
             futureTask.getFuture().cancel(true);
         }
     }
