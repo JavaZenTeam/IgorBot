@@ -6,7 +6,7 @@ public interface MessageSchedulerService {
 
     void scheduleTask(MessageTask messageTask);
 
-    void cancelTaskByChatAndMessage(Long chatId, Long messageId);
+    boolean cancelTaskByChatAndMessage(Long chatId, Integer messageId);
 
     void extendTaskByChatAndMessage(Long chatId, Long messageId, long additionalTime);
 }
