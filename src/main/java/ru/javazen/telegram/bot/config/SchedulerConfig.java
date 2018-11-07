@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.javazen.telegram.bot.CompositeBot;
+import ru.javazen.telegram.bot.filter.RegexpFilter;
+import ru.javazen.telegram.bot.handler.FilterAdapter;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
 import ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler;
+import ru.javazen.telegram.bot.scheduler.UnschedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.parser.ShiftTimeParser;
 import ru.javazen.telegram.bot.scheduler.parser.SpecificTimeParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
@@ -31,6 +34,19 @@ public class SchedulerConfig {
                 okSupplier,
                 Arrays.asList(shiftTimeParser, specificTimeParser),
                 chatConfigService);
+    }
+
+    @Bean("unscheduler")
+    public FilterAdapter unschedulerFilterAdapter(UnschedulerNotifyHandler unschedulerNotifyHandler) {
+        RegexpFilter regexpFilter = new RegexpFilter();
+        regexpFilter.setPattern("(з[ао]бу[дт]ь|ш[ао]+т[ао]+п)");
+        return new FilterAdapter(regexpFilter, unschedulerNotifyHandler);
+    }
+
+    @Bean
+    public UnschedulerNotifyHandler unschedulerNotifyHandler(MessageSchedulerService messageSchedulerService,
+                                                             @Qualifier("sadOkSupplier") Supplier<String> okSupplier) {
+        return new UnschedulerNotifyHandler(messageSchedulerService, okSupplier);
     }
 
     @Bean
