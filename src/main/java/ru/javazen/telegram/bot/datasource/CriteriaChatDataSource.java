@@ -64,7 +64,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
         Join<MessageEntity, String> wordJoin = messages.join(MessageEntity_.words);
 
         query.where(
-                builder.greaterThan(builder.length(wordJoin.as(String.class)), 3),
+                builder.greaterThanOrEqualTo(builder.length(wordJoin.as(String.class)), 3),
                 builder.equal(messages.get(MessageEntity_.chat), chatId),
                 builder.between(messages.get(MessageEntity_.date), after, before));
         query.groupBy(wordJoin);
