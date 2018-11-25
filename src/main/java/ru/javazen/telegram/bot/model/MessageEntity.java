@@ -29,6 +29,10 @@ public class MessageEntity {
     @Column(length = 4096)
     private String text;
 
+    private int textLength;
+
+    private float score;
+
     @Column
     private Date date;
 
