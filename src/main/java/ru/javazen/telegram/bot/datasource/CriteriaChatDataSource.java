@@ -30,7 +30,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
 
         Expression<Long> count = builder.count(messages);
         Expression<Long> length = builder.sumAsLong(messages.get(MessageEntity_.textLength));
-        Expression<Float> score = builder.sum(messages.get(MessageEntity_.score));
+        Expression<Double> score = builder.sum(messages.get(MessageEntity_.score));
         query.select(builder.construct(UserStatistic.class, userJoin, count, length, score));
         query.orderBy(builder.desc(score));
 
