@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!--/*@thymesVar id="chat" type="org.telegram.telegrambots.api.objects.Chat"*/-->
-<!--/*@thymesVar id="bot" type="org.telegram.telegrambots.api.objects.User"*/-->
 <head>
     <title th:text="${chat.title}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -73,6 +71,18 @@
                         </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <h4>Top Used Stickers</h4>
+                <div th:if=" ${!wordsUsageStatistic.isEmpty()}"
+                     class="d-flex flex-row bg-white border">
+                    <div th:each="sticker, iter : ${topStickers}" class="m-2">
+                        <span class="position-fixed badge badge-secondary" th:text="${sticker.count}"></span>
+                        <img th:src="${'/file/' + sticker.key}" class="w-100"/>
+                    </div>
+                </div>
+                <div class="alert-info p-3" th:if=" ${topStickers.isEmpty()}">
+                    Stickers have not used yet
                 </div>
             </div>
             <div class="col-lg-4">

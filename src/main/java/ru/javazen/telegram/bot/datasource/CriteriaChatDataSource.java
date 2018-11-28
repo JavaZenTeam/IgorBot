@@ -38,6 +38,28 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
+    public List<CountStatistic> topStickers(Long chatId, Date after, Date before) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
+
+        Root<MessageEntity> messages = query.from(MessageEntity.class);
+        query.where(
+                builder.equal(messages.get(MessageEntity_.fileType), FileType.STICKER),
+                builder.equal(messages.get(MessageEntity_.chat), chatId),
+                builder.between(messages.get(MessageEntity_.date), after, before));
+        Path<String> fileId = messages.get(MessageEntity_.fileId);
+        query.groupBy(fileId);
+
+        Expression<Long> count = builder.count(messages);
+        query.select(builder.construct(CountStatistic.class, fileId, count));
+        query.orderBy(builder.desc(count));
+
+        return entityManager.createQuery(query)
+                .setMaxResults(5)
+                .getResultList();
+    }
+
+    @Override
     public List<CountStatistic> botUsagesByModule(Long chatId, Date after, Date before) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);

@@ -52,7 +52,7 @@ public class ChatStatController {
 //        model.addAttribute("botUsagesByModule", chatDataSource.botUsagesByModule(chatId, fromDate, toDate));
         model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, fromDate, toDate));
 //        model.addAttribute("messagesCount", chatDataSource.messagesCount(chatId, fromDate, toDate));
-
+        model.addAttribute("topStickers", chatDataSource.topStickers(chatId, fromDate, toDate));
         return "chat";
     }
 
