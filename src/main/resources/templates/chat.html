@@ -58,7 +58,7 @@
                                 <span th:text="${user.user.lastName}"></span>
                             </td>
                             <td th:with="activity=${100.0 * user.score / totalScore}, activityStr=${#numbers.formatDecimal(activity, 0, 0)}">
-                                <div class="progress" style="height: 1.5rem">
+                                <div class="progress" style="height: 1.5rem" th:title="${#numbers.formatDecimal(user.score, 0, 0)} + ' points'">
                                     <div class="progress-bar" role="progressbar"
                                          th:style="'width: ' + ${activityStr} + '%;'">
                                         <div th:if="${activity >= 40}"
