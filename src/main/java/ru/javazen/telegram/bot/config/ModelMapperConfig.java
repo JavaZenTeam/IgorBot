@@ -83,9 +83,9 @@ public class ModelMapperConfig {
         return text != null ? text.length() : 0;
     };
 
-    private Converter<Message, Float> scoreConverter = ctx -> {
+    private Converter<Message, Double> scoreConverter = ctx -> {
         String text = MessageHelper.getActualText(ctx.getSource());
-        return text != null ? text.length() : (float) Math.sqrt(30);
+        return text != null ? text.length() : Math.sqrt(30);
     };
 
     private Converter<Integer, Date> dateConverter = ctx -> new Date(1000L * ctx.getSource());

@@ -31,7 +31,7 @@ public class MessageEntity {
 
     private int textLength;
 
-    private float score;
+    private double score;
 
     @Column
     private Date date;

@@ -10,5 +10,5 @@ public class UserStatistic {
     private final UserEntity user;
     private final Long count;
     private final Long length;
-    private final Float score;
+    private final Double score;
 }

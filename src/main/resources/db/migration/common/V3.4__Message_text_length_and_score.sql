@@ -16,7 +16,7 @@ ALTER COLUMN text_length SET not null;
 
 
 ALTER TABLE message_entity
-ADD COLUMN score real;
+ADD COLUMN score double precision;
 
 UPDATE message_entity
 SET score = sqrt(char_length(text))
