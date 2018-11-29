@@ -85,7 +85,8 @@ public class ModelMapperConfig {
 
     private Converter<Message, Double> scoreConverter = ctx -> {
         String text = MessageHelper.getActualText(ctx.getSource());
-        return text != null ? text.length() : Math.sqrt(30);
+        int length = text != null ? text.length() : 30;
+        return Math.sqrt(length);
     };
 
     private Converter<Integer, Date> dateConverter = ctx -> new Date(1000L * ctx.getSource());
