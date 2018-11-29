@@ -441,6 +441,39 @@
         </constructor-arg>
     </bean>
 
+    <bean id="helpCommandHandler" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.CommandFilter">
+                <constructor-arg name="command" value="/help"/>
+                <constructor-arg name="botName" value="${bot.name}"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler" ref="helpMainPostCommandHandler" />
+    </bean>
+
+    <bean id="helpInlineListHandler" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.CallbackQueryFilter">
+                <constructor-arg name="callbackPrefix" value="help:list"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler" ref="helpMainPostQueryHandler" />
+    </bean>
+
+    <bean id="helpInlineFeatureHandler" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.CallbackQueryFilter">
+                <constructor-arg name="callbackPrefix" value="help:feature:"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.help.HelpFeatureCallbackHandler">
+                <constructor-arg name="helpInfoProvider" ref="helpInfoProvider" />
+                <constructor-arg name="callbackPrefix" value="help:feature:" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <bean id="updateHandlers" class="java.util.ArrayList">
         <constructor-arg name="c">
             <list value-type="ru.javazen.telegram.bot.handler.base.UpdateHandler">
@@ -477,6 +510,9 @@
                 <ref bean="songSingerModule"/>
                 <ref bean="secretAndSacred"/>
                 <ref bean="boysForAll"/>
+                <ref bean="helpCommandHandler"/>
+                <ref bean="helpInlineListHandler"/>
+                <ref bean="helpInlineFeatureHandler"/>
             </list>
         </constructor-arg>
     </bean>
