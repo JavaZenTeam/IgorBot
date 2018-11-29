@@ -15,10 +15,12 @@ import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.datasource.ChatDataSource;
+import ru.javazen.telegram.bot.datasource.model.UserStatistic;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -44,11 +46,13 @@ public class ChatStatController {
         Date toDate = Date.from(to.toInstant());
         Date fromDate = Date.from(from.toInstant());
 
-        model.addAttribute("topActiveUsers", chatDataSource.topActiveUsers(chatId, fromDate, toDate));
+        List<UserStatistic> topActiveUsers = chatDataSource.topActiveUsers(chatId, fromDate, toDate);
+        model.addAttribute("topActiveUsers", topActiveUsers);
+        model.addAttribute("totalScore", topActiveUsers.stream().mapToDouble(UserStatistic::getScore).sum());
 //        model.addAttribute("botUsagesByModule", chatDataSource.botUsagesByModule(chatId, fromDate, toDate));
         model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, fromDate, toDate));
-        model.addAttribute("messagesCount", chatDataSource.messagesCount(chatId, fromDate, toDate));
-
+//        model.addAttribute("messagesCount", chatDataSource.messagesCount(chatId, fromDate, toDate));
+        model.addAttribute("topStickers", chatDataSource.topStickers(chatId, fromDate, toDate));
         return "chat";
     }
 
