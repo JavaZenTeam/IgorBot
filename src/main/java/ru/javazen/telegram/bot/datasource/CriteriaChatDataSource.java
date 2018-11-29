@@ -29,11 +29,34 @@ public class CriteriaChatDataSource implements ChatDataSource {
         query.groupBy(userJoin);
 
         Expression<Long> count = builder.count(messages);
-        Expression<Long> length = builder.sum(builder.toLong(builder.length(messages.get(MessageEntity_.text))));
-        query.select(builder.construct(UserStatistic.class, userJoin, count, length));
-        query.orderBy(builder.desc(count));
+        Expression<Long> length = builder.sumAsLong(messages.get(MessageEntity_.textLength));
+        Expression<Double> score = builder.sum(messages.get(MessageEntity_.score));
+        query.select(builder.construct(UserStatistic.class, userJoin, count, length, score));
+        query.orderBy(builder.desc(score));
 
         return entityManager.createQuery(query).getResultList();
+    }
+
+    @Override
+    public List<CountStatistic> topStickers(Long chatId, Date after, Date before) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
+
+        Root<MessageEntity> messages = query.from(MessageEntity.class);
+        query.where(
+                builder.equal(messages.get(MessageEntity_.fileType), FileType.STICKER),
+                builder.equal(messages.get(MessageEntity_.chat), chatId),
+                builder.between(messages.get(MessageEntity_.date), after, before));
+        Path<String> fileId = messages.get(MessageEntity_.fileId);
+        query.groupBy(fileId);
+
+        Expression<Long> count = builder.count(messages);
+        query.select(builder.construct(CountStatistic.class, fileId, count));
+        query.orderBy(builder.desc(count));
+
+        return entityManager.createQuery(query)
+                .setMaxResults(5)
+                .getResultList();
     }
 
     @Override
