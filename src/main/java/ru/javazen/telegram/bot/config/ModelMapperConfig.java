@@ -10,6 +10,7 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.User;
 import ru.javazen.telegram.bot.model.*;
+import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Collections;
 import java.util.Date;
@@ -26,6 +27,8 @@ public class ModelMapperConfig {
             protected void configure() {
                 map(source, destination.getMessagePK());
                 using(textConverter).map(source, destination.getText());
+                using(textLengthConverter).map(source, destination.getTextLength());
+                using(scoreConverter).map(source, destination.getScore());
                 using(dateConverter).map(source.getDate(), destination.getDate());
                 map(source.getChat(), destination.getChat());
                 map(source.getFrom(), destination.getUser());
@@ -73,9 +76,18 @@ public class ModelMapperConfig {
         };
     }
 
-    private Converter<Message, String> textConverter = ctx -> ctx.getSource().getText() != null
-            ? ctx.getSource().getText()
-            : ctx.getSource().getCaption();
+    private Converter<Message, String> textConverter = ctx -> MessageHelper.getActualText(ctx.getSource());
+
+    private Converter<Message, Integer> textLengthConverter = ctx -> {
+        String text = MessageHelper.getActualText(ctx.getSource());
+        return text != null ? text.length() : 0;
+    };
+
+    private Converter<Message, Double> scoreConverter = ctx -> {
+        String text = MessageHelper.getActualText(ctx.getSource());
+        int length = text != null ? text.length() : 30;
+        return Math.sqrt(length);
+    };
 
     private Converter<Integer, Date> dateConverter = ctx -> new Date(1000L * ctx.getSource());
 
