@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title th:text="${chat.title}"></title>
+<head th:fragment="head (title)">
+    <title th:text="${title}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
     <script type="text/javascript" src="/webjars/jquery/3.0.0/jquery.min.js"></script>
     <script type="text/javascript" src="/webjars/popper.js/1.14.1/umd/popper.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 </head>
-<style>
-    .fix-height {
-        max-height: 500px;
-        overflow-y: auto;
-    }
-</style>
 <body>
-<div class="bg-white border-bottom p-3 ">
+<div class="bg-white border-bottom" th:fragment="header(chat, page)">
+    <!--/*@thymesVar id="chat" type="org.telegram.telegrambots.api.objects.Chat"*/-->
     <div class="container clearfix">
         <img th:src="${'/file/' + chat.photo.smallFileId}"
-             class="rounded float-left mr-3" style="height: 120px;">
+             class="rounded float-left mr-3 my-3" style="height: 120px;">
         <h1 class="display-4">
             <span th:text="${chat.title}"></span>
             <span th:text="${chat.firstName}"></span>
@@ -30,89 +25,38 @@
             <span th:if="${chat.isSuperGroupChat()}">super group</span>
             <span th:if="${chat.isUserChat()}">user</span>
         </p>
+        <style>
+            .nav {
+                margin-bottom: -2px;
+            }
+            .nav-link {
+                border-bottom: 0!important;
+            }
+        </style>
+        <ul class="nav nav-tabs nav-justified">
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${page} == 'activity' ? 'active bg-light' : ''"
+                   th:href="@{../activity/}">Activity</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${page} == 'vocabulary' ? 'active bg-light' : ''"
+                   th:href="@{../vocabulary/}">Vocabulary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${page} == 'history' ? 'active bg-light' : ''"
+                   th:href="@{../history/}">History</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled">Settings</a>
+            </li>
+        </ul>
     </div>
 </div>
-<div class="bg-light p-3 ">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                <h4>Top Active Users</h4>
-                <div class="fix-height">
-                    <table class="table table-bordered table-sm bg-white">
-                        <thead class="thead-light text-center">
-                        <tr>
-                            <th width="8%">#</th>
-                            <th width="37%">User</th>
-                            <th width="25%">Activity</th>
-                            <th width="15%">Messages</th>
-                            <th width="15%">Characters</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="user, iter : ${topActiveUsers}">
-                            <td th:text="${iter.index} + 1" class="text-right"></td>
-                            <td>
-                                <span th:text="${user.user.firstName}"></span>
-                                <span th:text="${user.user.lastName}"></span>
-                            </td>
-                            <td th:with="activity=${100.0 * user.score / totalScore}, activityStr=${#numbers.formatDecimal(activity, 0, 0)}">
-                                <div class="progress" style="height: 1.5rem" th:title="${#numbers.formatDecimal(user.score, 0, 0)} + ' points'">
-                                    <div class="progress-bar" role="progressbar"
-                                         th:style="'width: ' + ${activityStr} + '%;'">
-                                        <div th:if="${activity >= 40}"
-                                             th:text="${activityStr} + '%'"></div>
-                                    </div>
-                                    <div th:if="${activity} < 40" class="ml-2 d-flex flex-column justify-content-center"
-                                         th:text="${activityStr} + '%'"></div>
-                                </div>
-                            </td>
-                            <td th:text="${user.count}" class="text-right"></td>
-                            <td th:text="${user.length}" class="text-right"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h4>Top Used Stickers</h4>
-                <div th:if=" ${!wordsUsageStatistic.isEmpty()}"
-                     class="d-flex flex-row bg-white border">
-                    <div th:each="sticker, iter : ${topStickers}" class="m-2">
-                        <span class="position-fixed badge badge-secondary" th:text="${sticker.count}"></span>
-                        <img th:src="${'/file/' + sticker.key}" class="w-100"/>
-                    </div>
-                </div>
-                <div class="alert-info p-3" th:if=" ${topStickers.isEmpty()}">
-                    Stickers have not used yet
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <h4>Top Used Words</h4>
-                <div class="alert-warning p-3" th:if=" ${wordsUsageStatistic.isEmpty()}">
-                    Word usage statistic is disabled for this chat
-                </div>
-                <div class="fix-height" th:if=" ${!wordsUsageStatistic.isEmpty()}">
-                    <table class="table table-bordered table-sm bg-white">
-                        <thead class="thead-light text-center">
-                        <tr>
-                            <th width="8%">#</th>
-                            <th width="46%">Word</th>
-                            <th width="46%">Total</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="usage, iter : ${wordsUsageStatistic}">
-                            <td th:text="${iter.index} + 1" class="text-right"></td>
-                            <td th:text="${usage.key}"></td>
-                            <td th:text="${usage.count}" class="text-right"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="bg-white border-top p-3">
+<div class="bg-white border-top p-3" th:fragment="footer (bot)">
+    <!--/*@thymesVar id="bot" type="org.telegram.telegrambots.api.objects.User"*/-->
     <div class="container">
         <a class="float-right"
            th:href="${'https://t.me/' + bot.userName}"

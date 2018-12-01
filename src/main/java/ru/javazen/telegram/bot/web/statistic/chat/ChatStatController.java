@@ -30,14 +30,20 @@ public class ChatStatController {
     private ChatDataSource chatDataSource;
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
-    @GetMapping("/chat/{chatId}")
-    public String getChatView(@PathVariable("chatId") String chatIdStr, Model model,
-                              @RequestParam(value = "from", required = false)
-                              @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                      ZonedDateTime from,
-                              @RequestParam(value = "to", required = false)
-                              @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                      ZonedDateTime to) {
+    @GetMapping("/chat/{chatId}/")
+    public String getChatView(@PathVariable("chatId") String chatIdStr) {
+        return "redirect:activity/";
+    }
+
+    @PreAuthorize("hasAuthority(#chatIdStr)")
+    @GetMapping("/chat/{chatId}/activity/")
+    public String getChatActivityView(@PathVariable("chatId") String chatIdStr, Model model,
+                                      @RequestParam(value = "from", required = false)
+                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                              ZonedDateTime from,
+                                      @RequestParam(value = "to", required = false)
+                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                              ZonedDateTime to) {
         Long chatId = Long.valueOf(chatIdStr);
 
         to = Optional.ofNullable(to).orElse(ZonedDateTime.now());
@@ -53,7 +59,14 @@ public class ChatStatController {
         model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, fromDate, toDate));
 //        model.addAttribute("messagesCount", chatDataSource.messagesCount(chatId, fromDate, toDate));
         model.addAttribute("topStickers", chatDataSource.topStickers(chatId, fromDate, toDate));
-        return "chat";
+        return "chat_activity";
+    }
+
+
+    @PreAuthorize("hasAuthority(#chatIdStr)")
+    @GetMapping("/chat/{chatId}/history/")
+    public String getChatHistoryView(@PathVariable("chatId") String chatIdStr, Model model) {
+        return "chat_history";
     }
 
     @ModelAttribute("chat")

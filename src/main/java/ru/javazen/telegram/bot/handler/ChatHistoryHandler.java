@@ -41,7 +41,7 @@ public class ChatHistoryHandler implements MessageHandler {
         } else if (message.getLeftChatMember() != null) {
             chatHistoryCollection.add(leftMemberChatHistory(message));
         }
-        chatHistoryRepository.saveAll(chatHistoryCollection);
+//        chatHistoryRepository.saveAll(chatHistoryCollection);
         return false;
     }
 

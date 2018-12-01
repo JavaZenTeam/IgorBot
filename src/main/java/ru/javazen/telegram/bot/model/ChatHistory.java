@@ -2,12 +2,11 @@ package ru.javazen.telegram.bot.model;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.util.Date;
 
-@Entity
+//@Entity
 @Data
 public class ChatHistory {
     @Id
