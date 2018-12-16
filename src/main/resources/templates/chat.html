@@ -77,7 +77,7 @@
                 <div th:if=" ${!wordsUsageStatistic.isEmpty()}"
                      class="d-flex flex-row bg-white border">
                     <div th:each="sticker, iter : ${topStickers}" class="m-2">
-                        <span class="position-fixed badge badge-secondary" th:text="${sticker.count}"></span>
+                        <span class="position-absolute badge badge-secondary" th:text="${sticker.count}"></span>
                         <img th:src="${'/file/' + sticker.key}" class="w-100"/>
                     </div>
                 </div>
