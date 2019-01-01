@@ -46,7 +46,7 @@
                 </div>
 
                 <h4>Top Used Stickers</h4>
-                <div th:if=" ${!wordsUsageStatistic.isEmpty()}"
+                <div th:if=" ${!topStickers.isEmpty()}"
                      class="d-flex flex-row bg-white border">
                     <div th:each="sticker, iter : ${topStickers}" class="m-2">
                         <span class="position-absolute badge badge-secondary" th:text="${sticker.count}"></span>
