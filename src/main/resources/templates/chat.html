@@ -17,7 +17,7 @@
 <body>
 <div class="bg-white border-bottom p-3 ">
     <div class="container clearfix">
-        <img th:src="${'/file/' + chat.photo.smallFileId}"
+        <img th:if="${chat.photo}" th:src="${'/file/' + chat.photo.smallFileId}"
              class="rounded float-left mr-3" style="height: 120px;">
         <h1 class="display-4">
             <span th:text="${chat.title}"></span>
