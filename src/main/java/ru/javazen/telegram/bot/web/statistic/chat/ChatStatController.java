@@ -17,7 +17,8 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.datasource.ChatDataSource;
 import ru.javazen.telegram.bot.datasource.model.UserStatistic;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -33,18 +34,16 @@ public class ChatStatController {
     @GetMapping("/chat/{chatId}")
     public String getChatView(@PathVariable("chatId") String chatIdStr, Model model,
                               @RequestParam(value = "from", required = false)
-                              @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                      ZonedDateTime from,
+                              @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate from,
                               @RequestParam(value = "to", required = false)
-                              @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                      ZonedDateTime to) {
+                              @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate to) {
         Long chatId = Long.valueOf(chatIdStr);
 
-        to = Optional.ofNullable(to).orElse(ZonedDateTime.now());
+        to = Optional.ofNullable(to).orElse(LocalDate.now());
         from = Optional.ofNullable(from).orElse(to.minus(1, ChronoUnit.MONTHS));
 
-        Date toDate = Date.from(to.toInstant());
-        Date fromDate = Date.from(from.toInstant());
+        Date toDate = Date.from(to.atStartOfDay(ZoneId.systemDefault()).plusDays(1).toInstant());
+        Date fromDate = Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         List<UserStatistic> topActiveUsers = chatDataSource.topActiveUsers(chatId, fromDate, toDate);
         model.addAttribute("topActiveUsers", topActiveUsers);
