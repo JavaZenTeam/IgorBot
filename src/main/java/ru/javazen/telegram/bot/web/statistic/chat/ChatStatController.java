@@ -56,9 +56,8 @@ public class ChatStatController {
         model.addAttribute("topActiveUsers", topActiveUsers);
         model.addAttribute("totalScore", topActiveUsers.stream().mapToDouble(UserStatistic::getScore).sum());
 //        model.addAttribute("botUsagesByModule", chatDataSource.botUsagesByModule(chatId, fromDate, toDate));
-        model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, fromDate, toDate));
 //        model.addAttribute("messagesCount", chatDataSource.messagesCount(chatId, fromDate, toDate));
-        model.addAttribute("topStickers", chatDataSource.topStickers(chatId, fromDate, toDate));
+        model.addAttribute("topStickers", chatDataSource.topStickers(chatId, fromDate, toDate, 6));
         return "chat_activity";
     }
 
@@ -67,6 +66,19 @@ public class ChatStatController {
     @GetMapping("/chat/{chatId}/history/")
     public String getChatHistoryView(@PathVariable("chatId") String chatIdStr, Model model) {
         return "chat_history";
+    }
+
+    @PreAuthorize("hasAuthority(#chatIdStr)")
+    @GetMapping("/chat/{chatId}/vocabulary/")
+    public String getChatVocabularyView(@PathVariable("chatId") String chatIdStr, Model model) {
+        Long chatId = Long.valueOf(chatIdStr);
+        ZonedDateTime to = ZonedDateTime.now();
+        ZonedDateTime from = to.minus(1, ChronoUnit.MONTHS);
+
+        Date toDate = Date.from(to.toInstant());
+        Date fromDate = Date.from(from.toInstant());
+        model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, fromDate, toDate));
+        return "chat_vocabulary";
     }
 
     @ModelAttribute("chat")

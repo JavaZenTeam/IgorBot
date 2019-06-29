@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
@@ -38,7 +39,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
-    public List<CountStatistic> topStickers(Long chatId, Date after, Date before) {
+    public List<CountStatistic> topStickers(Long chatId, Date after, Date before, Integer maxResults) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
 
@@ -55,7 +56,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
         query.orderBy(builder.desc(count));
 
         return entityManager.createQuery(query)
-                .setMaxResults(5)
+                .setMaxResults(Optional.ofNullable(maxResults).orElse(5))
                 .getResultList();
     }
 

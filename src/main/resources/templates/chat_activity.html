@@ -44,41 +44,18 @@
                         </tbody>
                     </table>
                 </div>
-
+            </div>
+            <div class="col-lg-4">
                 <h4>Top Used Stickers</h4>
                 <div th:if=" ${!topStickers.isEmpty()}"
-                     class="d-flex flex-row bg-white border">
-                    <div th:each="sticker, iter : ${topStickers}" class="m-2">
+                     class="d-flex flex-wrap bg-white border p1">
+                    <div th:each="sticker, iter : ${topStickers}" class="p-1 w-50">
                         <span class="position-absolute badge badge-secondary" th:text="${sticker.count}"></span>
                         <img th:src="${'/file/' + sticker.key}" class="w-100"/>
                     </div>
                 </div>
                 <div class="alert-info p-3" th:if=" ${topStickers.isEmpty()}">
                     Stickers have not used yet
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <h4>Top Used Words</h4>
-                <div class="alert-warning p-3" th:if=" ${wordsUsageStatistic.isEmpty()}">
-                    Word usage statistic is disabled for this chat
-                </div>
-                <div style="max-height: 800px" th:if=" ${!wordsUsageStatistic.isEmpty()}">
-                    <table class="table table-bordered table-sm bg-white">
-                        <thead class="thead-light text-center">
-                        <tr>
-                            <th width="8%">#</th>
-                            <th width="46%">Word</th>
-                            <th width="46%">Total</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="usage, iter : ${wordsUsageStatistic}">
-                            <td th:text="${iter.index} + 1" class="text-right"></td>
-                            <td th:text="${usage.key}"></td>
-                            <td th:text="${usage.count}" class="text-right"></td>
-                        </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
