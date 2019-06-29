@@ -2,12 +2,16 @@ package ru.javazen.telegram.bot.datasource;
 
 import ru.javazen.telegram.bot.datasource.model.CountStatistic;
 import ru.javazen.telegram.bot.datasource.model.UserStatistic;
+import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
 
 import java.util.Date;
 import java.util.List;
 
 public interface ChatDataSource {
     List<UserStatistic> topActiveUsers(Long chatId, Date after, Date before);
+
+    List<PeriodUserStatistic> activityChart(Long chatId, Date after, Date before);
+
     List<CountStatistic> topStickers(Long chatId, Date after, Date before, Integer maxResults);
 
     List<CountStatistic> botUsagesByModule(Long chatId, Date after, Date before);

@@ -48,12 +48,12 @@
                    th:href="@{../vocabulary/}">Vocabulary</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link"
-                   th:classappend="${page} == 'history' ? 'active bg-light' : ''"
-                   th:href="@{../history/}">History</a>
+                <a class="nav-link disabled"
+                   th:classappend="${page} == 'history' ? 'active bg-light' : ''">History</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled">Settings</a>
+                <a class="nav-link disabled"
+                   th:classappend="${page} == 'settings' ? 'active bg-light' : ''">Settings</a>
             </li>
         </ul>
     </div>

@@ -3,6 +3,7 @@ package ru.javazen.telegram.bot.datasource;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.javazen.telegram.bot.datasource.model.CountStatistic;
+import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
 import ru.javazen.telegram.bot.datasource.model.UserStatistic;
 import ru.javazen.telegram.bot.model.*;
 
@@ -35,6 +36,28 @@ public class CriteriaChatDataSource implements ChatDataSource {
         query.select(builder.construct(UserStatistic.class, userJoin, count, length, score));
         query.orderBy(builder.desc(score));
 
+        return entityManager.createQuery(query).getResultList();
+    }
+
+    @Override
+    public List<PeriodUserStatistic> activityChart(Long chatId, Date after, Date before) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<PeriodUserStatistic> query = builder.createQuery(PeriodUserStatistic.class);
+
+        Root<MessageEntity> messages = query.from(MessageEntity.class);
+        Join<MessageEntity, UserEntity> userJoin = messages.join(MessageEntity_.user);
+        query.where(
+                builder.equal(messages.get(MessageEntity_.chat), chatId),
+                builder.between(messages.get(MessageEntity_.date), after, before));
+        Expression<String> dateFunction = builder.function("TO_CHAR", String.class,
+                messages.get(MessageEntity_.date),
+                InlineLiteral.of(builder,"YYYY-MM-dd"));
+        query.groupBy(dateFunction, userJoin);
+
+        Expression<Long> count = builder.count(messages);
+        Expression<Long> length = builder.sumAsLong(messages.get(MessageEntity_.textLength));
+        Expression<Double> score = builder.sum(messages.get(MessageEntity_.score));
+        query.select(builder.construct(PeriodUserStatistic.class, dateFunction, userJoin, count, length, score));
         return entityManager.createQuery(query).getResultList();
     }
 

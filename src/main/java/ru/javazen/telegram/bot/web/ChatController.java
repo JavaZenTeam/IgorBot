@@ -1,20 +1,20 @@
-package ru.javazen.telegram.bot.web.statistic.chat;
+package ru.javazen.telegram.bot.web;
 
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.datasource.model.ChartData;
+import ru.javazen.telegram.bot.util.ChartDataUtil;
 import ru.javazen.telegram.bot.datasource.ChatDataSource;
+import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
 import ru.javazen.telegram.bot.datasource.model.UserStatistic;
 
 import java.time.ZonedDateTime;
@@ -25,7 +25,7 @@ import java.util.Optional;
 
 @Controller
 @AllArgsConstructor
-public class ChatStatController {
+public class ChatController {
     private DefaultAbsSender bot;
     private ChatDataSource chatDataSource;
 
@@ -61,6 +61,20 @@ public class ChatStatController {
         return "chat_activity";
     }
 
+    @PreAuthorize("hasAuthority(#chatIdStr)")
+    @GetMapping("/chat/{chatId}/activity/chart/")
+    @ResponseBody
+    public ChartData getChatActivityChart(@PathVariable("chatId") String chatIdStr) {
+        Long chatId = Long.valueOf(chatIdStr);
+        ZonedDateTime to = ZonedDateTime.now();
+        ZonedDateTime from = to.minus(1, ChronoUnit.MONTHS);
+        Date toDate = Date.from(to.toInstant());
+        Date fromDate = Date.from(from.toInstant());
+
+        ChartDataUtil chartDataUtil = new ChartDataUtil();
+        List<PeriodUserStatistic> statistic = chatDataSource.activityChart(chatId, fromDate, toDate);
+        return chartDataUtil.convert(statistic);
+    }
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
     @GetMapping("/chat/{chatId}/history/")
