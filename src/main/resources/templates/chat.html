@@ -5,17 +5,44 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/morrisjs/0.5.1/morris.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
     <script type="text/javascript" src="/webjars/jquery/3.0.0/jquery.min.js"></script>
     <script type="text/javascript" src="/webjars/popper.js/1.14.1/umd/popper.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/webjars/raphaeljs/2.1.2/raphael-min.js"></script>
     <script type="text/javascript" src="/webjars/morrisjs/0.5.1/morris.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 </head>
 <body>
 <div class="bg-white border-bottom p-3 ">
     <div class="container clearfix">
         <img th:if="${chat.photo}" th:src="${'/file/' + chat.photo.smallFileId}"
              class="rounded float-left mr-3" style="height: 120px;">
+
+        <div class="float-right">
+            <div class="input-group input-group-sm input-daterange">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">from</span>
+                </div>
+                <input type="text" class="form-control" value="2012-04-05">
+                <div class="input-group-prepend input-group-append">
+                    <span class="input-group-text">to</span>
+                </div>
+                <input type="text" class="form-control" value="2019-04-05">
+            </div>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-outline-secondary">Last day</button>
+                <button type="button" class="btn btn-primary">Last week</button>
+                <button type="button" class="btn btn-outline-secondary">Last month</button>
+                <button type="button" class="btn btn-outline-secondary">Last year</button>
+                <button type="button" class="btn btn-outline-secondary">All time</button>
+            </div>
+        </div>
+        <script>
+            $('.input-daterange input').each(function () {
+                $(this).datepicker();
+            });
+        </script>
         <h1 class="display-4">
             <span th:text="${chat.title}"></span>
             <span th:text="${chat.firstName}"></span>
