@@ -1,0 +1,15 @@
+<div class="bg-white border p-2">
+    <div id="activity-chart"></div>
+</div>
+<script>
+    $.get(window.location + "activity-chart/")
+        .done(function( response ) {
+            Morris.Line({
+                element: 'activity-chart',
+                data: response['data'],
+                xkey: response['xKey'],
+                ykeys: response['yKeys'],
+                labels: response['labels']
+            });
+        });
+</script>

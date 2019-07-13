@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:fragment="head (title)">
-    <title th:text="${title}"></title>
+<head>
+    <title th:text="${#strings.concatReplaceNulls(chat.title, ' ', chat.firstName, ' ', chat.lastName).trim()}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/morrisjs/0.5.1/morris.css">
@@ -12,11 +12,10 @@
     <script type="text/javascript" src="/webjars/morrisjs/0.5.1/morris.min.js"></script>
 </head>
 <body>
-<div class="bg-white border-bottom" th:fragment="header(chat, page)">
-    <!--/*@thymesVar id="chat" type="org.telegram.telegrambots.api.objects.Chat"*/-->
+<div class="bg-white border-bottom p-3 ">
     <div class="container clearfix">
-        <img th:src="${'/file/' + chat.photo.smallFileId}"
-             class="rounded float-left mr-3 my-3" style="height: 120px;">
+        <img th:if="${chat.photo}" th:src="${'/file/' + chat.photo.smallFileId}"
+             class="rounded float-left mr-3" style="height: 120px;">
         <h1 class="display-4">
             <span th:text="${chat.title}"></span>
             <span th:text="${chat.firstName}"></span>
@@ -28,37 +27,25 @@
             <span th:if="${chat.isSuperGroupChat()}">super group</span>
             <span th:if="${chat.isUserChat()}">user</span>
         </p>
-        <style>
-            .nav {
-                margin-bottom: -1px;
-            }
-            .nav-link {
-                border-bottom: 0!important;
-            }
-        </style>
-        <ul class="nav nav-tabs nav-justified">
-            <li class="nav-item">
-                <a class="nav-link"
-                   th:classappend="${page} == 'activity' ? 'active bg-light' : ''"
-                   th:href="@{../activity/}">Activity</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link"
-                   th:classappend="${page} == 'vocabulary' ? 'active bg-light' : ''"
-                   th:href="@{../vocabulary/}">Vocabulary</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled"
-                   th:classappend="${page} == 'history' ? 'active bg-light' : ''">History</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled"
-                   th:classappend="${page} == 'settings' ? 'active bg-light' : ''">Settings</a>
-            </li>
-        </ul>
     </div>
 </div>
-<div class="bg-white border-top p-3" th:fragment="footer (bot)">
+<div class="bg-light p-3 ">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h4>Top Active Users</h4>
+                <div th:insert="chat_activity_table"></div>
+                <h4>Activity chart</h4>
+                <div th:insert="chat_activity_chart"></div>
+            </div>
+            <div class="col-lg-4">
+                <h4>Top Used Stickers</h4>
+                <div th:insert="chat_stickers"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="bg-white border-top p-3">
     <!--/*@thymesVar id="bot" type="org.telegram.telegrambots.api.objects.User"*/-->
     <div class="container">
         <a class="float-right"

@@ -31,19 +31,13 @@ public class ChatController {
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
     @GetMapping("/chat/{chatId}/")
-    public String getChatView(@PathVariable("chatId") String chatIdStr) {
-        return "redirect:activity/";
-    }
-
-    @PreAuthorize("hasAuthority(#chatIdStr)")
-    @GetMapping("/chat/{chatId}/activity/")
-    public String getChatActivityView(@PathVariable("chatId") String chatIdStr, Model model,
-                                      @RequestParam(value = "from", required = false)
-                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                              ZonedDateTime from,
-                                      @RequestParam(value = "to", required = false)
-                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                              ZonedDateTime to) {
+    public String getChatView(@PathVariable("chatId") String chatIdStr, Model model,
+                              @RequestParam(value = "from", required = false)
+                              @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                      ZonedDateTime from,
+                              @RequestParam(value = "to", required = false)
+                              @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                      ZonedDateTime to) {
         Long chatId = Long.valueOf(chatIdStr);
 
         to = Optional.ofNullable(to).orElse(ZonedDateTime.now());
@@ -58,11 +52,13 @@ public class ChatController {
 //        model.addAttribute("botUsagesByModule", chatDataSource.botUsagesByModule(chatId, fromDate, toDate));
 //        model.addAttribute("messagesCount", chatDataSource.messagesCount(chatId, fromDate, toDate));
         model.addAttribute("topStickers", chatDataSource.topStickers(chatId, fromDate, toDate, 6));
-        return "chat_activity";
+        model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, fromDate, toDate));
+
+        return "chat";
     }
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
-    @GetMapping("/chat/{chatId}/activity/chart/")
+    @GetMapping("/chat/{chatId}/activity-chart/")
     @ResponseBody
     public ChartData getChatActivityChart(@PathVariable("chatId") String chatIdStr) {
         Long chatId = Long.valueOf(chatIdStr);
@@ -74,25 +70,6 @@ public class ChatController {
         ChartDataUtil chartDataUtil = new ChartDataUtil();
         List<PeriodUserStatistic> statistic = chatDataSource.activityChart(chatId, fromDate, toDate);
         return chartDataUtil.convert(statistic);
-    }
-
-    @PreAuthorize("hasAuthority(#chatIdStr)")
-    @GetMapping("/chat/{chatId}/history/")
-    public String getChatHistoryView(@PathVariable("chatId") String chatIdStr, Model model) {
-        return "chat_history";
-    }
-
-    @PreAuthorize("hasAuthority(#chatIdStr)")
-    @GetMapping("/chat/{chatId}/vocabulary/")
-    public String getChatVocabularyView(@PathVariable("chatId") String chatIdStr, Model model) {
-        Long chatId = Long.valueOf(chatIdStr);
-        ZonedDateTime to = ZonedDateTime.now();
-        ZonedDateTime from = to.minus(1, ChronoUnit.MONTHS);
-
-        Date toDate = Date.from(to.toInstant());
-        Date fromDate = Date.from(from.toInstant());
-        model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, fromDate, toDate));
-        return "chat_vocabulary";
     }
 
     @ModelAttribute("chat")

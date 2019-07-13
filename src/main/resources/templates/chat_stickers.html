@@ -1,0 +1,12 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <div th:if=" ${!topStickers.isEmpty()}"
+         class="d-flex flex-wrap bg-white border p-2">
+        <div th:each="sticker, iter : ${topStickers}" class="p-2 w-50">
+            <span class="position-absolute badge badge-secondary" th:text="${sticker.count}"></span>
+            <img th:src="${'/file/' + sticker.key}" class="w-100"/>
+        </div>
+    </div>
+    <div class="alert-info p-3" th:if=" ${topStickers.isEmpty()}">
+        Stickers have not used yet
+    </div>
+</div>

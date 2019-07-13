@@ -1,35 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="chat :: head (title = ${chat.title})">
-</head>
-<body>
-<div th:replace="chat :: header (chat = ${chat}, page = 'vocabulary')"></div>
-<div class="bg-light p-3 ">
-    <div class="container">
-        <h4>Top Used Words</h4>
-        <div class="alert-warning p-3" th:if=" ${wordsUsageStatistic.isEmpty()}">
-            Word usage statistic is disabled for this chat
-        </div>
-        <div style="max-height: 800px" th:if=" ${!wordsUsageStatistic.isEmpty()}">
-            <table class="table table-bordered table-sm bg-white">
-                <thead class="thead-light text-center">
-                <tr>
-                    <th width="8%">#</th>
-                    <th width="46%">Word</th>
-                    <th width="46%">Total</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="usage, iter : ${wordsUsageStatistic}">
-                    <td th:text="${iter.index} + 1" class="text-right"></td>
-                    <td th:text="${usage.key}"></td>
-                    <td th:text="${usage.count}" class="text-right"></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+<div xmlns:th="http://www.thymeleaf.org">
+    <div class="alert-warning p-3" th:if=" ${wordsUsageStatistic.isEmpty()}">
+        Word usage statistic is disabled for this chat
+    </div>
+    <div style="max-height: 800px" th:if=" ${!wordsUsageStatistic.isEmpty()}">
+        <table class="table table-bordered table-sm bg-white">
+            <thead class="thead-light text-center">
+            <tr>
+                <th width="8%">#</th>
+                <th width="46%">Word</th>
+                <th width="46%">Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="usage, iter : ${wordsUsageStatistic}">
+                <td th:text="${iter.index} + 1" class="text-right"></td>
+                <td th:text="${usage.key}"></td>
+                <td th:text="${usage.count}" class="text-right"></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
-<div th:replace="chat :: footer (bot = ${bot})"></div>
-</body>
-</html>
