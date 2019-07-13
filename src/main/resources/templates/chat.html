@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${#strings.concatReplaceNulls(chat.title, ' ', chat.firstName, ' ', chat.lastName).trim()}"></title>
+    <title th:text="${#strings.concat(chat.title, ' ', chat.firstName, ' ', chat.lastName).trim()}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/morrisjs/0.5.1/morris.css">
