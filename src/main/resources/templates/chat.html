@@ -1,24 +1,110 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${chat.title}"></title>
+    <title th:text="${#strings.concat(chat.title, ' ', chat.firstName, ' ', chat.lastName).trim()}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/webjars/morrisjs/0.5.1/morris.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
     <script type="text/javascript" src="/webjars/jquery/3.0.0/jquery.min.js"></script>
     <script type="text/javascript" src="/webjars/popper.js/1.14.1/umd/popper.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/webjars/raphaeljs/2.1.2/raphael-min.js"></script>
+    <script type="text/javascript" src="/webjars/morrisjs/0.5.1/morris.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/script.js"></script>
 </head>
+<body>
 <style>
-    .fix-height {
-        max-height: 500px;
-        overflow-y: auto;
+    #fromDate, #toDate {
+        width: 110px;
     }
 </style>
-<body>
 <div class="bg-white border-bottom p-3 ">
     <div class="container clearfix">
         <img th:if="${chat.photo}" th:src="${'/file/' + chat.photo.smallFileId}"
              class="rounded float-left mr-3" style="height: 120px;">
+        <div class="float-right">
+            <div class="input-group input-group-sm input-daterange mb-2">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">from</span>
+                </div>
+                <input id="fromDate" type="text" class="form-control"
+                       th:value="${#dates.format(fromDate, 'dd.MM.yyyy')}">
+                <div class="input-group-prepend input-group-append">
+                    <span class="input-group-text">to</span>
+                </div>
+                <input id="toDate" type="text" class="form-control"
+                       th:value="${#dates.format(toDate, 'dd.MM.yyyy')}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" onclick="selectCustomRange()">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="margin-top: 4px"
+                             x="0px" y="0px" height="0.9em" viewBox="0 0 438.529 438.528">
+                            <path fill="white" d="M433.109,23.694c-3.614-3.612-7.898-5.424-12.848-5.424c-4.948,0-9.226,1.812-12.847,5.424l-37.113,36.835
+                                c-20.365-19.226-43.684-34.123-69.948-44.684C274.091,5.283,247.056,0.003,219.266,0.003c-52.344,0-98.022,15.843-137.042,47.536
+                                C43.203,79.228,17.509,120.574,5.137,171.587v1.997c0,2.474,0.903,4.617,2.712,6.423c1.809,1.809,3.949,2.712,6.423,2.712h56.814
+                                c4.189,0,7.042-2.19,8.566-6.565c7.993-19.032,13.035-30.166,15.131-33.403c13.322-21.698,31.023-38.734,53.103-51.106
+                                c22.082-12.371,45.873-18.559,71.376-18.559c38.261,0,71.473,13.039,99.645,39.115l-39.406,39.397
+                                c-3.607,3.617-5.421,7.902-5.421,12.851c0,4.948,1.813,9.231,5.421,12.847c3.621,3.617,7.905,5.424,12.854,5.424h127.906
+                                c4.949,0,9.233-1.807,12.848-5.424c3.613-3.616,5.42-7.898,5.42-12.847V36.542C438.529,31.593,436.733,27.312,433.109,23.694z">
+                            </path>
+                            <path fill="white" d="M422.253,255.813h-54.816c-4.188,0-7.043,2.187-8.562,6.566c-7.99,19.034-13.038,30.163-15.129,33.4
+                                c-13.326,21.693-31.028,38.735-53.102,51.106c-22.083,12.375-45.874,18.556-71.378,18.556c-18.461,0-36.259-3.423-53.387-10.273
+                                c-17.13-6.858-32.454-16.567-45.966-29.13l39.115-39.112c3.615-3.613,5.424-7.901,5.424-12.847c0-4.948-1.809-9.236-5.424-12.847
+                                c-3.617-3.62-7.898-5.431-12.847-5.431H18.274c-4.952,0-9.235,1.811-12.851,5.431C1.807,264.844,0,269.132,0,274.08v127.907
+                                c0,4.945,1.807,9.232,5.424,12.847c3.619,3.61,7.902,5.428,12.851,5.428c4.948,0,9.229-1.817,12.847-5.428l36.829-36.833
+                                c20.367,19.41,43.542,34.355,69.523,44.823c25.981,10.472,52.866,15.701,80.653,15.701c52.155,0,97.643-15.845,136.471-47.534
+                                c38.828-31.688,64.333-73.042,76.52-124.05c0.191-0.38,0.281-1.047,0.281-1.995c0-2.478-0.907-4.612-2.715-6.427
+                                C426.874,256.72,424.731,255.813,422.253,255.813z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="btn-group btn-group-sm d-flex" role="group">
+                <button type="button" class="btn btn-outline-secondary w-100"
+                        th:classappend="${range=='LAST_DAY'} ? 'active' : ''"
+                        onclick="selectRange('LAST_DAY')">
+                    Last day
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-100"
+                        th:classappend="${range=='LAST_WEEK'} ? 'active' : ''"
+                        onclick="selectRange('LAST_WEEK')">
+                    Last week
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-100"
+                        th:classappend="${range=='LAST_MONTH'} ? 'active' : ''"
+                        onclick="selectRange('LAST_MONTH')">
+                    Last month
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-100"
+                        th:classappend="${range=='LAST_YEAR'} ? 'active' : ''"
+                        onclick="selectRange('LAST_YEAR')">
+                    Last year
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-100"
+                        th:classappend="${range=='ALL_TIME'} ? 'active' : ''"
+                        onclick="selectRange('ALL_TIME')">
+                    All time
+                </button>
+            </div>
+        </div>
+        <script>
+            $('.input-daterange').datepicker({
+                format: 'dd.mm.yyyy',
+                endDate: '0d',
+                todayHighlight: true,
+                weekStart: 1
+            });
+
+            function selectRange(range) {
+                window.location.search = $.param({range: range})
+            }
+
+            function selectCustomRange() {
+                window.location.search = $.param({range: 'CUSTOM', from: $('#fromDate').val(), to: $('#toDate').val()});
+            }
+        </script>
         <h1 class="display-4">
             <span th:text="${chat.title}"></span>
             <span th:text="${chat.firstName}"></span>
@@ -37,82 +123,19 @@
         <div class="row">
             <div class="col-lg-8">
                 <h4>Top Active Users</h4>
-                <div class="fix-height">
-                    <table class="table table-bordered table-sm bg-white">
-                        <thead class="thead-light text-center">
-                        <tr>
-                            <th width="8%">#</th>
-                            <th width="37%">User</th>
-                            <th width="25%">Activity</th>
-                            <th width="15%">Messages</th>
-                            <th width="15%">Characters</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="user, iter : ${topActiveUsers}">
-                            <td th:text="${iter.index} + 1" class="text-right"></td>
-                            <td>
-                                <span th:text="${user.user.firstName}"></span>
-                                <span th:text="${user.user.lastName}"></span>
-                            </td>
-                            <td th:with="activity=${100.0 * user.score / totalScore}, activityStr=${#numbers.formatDecimal(activity, 0, 0)}">
-                                <div class="progress" style="height: 1.5rem" th:title="${#numbers.formatDecimal(user.score, 0, 0)} + ' points'">
-                                    <div class="progress-bar" role="progressbar"
-                                         th:style="'width: ' + ${activityStr} + '%;'">
-                                        <div th:if="${activity >= 40}"
-                                             th:text="${activityStr} + '%'"></div>
-                                    </div>
-                                    <div th:if="${activity} < 40" class="ml-2 d-flex flex-column justify-content-center"
-                                         th:text="${activityStr} + '%'"></div>
-                                </div>
-                            </td>
-                            <td th:text="${user.count}" class="text-right"></td>
-                            <td th:text="${user.length}" class="text-right"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h4>Top Used Stickers</h4>
-                <div th:if=" ${!topStickers.isEmpty()}"
-                     class="d-flex flex-row bg-white border">
-                    <div th:each="sticker, iter : ${topStickers}" class="m-2">
-                        <span class="position-absolute badge badge-secondary" th:text="${sticker.count}"></span>
-                        <img th:src="${'/file/' + sticker.key}" class="w-100"/>
-                    </div>
-                </div>
-                <div class="alert-info p-3" th:if=" ${topStickers.isEmpty()}">
-                    Stickers have not used yet
-                </div>
+                <div th:insert="chat_activity_table"></div>
+                <h4>Activity chart</h4>
+                <div th:insert="chat_activity_chart"></div>
             </div>
             <div class="col-lg-4">
-                <h4>Top Used Words</h4>
-                <div class="alert-warning p-3" th:if=" ${wordsUsageStatistic.isEmpty()}">
-                    Word usage statistic is disabled for this chat
-                </div>
-                <div class="fix-height" th:if=" ${!wordsUsageStatistic.isEmpty()}">
-                    <table class="table table-bordered table-sm bg-white">
-                        <thead class="thead-light text-center">
-                        <tr>
-                            <th width="8%">#</th>
-                            <th width="46%">Word</th>
-                            <th width="46%">Total</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="usage, iter : ${wordsUsageStatistic}">
-                            <td th:text="${iter.index} + 1" class="text-right"></td>
-                            <td th:text="${usage.key}"></td>
-                            <td th:text="${usage.count}" class="text-right"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <h4>Top Used Stickers</h4>
+                <div th:insert="chat_stickers"></div>
             </div>
         </div>
     </div>
 </div>
 <div class="bg-white border-top p-3">
+    <!--/*@thymesVar id="bot" type="org.telegram.telegrambots.api.objects.User"*/-->
     <div class="container">
         <a class="float-right"
            th:href="${'https://t.me/' + bot.userName}"
