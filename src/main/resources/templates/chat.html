@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/morrisjs/0.5.1/morris.css">
-    <link rel="stylesheet" href="/webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
     <script type="text/javascript" src="/webjars/jquery/3.0.0/jquery.min.js"></script>
     <script type="text/javascript" src="/webjars/popper.js/1.14.1/umd/popper.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap/4.1.1/js/bootstrap.min.js"></script>
@@ -20,15 +20,15 @@
              class="rounded float-left mr-3" style="height: 120px;">
 
         <div class="float-right">
-            <div class="input-group input-group-sm input-daterange">
+            <div class="input-group input-group-sm input-daterange mb-2">
                 <div class="input-group-prepend">
                     <span class="input-group-text">from</span>
                 </div>
-                <input type="text" class="form-control" value="2012-04-05">
+                <input type="text" class="form-control" th:value="${#dates.format(fromDate, 'dd.MM.yyyy')}">
                 <div class="input-group-prepend input-group-append">
                     <span class="input-group-text">to</span>
                 </div>
-                <input type="text" class="form-control" value="2019-04-05">
+                <input type="text" class="form-control" th:value="${#dates.format(toDate, 'dd.MM.yyyy')}">
             </div>
             <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                 <button type="button" class="btn btn-outline-secondary">Last day</button>
@@ -39,8 +39,11 @@
             </div>
         </div>
         <script>
-            $('.input-daterange input').each(function () {
-                $(this).datepicker();
+            $('.input-daterange').datepicker({
+                format: 'dd.mm.yyyy',
+                endDate: '0d',
+                todayHighlight: true,
+                weekStart: 1
             });
         </script>
         <h1 class="display-4">

@@ -47,6 +47,8 @@ public class ChatController {
         Date fromDate = Date.from(from.toInstant());
 
         List<UserStatistic> topActiveUsers = chatDataSource.topActiveUsers(chatId, fromDate, toDate);
+        model.addAttribute("toDate", toDate);
+        model.addAttribute("fromDate", fromDate);
         model.addAttribute("topActiveUsers", topActiveUsers);
         model.addAttribute("totalScore", topActiveUsers.stream().mapToDouble(UserStatistic::getScore).sum());
 //        model.addAttribute("botUsagesByModule", chatDataSource.botUsagesByModule(chatId, fromDate, toDate));
