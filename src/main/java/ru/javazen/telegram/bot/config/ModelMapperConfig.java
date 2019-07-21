@@ -1,17 +1,25 @@
 package ru.javazen.telegram.bot.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.User;
-import ru.javazen.telegram.bot.model.*;
+import ru.javazen.telegram.bot.analysis.tone.TextToneAnalyzer;
+import ru.javazen.telegram.bot.model.ChatEntity;
+import ru.javazen.telegram.bot.model.FileType;
+import ru.javazen.telegram.bot.model.MessageEntity;
+import ru.javazen.telegram.bot.model.MessagePK;
+import ru.javazen.telegram.bot.model.UserEntity;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -19,9 +27,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Configuration
+@Slf4j
 public class ModelMapperConfig {
+
     @Bean
-    public PropertyMap<Message, MessageEntity> messageEntityPropertyMap() {
+    public PropertyMap<Message, MessageEntity> messageEntityPropertyMap(
+            @Autowired Converter<Message, BigDecimal> toneConverter) {
         return new PropertyMap<Message, MessageEntity>() {
             @Override
             protected void configure() {
@@ -33,6 +44,7 @@ public class ModelMapperConfig {
                 map(source.getChat(), destination.getChat());
                 map(source.getFrom(), destination.getUser());
                 map(source.getForwardFrom(), destination.getForwardFrom());
+                using(toneConverter).map(source, destination.getTone());
                 using(fileTypeConverter).map(source, destination.getFileType());
                 using(fileIdConverter).map(source, destination.getFileId());
                 using(wordsConverter).map(source.getText(), destination.getWords());
@@ -72,6 +84,19 @@ public class ModelMapperConfig {
             protected void configure() {
                 map().setChatId(source.getChatId());
                 map().setMessageId(source.getMessageId());
+            }
+        };
+    }
+
+    @Bean
+    public Converter<Message, BigDecimal> toneConverter(@Autowired TextToneAnalyzer textToneAnalyzer) {
+        return ctx -> {
+            try {
+                return textToneAnalyzer.analyze(ctx.getSource().getText()).getScore();
+            } catch (RuntimeException e) {
+                log.warn("Can't analyze text for 'c:{}-m:{}', will save neutral value",
+                        ctx.getSource().getChatId(), ctx.getSource().getMessageId(), e);
+                return BigDecimal.valueOf(0.5); //TODO
             }
         };
     }

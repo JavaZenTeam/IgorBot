@@ -24,6 +24,11 @@ file-service:
   url: ${FILE_SERVICE_URL}
 ---
 spring:
+  profiles: text-analysis
+text-analysis:
+  url: ${TEXT_ANALYSIS_URL}
+---
+spring:
   profiles: dev
   thymeleaf:
     cache: false

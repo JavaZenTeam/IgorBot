@@ -11,4 +11,14 @@ public class UserStatistic {
     private final Long count;
     private final Long length;
     private final Double score;
+    private final Tone tone;
+
+    @Getter
+    @AllArgsConstructor
+    public static class Tone {
+        private Long positive;
+        private Long neutral;
+        private Integer negative;
+
+    }
 }

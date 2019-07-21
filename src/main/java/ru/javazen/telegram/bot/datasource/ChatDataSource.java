@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ChatDataSource {
     List<UserStatistic> topActiveUsers(Long chatId, Date after, Date before);
+
     List<CountStatistic> topStickers(Long chatId, Date after, Date before);
 
     List<CountStatistic> botUsagesByModule(Long chatId, Date after, Date before);
