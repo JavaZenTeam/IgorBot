@@ -42,10 +42,11 @@
                         <thead class="thead-light text-center">
                         <tr>
                             <th width="8%">#</th>
-                            <th width="37%">User</th>
+                            <th width="30%">User</th>
                             <th width="25%">Activity</th>
-                            <th width="15%">Messages</th>
-                            <th width="15%">Characters</th>
+                            <th width="12%">Messages</th>
+                            <th width="12%">Characters</th>
+                            <th width="13%">Tone</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -68,6 +69,20 @@
                             </td>
                             <td th:text="${user.count}" class="text-right"></td>
                             <td th:text="${user.length}" class="text-right"></td>
+                            <td>
+                                <div class="progress" style="height: 1.5rem" th:title="${#numbers.formatDecimal(user.score, 0, 0)} + ' points'">
+                                    <!--<div class="progress-bar" role="progressbar"
+                                         th:style="'width: ' + ${activityStr} + '%;'">
+                                        <div th:if="${activity >= 40}"
+                                             th:text="${activityStr} + '%'"></div>
+                                    </div>
+                                    <div th:if="${activity} < 40" class="ml-2 d-flex flex-column justify-content-center"
+                                         th:text="${activityStr} + '%'"></div>-->
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 33%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 33%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 33%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </td>
                         </tr>
                         </tbody>
                     </table>

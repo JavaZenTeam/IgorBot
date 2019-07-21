@@ -32,6 +32,8 @@ import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.ApiContext;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.facilities.TelegramHttpClientBuilder;
+import ru.javazen.telegram.bot.analysis.tone.RemoteTextToneAnalyzer;
+import ru.javazen.telegram.bot.analysis.tone.TextToneAnalyzer;
 import ru.javazen.telegram.bot.client.FileServiceClient;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 import ru.javazen.telegram.bot.handler.SayTextHandler;
@@ -42,6 +44,7 @@ import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerServiceImpl;
 import ru.javazen.telegram.bot.service.VoiceService;
 import ru.javazen.telegram.bot.service.impl.VoiceServiceImpl;
 
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Random;
@@ -194,4 +197,15 @@ public class AppConfig {
     }
 
 
+    @Bean
+    @Profile("text-analysis")
+    RemoteTextToneAnalyzer remoteTextToneAnalyzer() {
+        return new RemoteTextToneAnalyzer();
+    }
+
+    @Bean
+    @Profile("!text-analysis")
+    TextToneAnalyzer stubbedTextToneAnalyzer() {
+        return text -> new TextToneAnalyzer.AnalyzedResponse(text, "NEUTRAL", BigDecimal.valueOf(0.5));
+    }
 }
