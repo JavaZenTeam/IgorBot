@@ -2,22 +2,24 @@
     <div id="activity-chart"></div>
 </div>
 <script>
-    $.get(window.location + "activity-chart/")
-        .done(function( response ) {
-            Morris.Line({
-                element: 'activity-chart',
-                data: response['data'],
-                xkey: response['xKey'],
-                ykeys: response['yKeys'],
-                labels: response['labels'],
-                dateFormat: function (timestamp) {
-                    var d = new Date(timestamp);
-                    var parts = [
-                        d.getDate().toString().padStart(2, '0'),
-                        (d.getMonth()+1).toString().padStart(2, '0'),
-                        d.getFullYear()];
-                    return parts.join('.')
-                }
+    $(document).ready(function () {
+        var path = window.location.pathname + "activity-chart/";
+        var param = $.param({from: $('#fromDate').val(), to: $('#toDate').val()});
+        $.get(path + "?" + param)
+            .done(function (response) {
+                Morris.Line({
+                    element: 'activity-chart',
+                    data: response['data'],
+                    xkey: response['xKey'],
+                    ykeys: response['yKeys'],
+                    labels: response['labels'],
+                    xLabelFormat: function (timestamp) {
+                        return formatDate(new Date(timestamp));
+                    },
+                    dateFormat: function (timestamp) {
+                        return formatDate(new Date(timestamp));
+                    }
+                });
             });
-        });
+    });
 </script>

@@ -6,10 +6,10 @@ import ru.javazen.telegram.bot.datasource.model.CountStatistic;
 import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
 import ru.javazen.telegram.bot.datasource.model.UserStatistic;
 import ru.javazen.telegram.bot.model.*;
+import ru.javazen.telegram.bot.util.DateRange;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +19,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
     private EntityManager entityManager;
 
     @Override
-    public List<UserStatistic> topActiveUsers(Long chatId, Date after, Date before) {
+    public List<UserStatistic> topActiveUsers(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserStatistic> query = builder.createQuery(UserStatistic.class);
 
@@ -27,7 +27,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
         Join<MessageEntity, UserEntity> userJoin = messages.join(MessageEntity_.user);
         query.where(
                 builder.equal(messages.get(MessageEntity_.chat), chatId),
-                builder.between(messages.get(MessageEntity_.date), after, before));
+                builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
         query.groupBy(userJoin);
 
         Expression<Long> count = builder.count(messages);
@@ -40,7 +40,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
-    public List<PeriodUserStatistic> activityChart(Long chatId, Date after, Date before) {
+    public List<PeriodUserStatistic> activityChart(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<PeriodUserStatistic> query = builder.createQuery(PeriodUserStatistic.class);
 
@@ -48,7 +48,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
         Join<MessageEntity, UserEntity> userJoin = messages.join(MessageEntity_.user);
         query.where(
                 builder.equal(messages.get(MessageEntity_.chat), chatId),
-                builder.between(messages.get(MessageEntity_.date), after, before));
+                builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
         Expression<String> dateFunction = builder.function("TO_CHAR", String.class,
                 messages.get(MessageEntity_.date),
                 InlineLiteral.of(builder,"YYYY-MM-dd"));
@@ -62,7 +62,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
-    public List<CountStatistic> topStickers(Long chatId, Date after, Date before, Integer maxResults) {
+    public List<CountStatistic> topStickers(Long chatId, DateRange dateRange, Integer maxResults) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
 
@@ -70,7 +70,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
         query.where(
                 builder.equal(messages.get(MessageEntity_.fileType), FileType.STICKER),
                 builder.equal(messages.get(MessageEntity_.chat), chatId),
-                builder.between(messages.get(MessageEntity_.date), after, before));
+                builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
         Path<String> fileId = messages.get(MessageEntity_.fileId);
         query.groupBy(fileId);
 
@@ -84,7 +84,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
-    public List<CountStatistic> botUsagesByModule(Long chatId, Date after, Date before) {
+    public List<CountStatistic> botUsagesByModule(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
 
@@ -93,7 +93,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
 
         query.where(
                 builder.equal(messageJoin.get(MessageEntity_.chat), chatId),
-                builder.between(messageJoin.get(MessageEntity_.date), after, before));
+                builder.between(messageJoin.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
         query.groupBy(botUsages.get(BotUsageLog_.moduleName));
 
         Expression<Long> count = builder.count(botUsages);
@@ -103,7 +103,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
-    public List<CountStatistic> wordsUsageStatistic(Long chatId, Date after, Date before) {
+    public List<CountStatistic> wordsUsageStatistic(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
 
@@ -113,7 +113,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
         query.where(
                 builder.greaterThanOrEqualTo(builder.length(wordJoin.as(String.class)), 3),
                 builder.equal(messages.get(MessageEntity_.chat), chatId),
-                builder.between(messages.get(MessageEntity_.date), after, before));
+                builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
         query.groupBy(wordJoin);
 
         Expression<Long> count = builder.count(messages);
@@ -125,13 +125,13 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
-    public Long messagesCount(Long chatId, Date after, Date before) {
+    public Long messagesCount(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = builder.createQuery(Long.class);
         Root<MessageEntity> messages = query.from(MessageEntity.class);
         query.where(
                 builder.equal(messages.get(MessageEntity_.chat), chatId),
-                builder.between(messages.get(MessageEntity_.date), after, before));
+                builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
         query.select(builder.count(messages));
         List<Long> resultList = entityManager.createQuery(query)
                 .getResultList();

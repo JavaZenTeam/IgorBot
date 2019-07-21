@@ -1,5 +1,6 @@
 package ru.javazen.telegram.bot.util;
 
+import org.springframework.stereotype.Component;
 import ru.javazen.telegram.bot.datasource.model.ChartData;
 import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
 import ru.javazen.telegram.bot.model.UserEntity;
@@ -8,22 +9,23 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class ChartDataUtil {
-    private Function<PeriodUserStatistic, Integer> yValueFunc =
-            periodUserStatistic -> Math.toIntExact(Math.round(periodUserStatistic.getScore()));
+@Component
+public class ChartDataConverter {
+    private ToLongFunction<PeriodUserStatistic> yValueFunc =
+            periodUserStatistic -> Math.round(periodUserStatistic.getScore());
 
     public ChartData convert(List<PeriodUserStatistic> source) {
-        Map<UserEntity, Integer> totalCounts = source.stream()
-                .collect(Collectors.groupingBy(PeriodUserStatistic::getUser, Collectors.summingInt(yValueFunc::apply)));
+        Map<UserEntity, Long> totalCounts = source.stream()
+                .collect(Collectors.groupingBy(PeriodUserStatistic::getUser, Collectors.summingLong(yValueFunc)));
 
         List<UserEntity> users = source.stream().map(PeriodUserStatistic::getUser)
                 .distinct()
-                .sorted(Comparator.<UserEntity, Integer>comparing(totalCounts::get).reversed())
+                .sorted(Comparator.<UserEntity, Long>comparing(totalCounts::get).reversed())
                 .collect(Collectors.toList());
         ChartData target = new ChartData();
         target.setXKey(0);
@@ -44,7 +46,7 @@ public class ChartDataUtil {
         result[0] = entry.getKey();
         for (PeriodUserStatistic userStatistic : statistic) {
             int index = users.indexOf(userStatistic.getUser());
-            result[1 + index] = yValueFunc.apply(userStatistic);
+            result[1 + index] = yValueFunc.applyAsLong(userStatistic);
         }
         return result;
     }
