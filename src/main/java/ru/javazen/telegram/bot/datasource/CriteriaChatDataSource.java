@@ -10,6 +10,7 @@ import ru.javazen.telegram.bot.util.DateRange;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
                 builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
         Expression<String> dateFunction = builder.function("TO_CHAR", String.class,
                 messages.get(MessageEntity_.date),
-                InlineLiteral.of(builder,"YYYY-MM-dd"));
+                InlineLiteral.of(builder, resolveDateTimeFormat(dateRange.duration())));
         query.groupBy(dateFunction, userJoin);
 
         Expression<Long> count = builder.count(messages);
@@ -59,6 +60,21 @@ public class CriteriaChatDataSource implements ChatDataSource {
         Expression<Double> score = builder.sum(messages.get(MessageEntity_.score));
         query.select(builder.construct(PeriodUserStatistic.class, dateFunction, userJoin, count, length, score));
         return entityManager.createQuery(query).getResultList();
+    }
+
+    private String resolveDateTimeFormat(Duration duration) {
+        double monthSize = 31;
+        double yearSize = 365;
+        long days = duration.toDays();
+        if (days <= 3) {
+            return "YYYY-MM-dd HH24:00";
+        } else if (days <= monthSize * 3) {
+            return "YYYY-MM-dd";
+        } else if (days <= yearSize * 3) {
+            return "YYYY-MM";
+        } else {
+            return "YYYY";
+        }
     }
 
     @Override

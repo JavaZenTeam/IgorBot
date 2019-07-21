@@ -7,18 +7,16 @@
         var param = $.param({from: $('#fromDate').val(), to: $('#toDate').val()});
         $.get(path + "?" + param)
             .done(function (response) {
+                var sample = response['data'][0][0];
+                var format = resolveFormat(sample);
                 Morris.Line({
                     element: 'activity-chart',
                     data: response['data'],
                     xkey: response['xKey'],
                     ykeys: response['yKeys'],
                     labels: response['labels'],
-                    xLabelFormat: function (timestamp) {
-                        return formatDate(new Date(timestamp));
-                    },
-                    dateFormat: function (timestamp) {
-                        return formatDate(new Date(timestamp));
-                    }
+                    xLabelFormat: format,
+                    dateFormat: format
                 });
             });
     });
