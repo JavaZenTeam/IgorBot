@@ -17,6 +17,6 @@ public class TokenController {
     @GetMapping("/stats/{token}")
     public String redirectToChat(@PathVariable("token") String token) {
         AuthenticationToken authenticationToken = authenticationTokenService.findByToken(token);
-        return "redirect:/chat/" + authenticationToken.getChatId();
+        return "redirect:/chat/" + authenticationToken.getChatId() + "/";
     }
 }

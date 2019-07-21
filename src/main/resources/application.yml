@@ -4,6 +4,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    properties:
+      #skip error org.postgresql.jdbc.PgConnection.createClob() not implemented
+      hibernate.jdbc.lob.non_contextual_creation: true
+
   flyway:
     locations: classpath:db/migration/common
 bot:

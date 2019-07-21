@@ -1,0 +1,33 @@
+<div class="bg-white border p-2">
+    <div id="activity-chart"></div>
+</div>
+<script>
+    function buildChart(response) {
+        var sample = response['data'][0][0];
+        var format = resolveFormat(sample);
+        Morris.Line({
+            element: 'activity-chart',
+            data: response['data'],
+            xkey: response['xKey'],
+            ykeys: response['yKeys'],
+            labels: response['labels'],
+            xLabelFormat: format,
+            dateFormat: format
+        });
+    }
+    $(document).ready(function () {
+        var path = window.location.pathname + "activity-chart/";
+        var param = $.param({from: $('#fromDate').val(), to: $('#toDate').val()});
+        $.get(path + "?" + param)
+            .done(function (response) {
+                if (response['data'].length) {
+                    buildChart(response);
+                } else {
+                    $('#activity-chart').parent().replaceWith(
+                        '<div class="alert-info p-3 mb-3">' +
+                        'No data found for the selected period' +
+                        '</div>');
+                }
+            });
+    });
+</script>
