@@ -45,20 +45,24 @@ public class ChatController {
                                       LocalDate to) {
         Long chatId = Long.valueOf(chatIdStr);
 
-        DateRange dateRange = range == DateRanges.CUSTOM ? new DateRange(from, to) :
-                range == DateRanges.ALL_TIME ? new DateRange(messageRepository.startChatDate(chatId), new Date()) :
-                        range.get();
+        DateRange dateRange = range.get();
+        if (range == DateRanges.CUSTOM) {
+            dateRange = new DateRange(from, to);
+        } else if (range == DateRanges.ALL_TIME) {
+            dateRange = new DateRange(messageRepository.startChatDate(chatId), new Date());
+        }
 
-        List<UserStatistic> topActiveUsers = chatDataSource.topActiveUsers(chatId, dateRange);
         model.addAttribute("toDate", dateRange.getTo());
         model.addAttribute("fromDate", dateRange.getFrom());
         model.addAttribute("range", range.name());
+
+        List<UserStatistic> topActiveUsers = chatDataSource.topActiveUsers(chatId, dateRange);
         model.addAttribute("topActiveUsers", topActiveUsers);
         model.addAttribute("totalScore", topActiveUsers.stream().mapToDouble(UserStatistic::getScore).sum());
 //        model.addAttribute("botUsagesByModule", chatDataSource.botUsagesByModule(chatId, fromDate, toDate));
 //        model.addAttribute("messagesCount", chatDataSource.messagesCount(chatId, fromDate, toDate));
         model.addAttribute("topStickers", chatDataSource.topStickers(chatId, dateRange, 6));
-        model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, dateRange));
+//        model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, dateRange));
 
         return "chat";
     }

@@ -1,5 +1,5 @@
 <div xmlns:th="http://www.thymeleaf.org" class="fix-height">
-    <table class="table table-bordered table-sm bg-white">
+    <table class="table table-bordered table-sm bg-white" th:if="${!topActiveUsers.isEmpty()}">
         <thead class="thead-light text-center">
         <tr>
             <th width="8%">#</th>
@@ -33,4 +33,7 @@
         </tr>
         </tbody>
     </table>
+    <div class="alert-info p-3 mb-3" th:if="${topActiveUsers.isEmpty()}">
+        No messages found for the selected period
+    </div>
 </div>
