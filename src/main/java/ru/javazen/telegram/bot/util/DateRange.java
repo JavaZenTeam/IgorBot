@@ -1,9 +1,6 @@
 package ru.javazen.telegram.bot.util;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.Date;
 
 public class DateRange {
@@ -17,8 +14,10 @@ public class DateRange {
 
 
     public DateRange(LocalDate from, LocalDate to) {
-        this.from = Date.from(from.atTime(0, 0, 0).toInstant(ZoneOffset.UTC));
-        this.to = Date.from(to.atTime(23, 59, 59).toInstant(ZoneOffset.UTC));
+        ZonedDateTime fromDateTime = ZonedDateTime.of(from, LocalTime.MIN, ZoneId.systemDefault());
+        this.from = Date.from(fromDateTime.toInstant());
+        ZonedDateTime toDateTime = ZonedDateTime.of(to, LocalTime.MAX, ZoneId.systemDefault());
+        this.to = Date.from(toDateTime.toInstant());
     }
 
     public Date getFrom() {

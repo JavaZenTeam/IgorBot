@@ -15,11 +15,13 @@ import ru.javazen.telegram.bot.datasource.ChatDataSource;
 import ru.javazen.telegram.bot.datasource.model.ChartData;
 import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
 import ru.javazen.telegram.bot.datasource.model.UserStatistic;
+import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.util.ChartDataConverter;
 import ru.javazen.telegram.bot.util.DateRange;
 import ru.javazen.telegram.bot.util.DateRanges;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -28,6 +30,7 @@ public class ChatController {
     private DefaultAbsSender bot;
     private ChatDataSource chatDataSource;
     private ChartDataConverter chartDataConverter;
+    private MessageRepository messageRepository;
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
     @GetMapping("/chat/{chatId}/")
@@ -42,7 +45,9 @@ public class ChatController {
                                       LocalDate to) {
         Long chatId = Long.valueOf(chatIdStr);
 
-        DateRange dateRange = range == DateRanges.CUSTOM ? new DateRange(from, to) : range.get();
+        DateRange dateRange = range == DateRanges.CUSTOM ? new DateRange(from, to) :
+                range == DateRanges.ALL_TIME ? new DateRange(messageRepository.startChatDate(chatId), new Date()) :
+                        range.get();
 
         List<UserStatistic> topActiveUsers = chatDataSource.topActiveUsers(chatId, dateRange);
         model.addAttribute("toDate", dateRange.getTo());
