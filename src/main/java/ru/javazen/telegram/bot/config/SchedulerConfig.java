@@ -30,7 +30,7 @@ public class SchedulerConfig {
 
         return new SchedulerNotifyHandler(
                 messageSchedulerService,
-                1827,
+                3655,
                 okSupplier,
                 Arrays.asList(shiftTimeParser, specificTimeParser),
                 chatConfigService);

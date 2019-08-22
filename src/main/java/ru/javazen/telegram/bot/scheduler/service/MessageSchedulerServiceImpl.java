@@ -10,6 +10,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.CompositeBot;
 import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
+import ru.javazen.telegram.bot.util.DateInterval;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -114,6 +115,16 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
             futureTasks.remove(futureTask.taskId);
             messageTaskRepository.delete(task);
+            
+            Integer repeatCount = task.getRepeatCount();
+            if (repeatCount != null && repeatCount != 0) {
+                task.setTimeOfCompletion(DateInterval.apply(task.getRepeatInterval(), new Date(task.getTimeOfCompletion())).getTime());
+                if (repeatCount > 0) {
+                    task.setRepeatCount(repeatCount - 1);
+                }
+                
+                scheduleTask(task);
+            }
         }, new Date(task.getTimeOfCompletion()));
 
 

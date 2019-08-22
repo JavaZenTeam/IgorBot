@@ -94,6 +94,8 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
         task.setReplyMessageId(message.getMessageId().longValue());
         task.setScheduledText(result.getMessage());
         task.setTimeOfCompletion(result.getDate().getTime());
+        task.setRepeatCount(result.getRepetitions());
+        task.setRepeatInterval(result.getInterval());
 
         messageSchedulerService.scheduleTask(task);
 
