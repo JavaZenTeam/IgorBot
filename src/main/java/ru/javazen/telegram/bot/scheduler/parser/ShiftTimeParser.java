@@ -12,29 +12,8 @@ import java.util.regex.Pattern;
 
 import static org.springframework.util.StringUtils.isEmpty;
 
-public class ShiftTimeParser implements ScheduledMessageParser {
+public class ShiftTimeParser extends ScheduledWithRepetitionParser {
 
-    private final static String TIME_UNITS_REGEXP = /* 1 */"( \\d* ?(?:л|лет|г|год|года))?" +
-            /* 2 */"( \\d* ?(?:мес|месяц|месяца|месяцев))?" +
-            /* 3 */"( \\d* ?(?:н|нед|недель|неделю|недели))?" +
-            /* 4 */"( \\d* ?(?:д|дн|дней|дня|день))?" +
-            /* 5 */"( \\d* ?(?:ч|час|часа|часов))?" +
-            /* 6 */"( \\d* ?(?:м|мин|минуту|минуты|минут))?" +
-            /* 7 */"( \\d* ?(?:с|сек|секунду|секунды|секунд))?" +
-            /* 8 */"( .*)?$";
-
-    private final static int[] TIME_UNITS = {
-            0,
-            /* 1 */Calendar.YEAR,
-            /* 2 */Calendar.MONTH,
-            /* 3 */Calendar.WEEK_OF_YEAR,
-            /* 4 */Calendar.DAY_OF_YEAR,
-            /* 5 */Calendar.HOUR,
-            /* 6 */Calendar.MINUTE,
-            /* 7 */Calendar.SECOND
-    };
-
-    private final static Pattern TIME_UNITS_PATTERN = Pattern.compile(TIME_UNITS_REGEXP, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private final static int COMMAND_GROUP = 1;
 
     private final Supplier<String> defaultMessageSupplier;
@@ -93,7 +72,11 @@ public class ShiftTimeParser implements ScheduledMessageParser {
             }
         }
 
-        String returnMessage = matcher.group(matcher.groupCount());
+        RepetitionParsedResult repetitionResult = parseRepetition(matcher.group(matcher.groupCount()));
+        String returnMessage = repetitionResult.getText();
+        Integer repetitions = repetitionResult.getRepetitions();
+        String interval = repetitionResult.getInterval();
+
         if (isEmpty(returnMessage) && message.getReplyToMessage() != null) {
             returnMessage = MessageHelper.getActualText(message.getReplyToMessage());
         }
@@ -105,7 +88,7 @@ public class ShiftTimeParser implements ScheduledMessageParser {
             throw new IllegalArgumentException("No time span specified");
         }
 
-        return new ParseResult(calendar.getTime(), returnMessage.trim());
+        return new ParseResult(calendar.getTime(), returnMessage.trim(), repetitions, interval);
     }
 
     private int matchedCount(Matcher matcher) {
