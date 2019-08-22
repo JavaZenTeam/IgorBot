@@ -73,7 +73,7 @@ public class SchedulerNotifyHandlerTest {
         when(message.getText()).thenReturn(correctMessage);
 
         when(parser.canParse(correctMessage)).thenReturn(true);
-        ScheduledMessageParser.ParseResult result = new ScheduledMessageParser.ParseResult(new Date(), "test");
+        ScheduledMessageParser.ParseResult result = new ScheduledMessageParser.ParseResult(new Date(), "test", null, null);
         when(parser.parse(correctMessage, message)).thenReturn(result);
 
         Assert.assertTrue(handler.handle(message, sender));
@@ -91,7 +91,7 @@ public class SchedulerNotifyHandlerTest {
         calendar.add(Calendar.DAY_OF_YEAR, DAYS_LIMIT + 1);
 
         ScheduledMessageParser.ParseResult result =
-                new ScheduledMessageParser.ParseResult(calendar.getTime(), "test");
+                new ScheduledMessageParser.ParseResult(calendar.getTime(), "test", null, null);
         when(parser.parse(correctMessage, message)).thenReturn(result);
 
         Assert.assertTrue(handler.handle(message, sender));
