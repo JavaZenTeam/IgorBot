@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class DateInterval {
     
-    private final static String INTERVAL_REGEXP = "(\\d)?y(\\d)?mo(\\d)?w(\\d)?d(\\d)?h(\\d)?m(\\d)?s";
+    private final static String INTERVAL_REGEXP = "(\\d*)y(\\d*)mo(\\d*)w(\\d*)d(\\d*)h(\\d*)m(\\d*)s";
 
     private final static int[] TIME_UNITS = {
         Calendar.YEAR,
@@ -26,6 +26,7 @@ public class DateInterval {
         Pattern pattern = Pattern.compile(INTERVAL_REGEXP);
         Matcher matcher = pattern.matcher(interval);
 
+        matcher.matches();
         for (int i = 0; i < TIME_UNITS.length; i++) {
             String match = matcher.group(i + 1);
             if (!match.isEmpty()) {
