@@ -33,7 +33,9 @@ public class SchedulerConfig {
                 3655,
                 okSupplier,
                 Arrays.asList(shiftTimeParser, specificTimeParser),
-                chatConfigService);
+                chatConfigService,
+                60 * 60 - 1,
+                50);
     }
 
     @Bean("unscheduler")
