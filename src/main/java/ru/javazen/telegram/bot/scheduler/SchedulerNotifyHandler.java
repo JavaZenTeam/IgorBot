@@ -9,6 +9,7 @@ import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.scheduler.parser.ScheduledMessageParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.service.ChatConfigService;
+import ru.javazen.telegram.bot.util.DateInterval;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,6 +28,8 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
     private final Supplier<String> successResponseSupplier;
     private final List<ScheduledMessageParser> scheduledMessageParsers;
     private ChatConfigService chatConfigService;
+    private final int repetitionSecondsLimit;
+    private final int repetitionMaxTimesUnderLimit;
 
     //private DateFormat format = new SimpleDateFormat("HH:mm dd.MM.yy");
     //TimeZone timeZone = TimeZone.getTimeZone(chatConfigService.getProperty(
@@ -39,12 +42,16 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
                                   int daysLimit,
                                   Supplier<String> successResponseSupplier,
                                   List<ScheduledMessageParser> scheduledMessageParsers,
-                                  ChatConfigService chatConfigService) {
+                                  ChatConfigService chatConfigService,
+                                  int repetitionSecondsLimit,
+                                  int repetitionMaxTimesUnderLimit) {
         this.messageSchedulerService = messageSchedulerService;
         this.daysLimit = daysLimit;
         this.successResponseSupplier = successResponseSupplier;
         this.scheduledMessageParsers = scheduledMessageParsers;
         this.chatConfigService = chatConfigService;
+        this.repetitionSecondsLimit = repetitionSecondsLimit;
+        this.repetitionMaxTimesUnderLimit = repetitionMaxTimesUnderLimit;
     }
 
     @Override
@@ -68,6 +75,14 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
         if (result.getDate().compareTo(calendar.getTime()) > 0) {
             sender.execute(new SendMessage(message.getChatId(), "Так долго я помнить не смогу, сорри"));
+            return true;
+        }
+
+        calendar.setTime(result.getDate());
+        calendar.add(Calendar.SECOND, repetitionSecondsLimit);
+        if ((result.getRepetitions() < 0 || result.getRepetitions() > repetitionMaxTimesUnderLimit) &&
+                DateInterval.apply(result.getInterval(), result.getDate()).compareTo(calendar.getTime()) < 0) {
+            sender.execute(new SendMessage(message.getChatId(), "Не, я устану повторять так часто"));
             return true;
         }
 

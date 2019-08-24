@@ -34,7 +34,7 @@ public abstract class ScheduledWithRepetitionParser implements ScheduledMessageP
 
     protected final static Pattern TIME_UNITS_PATTERN = Pattern.compile(TIME_UNITS_REGEXP, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     
-    private final static String REPETITION_REGEXP = "(.*?)(?: и|,) п[оа]вт[оа]р(?:и|яй) кажды(?:й|е)" + TIME_UNITS_REGEXP;
+    private final static String REPETITION_REGEXP = "(.*?)(?: и|,) п[оа]вт[оа]р(?:и|яй) кажд(?:ы[йе]|ую)" + TIME_UNITS_REGEXP;
 
     private final static String TIMES_REGEXP = " (\\d{1,9}) ?раза?$";
 
@@ -62,9 +62,12 @@ public abstract class ScheduledWithRepetitionParser implements ScheduledMessageP
                 sb.append(REPETITION_INTERVAL_TIME_UNITS[i - 1]);
             }
 
-            Matcher timesMatcher = REPETITION_TIMES_PATTERN.matcher(matcher.group(matcher.groupCount()));
-            if (timesMatcher.matches()) {
-                repetitions = Integer.parseInt(timesMatcher.group(1));
+            String times = matcher.group(matcher.groupCount());
+            if (times != null && !times.isEmpty()) {
+                Matcher timesMatcher = REPETITION_TIMES_PATTERN.matcher(times);
+                if (timesMatcher.matches()) {
+                    repetitions = Integer.parseInt(timesMatcher.group(1));
+                }
             }
         } else {
             return new RepetitionParsedResult(null, null, returnMessage);

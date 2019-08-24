@@ -26,6 +26,8 @@ import static org.mockito.Mockito.*;
 public class SchedulerNotifyHandlerTest {
 
     private static final int DAYS_LIMIT = 100;
+    private static final int REPETITION_SECONDS_LIMIT = 60;
+    private static final int REPETITION_TIMES_LIMIT = 100;
     private SchedulerNotifyHandler handler;
 
     @Mock
@@ -49,7 +51,9 @@ public class SchedulerNotifyHandlerTest {
                 DAYS_LIMIT,
                 () -> "ok",
                 Collections.singletonList(parser),
-                chatConfigService);
+                chatConfigService,
+                REPETITION_SECONDS_LIMIT,
+                REPETITION_TIMES_LIMIT);
 
         message = mock(Message.class);
 
