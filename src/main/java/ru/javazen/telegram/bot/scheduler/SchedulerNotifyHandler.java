@@ -80,7 +80,8 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
 
         calendar.setTime(result.getDate());
         calendar.add(Calendar.SECOND, repetitionSecondsLimit);
-        if ((result.getRepetitions() < 0 || result.getRepetitions() > repetitionMaxTimesUnderLimit) &&
+        if (result.getRepetitions() != null &&
+                (result.getRepetitions() < 0 || result.getRepetitions() > repetitionMaxTimesUnderLimit) &&
                 DateInterval.apply(result.getInterval(), result.getDate()).compareTo(calendar.getTime()) < 0) {
             sender.execute(new SendMessage(message.getChatId(), "Не, я устану повторять так часто"));
             return true;
