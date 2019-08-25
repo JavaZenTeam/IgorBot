@@ -5,10 +5,7 @@ import ru.javazen.telegram.bot.datasource.model.ChartData;
 import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
 import ru.javazen.telegram.bot.model.UserEntity;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -43,6 +40,7 @@ public class ChartDataConverter {
     private Object[] formatDataRow(Map.Entry<String, List<PeriodUserStatistic>> entry, List<UserEntity> users) {
         List<PeriodUserStatistic> statistic = entry.getValue();
         Object[] result = new Object[users.size() + 1];
+        Arrays.fill(result, 0);
         result[0] = entry.getKey();
         for (PeriodUserStatistic userStatistic : statistic) {
             int index = users.indexOf(userStatistic.getUser());
