@@ -10,6 +10,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.CompositeBot;
 import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
+import ru.javazen.telegram.bot.util.DateInterval;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -81,16 +82,26 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
     private void performSchedulingTasks(MessageTask task, AbsSender sender) {
 
+        ScheduledFuture future = getFuture(task);
+
+        FutureTask futureTask = new FutureTask();
+        futureTask.setTaskId(task.getId());
+        futureTask.setFuture(future);
+        futureTask.setSender(sender);
+        futureTasks.put(task.getId(), futureTask);
+    }
+
+    private ScheduledFuture getFuture(MessageTask task) {
+
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(task.getChatId().toString());
         sendMessage.setReplyToMessageId(task.getReplyMessageId().intValue());
         sendMessage.setText(task.getScheduledText());
 
-
-        ScheduledFuture future = taskScheduler.schedule(() -> {
+        return taskScheduler.schedule(() -> {
             FutureTask futureTask = futureTasks.get(task.getId());
             if (futureTask == null) {
-                throw  new RuntimeException("Can't find future for task: " + task.getId());
+                throw new RuntimeException("Can't find future for task: " + task.getId());
             }
 
             try {
@@ -112,16 +123,18 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                 throw new RuntimeException(e);
             }
 
-            futureTasks.remove(futureTask.taskId);
-            messageTaskRepository.delete(task);
+            Integer repeatCount = task.getRepeatCount();
+            if (repeatCount != null && repeatCount != 0) {
+                task.setTimeOfCompletion(DateInterval.apply(task.getRepeatInterval(), new Date(task.getTimeOfCompletion())).getTime());
+                if (repeatCount > 0) {
+                    task.setRepeatCount(repeatCount - 1);
+                }
+                futureTask.setFuture(getFuture(task));
+            } else {
+                futureTasks.remove(futureTask.taskId);
+                messageTaskRepository.delete(task);
+            }
         }, new Date(task.getTimeOfCompletion()));
-
-
-        FutureTask futureTask = new FutureTask();
-        futureTask.setTaskId(task.getId());
-        futureTask.setFuture(future);
-        futureTask.setSender(sender);
-        futureTasks.put(task.getId(), futureTask);
     }
 
     @PreDestroy

@@ -19,5 +19,7 @@ public interface ScheduledMessageParser {
     class ParseResult {
         private Date date;
         private String message;
+        private Integer repetitions;
+        private String interval;
     }
 }

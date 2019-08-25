@@ -26,6 +26,8 @@ import static org.mockito.Mockito.*;
 public class SchedulerNotifyHandlerTest {
 
     private static final int DAYS_LIMIT = 100;
+    private static final int REPETITION_SECONDS_LIMIT = 60;
+    private static final int REPETITION_TIMES_LIMIT = 100;
     private SchedulerNotifyHandler handler;
 
     @Mock
@@ -49,7 +51,9 @@ public class SchedulerNotifyHandlerTest {
                 DAYS_LIMIT,
                 () -> "ok",
                 Collections.singletonList(parser),
-                chatConfigService);
+                chatConfigService,
+                REPETITION_SECONDS_LIMIT,
+                REPETITION_TIMES_LIMIT);
 
         message = mock(Message.class);
 
@@ -73,7 +77,7 @@ public class SchedulerNotifyHandlerTest {
         when(message.getText()).thenReturn(correctMessage);
 
         when(parser.canParse(correctMessage)).thenReturn(true);
-        ScheduledMessageParser.ParseResult result = new ScheduledMessageParser.ParseResult(new Date(), "test");
+        ScheduledMessageParser.ParseResult result = new ScheduledMessageParser.ParseResult(new Date(), "test", null, null);
         when(parser.parse(correctMessage, message)).thenReturn(result);
 
         Assert.assertTrue(handler.handle(message, sender));
@@ -91,7 +95,7 @@ public class SchedulerNotifyHandlerTest {
         calendar.add(Calendar.DAY_OF_YEAR, DAYS_LIMIT + 1);
 
         ScheduledMessageParser.ParseResult result =
-                new ScheduledMessageParser.ParseResult(calendar.getTime(), "test");
+                new ScheduledMessageParser.ParseResult(calendar.getTime(), "test", null, null);
         when(parser.parse(correctMessage, message)).thenReturn(result);
 
         Assert.assertTrue(handler.handle(message, sender));
