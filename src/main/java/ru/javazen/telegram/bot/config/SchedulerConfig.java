@@ -7,6 +7,7 @@ import ru.javazen.telegram.bot.CompositeBot;
 import ru.javazen.telegram.bot.filter.RegexpFilter;
 import ru.javazen.telegram.bot.handler.FilterAdapter;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
+import ru.javazen.telegram.bot.scheduler.SchedulerExtendNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.UnschedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.parser.ShiftTimeParser;
@@ -38,6 +39,18 @@ public class SchedulerConfig {
                 50);
     }
 
+    @Bean("schedulerExtend")
+    public SchedulerExtendNotifyHandler schedulerExtendNotifyHandler(MessageSchedulerService messageSchedulerService,
+        @Qualifier("okSupplier") Supplier<String> okSupplier,
+        @Qualifier("extendShiftTimeParser") ShiftTimeParser shiftTimeParser) {
+
+        return new SchedulerExtendNotifyHandler(
+                messageSchedulerService,
+                3655,
+                okSupplier,
+                Arrays.asList(shiftTimeParser));
+    }
+
     @Bean("unscheduler")
     public FilterAdapter unschedulerFilterAdapter(UnschedulerNotifyHandler unschedulerNotifyHandler) {
         RegexpFilter regexpFilter = new RegexpFilter();
@@ -64,7 +77,6 @@ public class SchedulerConfig {
                 "и+го+рь,\\s?ск[ао]ж[иы] че?р[еи]?з( .+)");
     }
 
-
     @Bean
     SpecificTimeParser specificTimeParser(
             @Qualifier("defaultSupplier") Supplier<String> defaultMessageSupplier,
@@ -72,6 +84,23 @@ public class SchedulerConfig {
         return new SpecificTimeParser(
                 defaultMessageSupplier,
                 "и+го+рь,\\s?ск[ао]ж[иы]( .+)",
+                chatConfigService);
+    }
+
+    @Bean
+    ShiftTimeParser extendShiftTimeParser(@Qualifier("defaultSupplier") Supplier<String> defaultMessageSupplier) {
+        return new ShiftTimeParser(
+                defaultMessageSupplier,
+                "(?:[ие](?:щ|сч)[еёо]|пр[оа]дли на|д[оа]бавь?)( .+)");
+    }
+
+    @Bean
+    SpecificTimeParser extendSpecificTimeParser(
+            @Qualifier("defaultSupplier") Supplier<String> defaultMessageSupplier,
+            ChatConfigService chatConfigService) {
+        return new SpecificTimeParser(
+                defaultMessageSupplier,
+                "п[еи]р[еи]в[еиоа]ди на( .+)",
                 chatConfigService);
     }
 }
