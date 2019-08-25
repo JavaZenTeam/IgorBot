@@ -61,14 +61,18 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
     }
 
     @Override
-    public void extendTaskByChatAndMessage(Long chatId, Long messageId, long additionalTime) {
-        /*MessageTask task = messageTaskRepository.getTaskByChatIdAndMessageId(chatId, messageId);
-        ScheduledFuture future = futureMap.get(task.getId());
-        futureMap.remove(task.getId());
+    public boolean extendTaskByChatAndMessage(Long chatId, Integer messageId, long additionalTime) {
+        MessageTask task = messageTaskRepository.getTaskByChatIdAndMessageId(chatId, messageId.longValue());
 
-        future.cancel(false);
+        if (task == null) { return false; }
 
-        task.setTimeOfCompletion(task.getTimeOfCompletion() + additionalTime);*/ //TODO
+        FutureTask futureTask = futureTasks.get(task.getId());
+
+        futureTask.getFuture().cancel(false);
+
+        task.setTimeOfCompletion(task.getTimeOfCompletion() + additionalTime);
+        futureTask.setFuture(getFuture(task));
+        return true;
     }
 
     @PostConstruct
