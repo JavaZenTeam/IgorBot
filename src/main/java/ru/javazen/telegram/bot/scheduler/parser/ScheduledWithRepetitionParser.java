@@ -12,14 +12,14 @@ import lombok.Setter;
 
 public abstract class ScheduledWithRepetitionParser implements ScheduledMessageParser {
 
-    protected final static String TIME_UNITS_REGEXP = /* 1 */"( \\d{0,9} ?(?:л|лет|г|год|года))?" +
-    /* 2 */"( \\d{0,9} ?(?:мес|месяц|месяца|месяцев))?" +
-    /* 3 */"( \\d{0,9} ?(?:н|нед|недель|неделю|недели))?" +
-    /* 4 */"( \\d{0,9} ?(?:д|дн|дней|дня|день))?" +
-    /* 5 */"( \\d{0,9} ?(?:ч|час|часа|часов))?" +
-    /* 6 */"( \\d{0,9} ?(?:м|мин|минуту|минуты|минут))?" +
-    /* 7 */"( \\d{0,9} ?(?:с|сек|секунду|секунды|секунд))?" +
-    /* 8 */"( .*)?$";
+    protected final static String TIME_UNITS_REGEXP = /* 1 */"(\\s+\\d{0,9}\\s*(?:л|лет|г|год|года))?" +
+    /* 2 */"(\\s+\\d{0,9}\\s*(?:мес|месяц|месяца|месяцев))?" +
+    /* 3 */"(\\s+\\d{0,9}\\s*(?:н|нед|недель|неделю|недели))?" +
+    /* 4 */"(\\s+\\d{0,9}\\s*(?:д|дн|дней|дня|день))?" +
+    /* 5 */"(\\s+\\d{0,9}\\s*(?:ч|час|часа|часов))?" +
+    /* 6 */"(\\s+\\d{0,9}\\s*(?:м|мин|минуту|минуты|минут))?" +
+    /* 7 */"(\\s+\\d{0,9}\\s*(?:с|сек|секунду|секунды|секунд))?" +
+    /* 8 */"(\\s.*)?$";
     
     protected final static int[] TIME_UNITS = {
         0,
@@ -34,9 +34,9 @@ public abstract class ScheduledWithRepetitionParser implements ScheduledMessageP
 
     protected final static Pattern TIME_UNITS_PATTERN = Pattern.compile(TIME_UNITS_REGEXP, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     
-    private final static String REPETITION_REGEXP = "(.*?)(?: и|,) п[оа]вт[оа]р(?:и|яй) кажд(?:ы[йе]|ую)" + TIME_UNITS_REGEXP;
+    private final static String REPETITION_REGEXP = "(.*?)(?:\\s+и|,)\\s+п[оа]вт[оа]р(?:и|яй)\\s+кажд(?:ы[йе]|ую)" + TIME_UNITS_REGEXP;
 
-    private final static String TIMES_REGEXP = " (\\d{1,9}) ?раза?$";
+    private final static String TIMES_REGEXP = "\\s+(\\d{1,9})\\s*раза?$";
 
     private final static String[] REPETITION_INTERVAL_TIME_UNITS = { "y", "mo", "w", "d", "h", "m", "s" };
 
