@@ -35,6 +35,12 @@ public class MessageTask {
     @Column(name = "BOT_NAME")
     private String botName;
 
+    @Column(name = "REPEAT_INTERVAL")
+    private String repeatInterval;
+
+    @Column(name = "REPEAT_COUNT")
+    private Integer repeatCount;
+
     public Long getId() {
         return id;
     }
@@ -107,12 +113,30 @@ public class MessageTask {
         this.botName = botName;
     }
 
+    public String getRepeatInterval() {
+        return repeatInterval;
+    }
+
+    public void setRepeatInterval(String repeatInterval) {
+        this.repeatInterval = repeatInterval;
+    }
+
+    public Integer getRepeatCount() {
+        return repeatCount;
+    }
+
+    public void setRepeatCount(Integer repeatCount) {
+        this.repeatCount = repeatCount;
+    }
+
     @Override
     public String toString() {
         return "MessageTask{" +
                 "id=" + id +
                 ", timeOfCompletion=" + timeOfCompletion +
                 ", scheduledText='" + scheduledText + '\'' +
+                ", repeatInterval='" + repeatInterval +
+                ", repeatCount='" + repeatCount +
                 ", replyMessageId=" + replyMessageId +
                 ", isCompleted=" + isCompleted +
                 ", userId=" + userId +
