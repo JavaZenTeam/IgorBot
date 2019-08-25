@@ -45,37 +45,35 @@ public abstract class ScheduledWithRepetitionParser implements ScheduledMessageP
     private final static Pattern REPETITION_TIMES_PATTERN = Pattern.compile(TIMES_REGEXP, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
     public RepetitionParsedResult parseRepetition(String text) {
-
-        Integer repetitions = -1; // forever
-        String returnMessage = text;
-
-        Matcher matcher = REPETITION_PATTERN.matcher(text);
-        StringBuilder sb = new StringBuilder();
-        if (matcher.matches()) {
-            returnMessage = matcher.group(1);
-            for (int i = 1; i < TIME_UNITS.length; i++) {
-                String group = matcher.group(i + 1);
-                if (group != null && !group.isEmpty()) {
-                    String value = group.replaceAll("\\D", "");
-                    sb.append(!StringUtils.isEmpty(value) ? Integer.parseInt(value) : "1");
+        if (text != null) {
+            Integer repetitions = -1; // forever
+            Matcher matcher = REPETITION_PATTERN.matcher(text);
+            StringBuilder sb = new StringBuilder();
+            if (matcher.matches()) {
+                String returnMessage = matcher.group(1);
+                for (int i = 1; i < TIME_UNITS.length; i++) {
+                    String group = matcher.group(i + 1);
+                    if (group != null && !group.isEmpty()) {
+                        String value = group.replaceAll("\\D", "");
+                        sb.append(!StringUtils.isEmpty(value) ? Integer.parseInt(value) : "1");
+                    }
+                    sb.append(REPETITION_INTERVAL_TIME_UNITS[i - 1]);
                 }
-                sb.append(REPETITION_INTERVAL_TIME_UNITS[i - 1]);
-            }
 
-            String times = matcher.group(matcher.groupCount());
-            if (times != null && !times.isEmpty()) {
-                Matcher timesMatcher = REPETITION_TIMES_PATTERN.matcher(times);
-                if (timesMatcher.matches()) {
-                    repetitions = Integer.parseInt(timesMatcher.group(1));
+                String times = matcher.group(matcher.groupCount());
+                if (times != null && !times.isEmpty()) {
+                    Matcher timesMatcher = REPETITION_TIMES_PATTERN.matcher(times);
+                    if (timesMatcher.matches()) {
+                        repetitions = Integer.parseInt(timesMatcher.group(1));
+                    }
                 }
+
+                return new RepetitionParsedResult(repetitions, sb.toString(), returnMessage);
             }
-        } else {
-            return new RepetitionParsedResult(null, null, returnMessage);
         }
 
-        return new RepetitionParsedResult(repetitions, sb.toString(), returnMessage);
+        return new RepetitionParsedResult(null, null, text);
     }
-
     @Getter
     @Setter
     @AllArgsConstructor
