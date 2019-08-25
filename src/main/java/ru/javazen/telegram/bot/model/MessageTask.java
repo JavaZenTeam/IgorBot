@@ -135,8 +135,8 @@ public class MessageTask {
                 "id=" + id +
                 ", timeOfCompletion=" + timeOfCompletion +
                 ", scheduledText='" + scheduledText + '\'' +
-                ", repeatInterval='" + repeatInterval +
-                ", repeatCount='" + repeatCount +
+                ", repeatInterval='" + repeatInterval + '\'' +
+                ", repeatCount=" + repeatCount +
                 ", replyMessageId=" + replyMessageId +
                 ", isCompleted=" + isCompleted +
                 ", userId=" + userId +

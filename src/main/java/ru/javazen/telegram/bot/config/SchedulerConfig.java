@@ -22,6 +22,10 @@ import java.util.function.Supplier;
 @Configuration
 public class SchedulerConfig {
 
+    public static final int DAYS_LIMIT = 3655;
+    public static final int REPETITION_SECONDS_LIMIT = 60 * 60 - 1;
+    public static final int MAX_REPETITION_UNDER_LIMIT = 50;
+
     @Bean("scheduler")
     public SchedulerNotifyHandler schedulerNotifyHandler(MessageSchedulerService messageSchedulerService,
                                                          @Qualifier("okSupplier") Supplier<String> okSupplier,
@@ -31,12 +35,12 @@ public class SchedulerConfig {
 
         return new SchedulerNotifyHandler(
                 messageSchedulerService,
-                3655,
+                DAYS_LIMIT,
                 okSupplier,
                 Arrays.asList(shiftTimeParser, specificTimeParser),
                 chatConfigService,
-                60 * 60 - 1,
-                50);
+                REPETITION_SECONDS_LIMIT,
+                MAX_REPETITION_UNDER_LIMIT);
     }
 
     @Bean("schedulerExtend")
@@ -46,7 +50,7 @@ public class SchedulerConfig {
 
         return new SchedulerExtendNotifyHandler(
                 messageSchedulerService,
-                3655,
+                DAYS_LIMIT,
                 okSupplier,
                 Arrays.asList(shiftTimeParser));
     }
