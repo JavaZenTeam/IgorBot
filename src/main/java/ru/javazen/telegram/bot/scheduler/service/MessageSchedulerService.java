@@ -8,5 +8,5 @@ public interface MessageSchedulerService {
 
     boolean cancelTaskByChatAndMessage(Long chatId, Integer messageId);
 
-    void extendTaskByChatAndMessage(Long chatId, Long messageId, long additionalTime);
+    boolean extendTaskByChatAndMessage(Long chatId, Integer messageId, long additionalTime);
 }

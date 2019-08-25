@@ -7,6 +7,7 @@ import ru.javazen.telegram.bot.CompositeBot;
 import ru.javazen.telegram.bot.filter.RegexpFilter;
 import ru.javazen.telegram.bot.handler.FilterAdapter;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
+import ru.javazen.telegram.bot.scheduler.SchedulerExtendNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.UnschedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.parser.ShiftTimeParser;
@@ -21,6 +22,10 @@ import java.util.function.Supplier;
 @Configuration
 public class SchedulerConfig {
 
+    public static final int DAYS_LIMIT = 3655;
+    public static final int REPETITION_SECONDS_LIMIT = 60 * 60 - 1;
+    public static final int MAX_REPETITION_UNDER_LIMIT = 50;
+
     @Bean("scheduler")
     public SchedulerNotifyHandler schedulerNotifyHandler(MessageSchedulerService messageSchedulerService,
                                                          @Qualifier("okSupplier") Supplier<String> okSupplier,
@@ -30,12 +35,24 @@ public class SchedulerConfig {
 
         return new SchedulerNotifyHandler(
                 messageSchedulerService,
-                3655,
+                DAYS_LIMIT,
                 okSupplier,
                 Arrays.asList(shiftTimeParser, specificTimeParser),
                 chatConfigService,
-                60 * 60 - 1,
-                50);
+                REPETITION_SECONDS_LIMIT,
+                MAX_REPETITION_UNDER_LIMIT);
+    }
+
+    @Bean("schedulerExtend")
+    public SchedulerExtendNotifyHandler schedulerExtendNotifyHandler(MessageSchedulerService messageSchedulerService,
+        @Qualifier("okSupplier") Supplier<String> okSupplier,
+        @Qualifier("extendShiftTimeParser") ShiftTimeParser shiftTimeParser) {
+
+        return new SchedulerExtendNotifyHandler(
+                messageSchedulerService,
+                DAYS_LIMIT,
+                okSupplier,
+                Arrays.asList(shiftTimeParser));
     }
 
     @Bean("unscheduler")
@@ -64,7 +81,6 @@ public class SchedulerConfig {
                 "и+го+рь,\\s?ск[ао]ж[иы] че?р[еи]?з( .+)");
     }
 
-
     @Bean
     SpecificTimeParser specificTimeParser(
             @Qualifier("defaultSupplier") Supplier<String> defaultMessageSupplier,
@@ -72,6 +88,23 @@ public class SchedulerConfig {
         return new SpecificTimeParser(
                 defaultMessageSupplier,
                 "и+го+рь,\\s?ск[ао]ж[иы]( .+)",
+                chatConfigService);
+    }
+
+    @Bean
+    ShiftTimeParser extendShiftTimeParser(@Qualifier("defaultSupplier") Supplier<String> defaultMessageSupplier) {
+        return new ShiftTimeParser(
+                defaultMessageSupplier,
+                "(?:[ие](?:щ|сч)[еёо]|пр[оа]дли на|д[оа]бавь?)( .+)");
+    }
+
+    @Bean
+    SpecificTimeParser extendSpecificTimeParser(
+            @Qualifier("defaultSupplier") Supplier<String> defaultMessageSupplier,
+            ChatConfigService chatConfigService) {
+        return new SpecificTimeParser(
+                defaultMessageSupplier,
+                "п[еи]р[еи]в[еиоа]ди на( .+)",
                 chatConfigService);
     }
 }
