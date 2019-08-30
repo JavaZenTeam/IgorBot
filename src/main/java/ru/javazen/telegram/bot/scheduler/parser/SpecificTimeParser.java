@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 import static org.springframework.util.StringUtils.isEmpty;
 
-public class SpecificTimeParser implements ScheduledMessageParser {
+public class SpecificTimeParser extends ScheduledMessageParser {
 
     private final static String PATTERN = " ?(\\d{2}[.-]\\d{2}[.-]\\d{4}|\\d{1}[.-]\\d{2}[.-]\\d{4})?" +
             "( ?в (\\d{2}:\\d{2}))?" +
@@ -32,7 +32,8 @@ public class SpecificTimeParser implements ScheduledMessageParser {
 
     public SpecificTimeParser(Supplier<String> defaultMessageSupplier,
                               String activationPattern,
-                              ChatConfigService chatConfigService) {
+                              ChatConfigService chatConfigService, TimeParser timeParser) {
+        super(timeParser);
         this.defaultMessageSupplier = defaultMessageSupplier;
         this.activationPattern = Pattern.compile(activationPattern,
                 Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);;
@@ -79,7 +80,7 @@ public class SpecificTimeParser implements ScheduledMessageParser {
 
                 Date parsedData = resolveDateTime(date, time, timeZone);
                 if (parsedData != null) {
-                    return new ParseResult(parsedData, returnMessage.trim());
+                    return new ParseResult(parsedData, returnMessage.trim(), parseRepeatPeriod(returnMessage));
                 }
             }
         }

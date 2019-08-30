@@ -11,6 +11,7 @@ import ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.UnschedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.parser.ShiftTimeParser;
 import ru.javazen.telegram.bot.scheduler.parser.SpecificTimeParser;
+import ru.javazen.telegram.bot.scheduler.parser.TimeParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerServiceImpl;
 import ru.javazen.telegram.bot.service.ChatConfigService;
@@ -59,7 +60,7 @@ public class SchedulerConfig {
     ShiftTimeParser shiftTimeParser(@Qualifier("defaultSupplier") Supplier<String> defaultMessageSupplier) {
         return new ShiftTimeParser(
                 defaultMessageSupplier,
-                "и+го+рь,\\s?ск[ао]ж[иы] че?р[еи]?з( .+)");
+                "и+го+рь,\\s?ск[ао]ж[иы] че?р[еи]?з( .+)", new TimeParser());
     }
 
 
@@ -70,6 +71,6 @@ public class SchedulerConfig {
         return new SpecificTimeParser(
                 defaultMessageSupplier,
                 "и+го+рь,\\s?ск[ао]ж[иы]( .+)",
-                chatConfigService);
+                chatConfigService, new TimeParser());
     }
 }

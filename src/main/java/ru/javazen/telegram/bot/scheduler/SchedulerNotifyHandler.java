@@ -94,8 +94,14 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
         task.setReplyMessageId(message.getMessageId().longValue());
         task.setScheduledText(result.getMessage());
         task.setTimeOfCompletion(result.getDate().getTime());
-
+        task.setRepeatPeriod(result.getRepeatPeriod());
         messageSchedulerService.scheduleTask(task);
+
+//        !TODO
+//        Норм валидация
+//        поддержка в других режимах
+//        Отмена
+//        ну и может билдер
 
         return true;
     }

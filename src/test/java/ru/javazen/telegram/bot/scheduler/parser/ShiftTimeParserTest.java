@@ -17,7 +17,7 @@ public class ShiftTimeParserTest {
     @BeforeClass
     public static void initClass() {
 
-        parser = new ShiftTimeParser(() -> "ok", "и+го+рь,\\s?ск[ао]ж[иы] через( .+)");
+        parser = new ShiftTimeParser(() -> "ok", "и+го+рь,\\s?ск[ао]ж[иы] через( .+)", new TimeParser());
 
         message = Mockito.mock(Message.class);
         Mockito.when(message.getReplyToMessage()).thenReturn(null);
