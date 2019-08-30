@@ -48,7 +48,9 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
     public boolean cancelTaskByChatAndMessage(Long chatId, Integer messageId) {
         MessageTask task = messageTaskRepository.getTaskByChatIdAndMessageId(chatId, messageId.longValue());
 
-        if (task == null) { return false; }
+        if (task == null) {
+            return false;
+        }
 
         FutureTask future = futureTasks.get(task.getId());
         futureTasks.remove(task.getId());
@@ -90,7 +92,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
         ScheduledFuture future = taskScheduler.schedule(() -> {
             FutureTask futureTask = futureTasks.get(task.getId());
             if (futureTask == null) {
-                throw  new RuntimeException("Can't find future for task: " + task.getId());
+                throw new RuntimeException("Can't find future for task: " + task.getId());
             }
 
             try {
@@ -114,6 +116,9 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
             futureTasks.remove(futureTask.taskId);
             messageTaskRepository.delete(task);
+            task.setMessageId(futureTask.get);
+            task.setTimeOfCompletion(task.getTimeOfCompletion() + task.getRepeatPeriod());
+            scheduleTask(task);
         }, new Date(task.getTimeOfCompletion()));
 
 

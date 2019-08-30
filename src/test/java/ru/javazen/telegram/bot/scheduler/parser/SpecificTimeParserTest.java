@@ -31,7 +31,7 @@ public class SpecificTimeParserTest {
 
         parser = new SpecificTimeParser(() -> "ok",
                 "и+го+рь,\\s?ск[ао]ж[иы]( .+)",
-                chatConfigService);
+                chatConfigService, new TimeParser());
 
         message = Mockito.mock(Message.class);
         User user = Mockito.mock(User.class);
