@@ -68,7 +68,9 @@ public abstract class ScheduledWithRepetitionParser implements ScheduledMessageP
                     }
                 }
 
-                return new RepetitionParsedResult(repetitions, sb.toString(), returnMessage);
+                if (sb.length() > 8) {
+                    return new RepetitionParsedResult(repetitions, sb.toString(), returnMessage);
+                }
             }
         }
 

@@ -99,9 +99,11 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
 
         format.setTimeZone(timeZone);
 
-        sender.execute(new SendMessage(message.getChatId(),
-                successResponseSupplier.get() + (needClarify ? ", завел на " +
-                format.format(result.getDate()): "")));
+        String responseMessage = successResponseSupplier.get() +
+                (needClarify ? ", завел на " + format.format(result.getDate()): "") +
+                (result.getRepetitions() != null ? ", буду повторять каждые " +
+                        DateInterval.getText(result.getInterval()) : "");
+        sender.execute(new SendMessage(message.getChatId(), responseMessage));
 
         MessageTask task = new MessageTask();
         task.setChatId(message.getChatId());
