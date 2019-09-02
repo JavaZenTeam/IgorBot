@@ -1,16 +1,8 @@
 language: java
-addons:
-  sonarcloud:
-    organization: "javazen"
-    token:
-      secure: $SONARCUBE_TOKEN
+
+services:
+  - docker
+
 script:
-  - mvn clean install
-  - sonar-scanner
-deploy:
-  provider: heroku
-  api_key:
-    secure: $HEROKU_API_KEY
-  app: igor-tg-bot
-  on:
-    branch: master
+  - chmod +x ./build/build-docker.sh
+  - ./build/build-docker.sh
