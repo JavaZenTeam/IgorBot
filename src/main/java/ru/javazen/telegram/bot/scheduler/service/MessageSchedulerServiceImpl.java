@@ -42,7 +42,6 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
         messageTaskRepository.save(task);
 
         performSchedulingTasks(task, telegramBot);
-
     }
 
     @Override
@@ -72,6 +71,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
         task.setTimeOfCompletion(task.getTimeOfCompletion() + additionalTime);
         futureTask.setFuture(getFuture(task));
+        messageTaskRepository.save(task);
         return true;
     }
 
@@ -133,6 +133,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                 if (repeatCount > 0) {
                     task.setRepeatCount(repeatCount - 1);
                 }
+                messageTaskRepository.save(task);
                 futureTask.setFuture(getFuture(task));
             } else {
                 futureTasks.remove(futureTask.taskId);
