@@ -6,7 +6,7 @@ import java.time.temporal.TemporalUnit;
 import java.util.function.Supplier;
 
 public enum DateRanges implements Supplier<DateRange> {
-    LAST_DAY(() -> lastUnit(ChronoUnit.DAYS)),
+    LAST_DAY(() -> new DateRange(LocalDate.now(), LocalDate.now())),
     LAST_WEEK(() -> lastUnit(ChronoUnit.WEEKS)),
     LAST_MONTH(() -> lastUnit(ChronoUnit.MONTHS)),
     LAST_YEAR(() -> lastUnit(ChronoUnit.YEARS)),
