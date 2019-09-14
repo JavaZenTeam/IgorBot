@@ -16,9 +16,16 @@
             hideHover: true
         });
     }
+
     $(document).ready(function () {
         var path = window.location.pathname + "activity-chart/";
-        var param = $.param({from: $('#fromDate').val(), to: $('#toDate').val()});
+        var interval = resolveInterval();
+        var param = $.param({
+            from: $('#fromDate').val(),
+            to: $('#toDate').val(),
+            interval: interval[0],
+            interval_unit: interval[1]
+        });
         $.get(path + "?" + param)
             .done(function (response) {
                 if (response['data'].length) {
@@ -31,4 +38,31 @@
                 }
             });
     });
+
+    function resolveInterval() {
+        var from = getDate($('#fromDate').val());
+        var to = getDate($('#toDate').val());
+        var durationMills = to.getTime() - from.getTime();
+        var durationDays = durationMills / (1000 * 60 * 60 * 24);
+        if (durationDays === 0) {
+            return [1, 'HOUR']
+        } else if (durationDays <= 3) {
+            return [3, 'HOUR']
+        } else if (durationDays <= 31) {
+            return [1, 'DAY']
+        } else if (durationDays <= 31 + 31 + 30) {
+            return [7, 'DAY']
+        } else if (durationDays <= 366) {
+            return [1, 'MONTH']
+        } else if (durationDays <= 366 + 365) {
+            return [3, 'MONTH']
+        } else {
+            return [1, 'YEAR']
+        }
+    }
+
+    function getDate(str) {
+        var a = str.split('.');
+        return new Date(new Date(a[2], a[1] - 1, a[0]));
+    }
 </script>
