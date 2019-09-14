@@ -13,4 +13,9 @@ public class PeriodUserStatistic extends UserStatistic {
         super(user, count, length, score);
         this.period = period;
     }
+
+    public PeriodUserStatistic(String period) {
+        super(null, null, null, null);
+        this.period = period;
+    }
 }

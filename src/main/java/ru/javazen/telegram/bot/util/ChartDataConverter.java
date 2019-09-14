@@ -18,9 +18,12 @@ public class ChartDataConverter {
 
     public ChartData convert(List<PeriodUserStatistic> source) {
         Map<UserEntity, Long> totalCounts = source.stream()
+                .filter(statistic -> statistic.getUser() != null)
                 .collect(Collectors.groupingBy(PeriodUserStatistic::getUser, Collectors.summingLong(yValueFunc)));
 
-        List<UserEntity> users = source.stream().map(PeriodUserStatistic::getUser)
+        List<UserEntity> users = source.stream()
+                .map(PeriodUserStatistic::getUser)
+                .filter(Objects::nonNull)
                 .distinct()
                 .sorted(Comparator.<UserEntity, Long>comparing(totalCounts::get).reversed())
                 .collect(Collectors.toList());
@@ -43,8 +46,10 @@ public class ChartDataConverter {
         Arrays.fill(result, 0);
         result[0] = entry.getKey();
         for (PeriodUserStatistic userStatistic : statistic) {
-            int index = users.indexOf(userStatistic.getUser());
-            result[1 + index] = yValueFunc.applyAsLong(userStatistic);
+            if (userStatistic.getUser() != null) {
+                int index = users.indexOf(userStatistic.getUser());
+                result[1 + index] = yValueFunc.applyAsLong(userStatistic);
+            }
         }
         return result;
     }
