@@ -1,5 +1,8 @@
 package ru.javazen.telegram.bot.model;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -8,6 +11,8 @@ import java.util.Objects;
 
 @Entity
 @Table
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserEntity {
     @Id
     private Integer userId;

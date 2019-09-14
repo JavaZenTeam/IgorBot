@@ -12,9 +12,7 @@ import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.datasource.ChatDataSource;
-import ru.javazen.telegram.bot.datasource.model.ChartData;
-import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
-import ru.javazen.telegram.bot.datasource.model.UserStatistic;
+import ru.javazen.telegram.bot.datasource.model.*;
 import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.util.ChartDataConverter;
 import ru.javazen.telegram.bot.util.DateRange;
@@ -23,6 +21,7 @@ import ru.javazen.telegram.bot.util.DateRanges;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 @Controller
 @AllArgsConstructor
@@ -35,6 +34,7 @@ public class ChatController {
     @PreAuthorize("hasAuthority(#chatIdStr)")
     @GetMapping("/chat/{chatId}/")
     public String getChatView(@PathVariable("chatId") String chatIdStr, Model model,
+                              TimeZone timeZone,
                               @RequestParam(value = "range", required = false, defaultValue = "LAST_WEEK")
                                       DateRanges range,
                               @RequestParam(value = "from", required = false)
@@ -45,9 +45,9 @@ public class ChatController {
                                       LocalDate to) {
         Long chatId = Long.valueOf(chatIdStr);
 
-        DateRange dateRange = range.get();
+        DateRange dateRange = range.apply(timeZone);
         if (range == DateRanges.CUSTOM) {
-            dateRange = new DateRange(from, to);
+            dateRange = new DateRange(from, to, timeZone);
         } else if (range == DateRanges.ALL_TIME) {
             dateRange = new DateRange(messageRepository.startChatDate(chatId), new Date());
         }
@@ -71,6 +71,11 @@ public class ChatController {
     @GetMapping("/chat/{chatId}/activity-chart/")
     @ResponseBody
     public ChartData getChatActivityChart(@PathVariable("chatId") String chatIdStr,
+                                          TimeZone timeZone,
+                                          @RequestParam("interval")
+                                                  int interval,
+                                          @RequestParam("interval_unit")
+                                                  TimeInterval.Unit unit,
                                           @RequestParam(value = "from")
                                           @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                   LocalDate from,
@@ -78,7 +83,9 @@ public class ChatController {
                                           @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                   LocalDate to) {
         Long chatId = Long.valueOf(chatIdStr);
-        List<PeriodUserStatistic> statistic = chatDataSource.activityChart(chatId, new DateRange(from, to));
+        DateRange dateRange = new DateRange(from, to, timeZone);
+        List<PeriodUserStatistic> statistic =
+                chatDataSource.activityChart(chatId, dateRange, new TimeInterval(interval, unit), timeZone);
         return chartDataConverter.convert(statistic);
     }
 
