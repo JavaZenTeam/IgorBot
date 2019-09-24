@@ -25,14 +25,16 @@ import java.util.TimeZone;
 
 @Controller
 @AllArgsConstructor
+@RequestMapping("/chat/{chatId}/")
 public class ChatController {
+    private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT +04:00"); //TODO get actual tz from user
     private DefaultAbsSender bot;
     private ChatDataSource chatDataSource;
     private ChartDataConverter chartDataConverter;
     private MessageRepository messageRepository;
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
-    @GetMapping("/chat/{chatId}/")
+    @GetMapping
     public String getChatView(@PathVariable("chatId") String chatIdStr, Model model,
                               TimeZone timeZone,
                               @RequestParam(value = "range", required = false, defaultValue = "LAST_WEEK")
@@ -68,10 +70,9 @@ public class ChatController {
     }
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
-    @GetMapping("/chat/{chatId}/activity-chart/")
+    @GetMapping("activity-chart")
     @ResponseBody
     public ChartData getChatActivityChart(@PathVariable("chatId") String chatIdStr,
-                                          TimeZone timeZone,
                                           @RequestParam("interval")
                                                   int interval,
                                           @RequestParam("interval_unit")
@@ -83,10 +84,26 @@ public class ChatController {
                                           @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                   LocalDate to) {
         Long chatId = Long.valueOf(chatIdStr);
-        DateRange dateRange = new DateRange(from, to, timeZone);
+        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         List<PeriodUserStatistic> statistic =
-                chatDataSource.activityChart(chatId, dateRange, new TimeInterval(interval, unit), timeZone);
+                chatDataSource.activityChart(chatId, dateRange, new TimeInterval(interval, unit), DEFAULT_TIME_ZONE);
         return chartDataConverter.convert(statistic);
+    }
+
+    @PreAuthorize("hasAuthority(#chatIdStr)")
+    @GetMapping("words-usage")
+    @ResponseBody
+    public DataTableResponse getWordUsageDataTable(@PathVariable("chatId") String chatIdStr,
+                                                   @RequestParam(value = "from")
+                                                   @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                           LocalDate from,
+                                                   @RequestParam(value = "to")
+                                                   @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                           LocalDate to,
+                                                   DataTableRequest request) {
+        Long chatId = Long.valueOf(chatIdStr);
+        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
+        return chatDataSource.wordsUsageStatistic(chatId, dateRange, request);
     }
 
     @ModelAttribute("chat")

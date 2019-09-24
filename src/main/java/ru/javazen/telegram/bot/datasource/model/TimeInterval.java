@@ -9,11 +9,14 @@ public class TimeInterval {
     private int interval;
     private Unit unit;
 
+    @AllArgsConstructor
+    @Getter
     public enum Unit {
-        YEAR,
-        MONTH,
-        DAY,
-        HOUR,
+        YEAR("YYYY"),
+        MONTH("YYYY-MM"),
+        DAY("YYYY-MM-dd"),
+        HOUR("YYYY-MM-dd HH:mm");
+        private String datetimeFormat;
     }
 
 }
