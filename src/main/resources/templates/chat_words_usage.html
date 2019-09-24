@@ -1,0 +1,56 @@
+<style>
+    tbody .tbody-text-right {
+        text-align: right !important;
+    }
+    .dataTables_info, .dataTables_paginate, .dataTables_length, .dataTables_filter {
+        font-size: 85%;
+    }
+</style>
+<table class="table table-sm w-100 border" id="words-usage">
+    <thead class="thead-light">
+    <tr>
+        <th class="w-25">Word</th>
+        <th class="w-25">Global Usage</th>
+        <th class="w-25">Chat Usage</th>
+        <th class="w-25">Delta</th>
+    </tr>
+    </thead>
+    <tbody class="bg-white"></tbody>
+</table>
+<script>
+    $('#words-usage').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: window.location.pathname + "words-usage",
+            data: function (request) {
+                request.from = $('#fromDate').val();
+                request.to = $('#toDate').val();
+            }
+        },
+        columns: [
+            {
+                data: 'word',
+                className: "px-3"
+            },
+            {
+                data: 'global',
+                render: $.fn.dataTable.render.number( ' ', '.', 2 ),
+                className: "px-3 tbody-text-right"
+            },
+            {
+                data: 'local',
+                render: $.fn.dataTable.render.number( ' ', '.', 2 ),
+                className: "px-3 tbody-text-right"
+            },
+            {
+                data: 'delta',
+                render: $.fn.dataTable.render.number( ' ', '.', 2 ),
+                className: "px-3 tbody-text-right"
+            }
+        ],
+        order: [
+            [ 2, "desc" ]
+        ]
+    });
+</script>
