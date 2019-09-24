@@ -56,7 +56,7 @@
     }
 
     $(document).ready(function () {
-        var path = window.location.pathname + "activity-chart/";
+        var path = window.location.pathname + "activity-chart";
         var interval = resolveInterval();
         var param = $.param({
             from: $('#fromDate').val(),
@@ -93,8 +93,6 @@
             return [7, 'DAY']
         } else if (durationDays <= 366) {
             return [1, 'MONTH']
-        } else if (durationDays <= 366 + 365) {
-            return [3, 'MONTH']
         } else {
             return [1, 'YEAR']
         }
