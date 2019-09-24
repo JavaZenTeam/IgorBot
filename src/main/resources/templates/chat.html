@@ -6,12 +6,15 @@
     <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/morrisjs/0.5.1/morris.css">
     <link rel="stylesheet" href="/webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
+    <link rel="stylesheet" href="/webjars/datatables/1.10.19/css/dataTables.bootstrap4.min.css">
     <script type="text/javascript" src="/webjars/jquery/3.0.0/jquery.min.js"></script>
     <script type="text/javascript" src="/webjars/popper.js/1.14.1/umd/popper.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/webjars/raphaeljs/2.1.2/raphael-min.js"></script>
     <script type="text/javascript" src="/webjars/morrisjs/0.5.1/morris.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/webjars/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/webjars/datatables/1.10.19/js/dataTables.bootstrap4.min.js"></script>
     <script type="text/javascript" src="/script.js"></script>
 </head>
 <body>
@@ -132,11 +135,17 @@
                 <div th:insert="chat_stickers"></div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg-8">
+                <h4>Wordы Usage Statistic</h4>
+                <div th:insert="chat_words_usage"></div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="bg-white border-top p-3">
     <!--/*@thymesVar id="bot" type="org.telegram.telegrambots.api.objects.User"*/-->
-    <div class="container">
+    <div class="container clearfix">
         <a class="float-right"
            th:href="${'https://t.me/' + bot.userName}"
            th:text="${'@' + bot.userName}"></a>

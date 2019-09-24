@@ -2,10 +2,7 @@ package ru.javazen.telegram.bot.datasource;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.javazen.telegram.bot.datasource.model.CountStatistic;
-import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
-import ru.javazen.telegram.bot.datasource.model.TimeInterval;
-import ru.javazen.telegram.bot.datasource.model.UserStatistic;
+import ru.javazen.telegram.bot.datasource.model.*;
 import ru.javazen.telegram.bot.model.*;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.DateRange;
@@ -13,10 +10,12 @@ import ru.javazen.telegram.bot.util.DateRange;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.*;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
@@ -34,6 +33,29 @@ public class CriteriaChatDataSource implements ChatDataSource {
             "and date >= generate_series and date < generate_series + cast(:period as INTERVAL) " +
             "left join user_entity u on m.user_id = u.user_id " +
             "group by generate_series, u.user_id, u.first_name, u.last_name, u.username";
+
+    private static final String WORD_USAGE_SQL = "select word, sum(global) as global, sum(local) as local, sum(local)-sum(global) as delta " +
+            "from (select word, 1000000.0 * count(word) / (select count(word) from message_entity_words) as global, 0 as local " +
+            "      from message_entity_words w " +
+            "      group by word " +
+            "      union all " +
+            "      select word, 0, 1000000.0 * count(word) / (select count(word) " +
+            "                                                 from message_entity_words w " +
+            "                                                        join message_entity m " +
+            "                                                          on w.message_id = m.message_id and w.chat_id = m.chat_id " +
+            "                                                 where m.chat_id = :chat_id " +
+            "                                                   and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP)) " +
+            "      from message_entity_words w " +
+            "             join message_entity m on w.message_id = m.message_id and w.chat_id = m.chat_id " +
+            "      where m.chat_id = :chat_id " +
+            "        and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP) " +
+            "      group by word) temp " +
+            "where word like :search " +
+            "group by word " +
+            "order by :order_column :order_dir " +
+            "limit :limit offset :offset";
+    public static final String TOTAL_WORDS_COUNT = "select count(*) from (select distinct word from message_entity_words) as temp";
+    public static final String FILTERED_WORDS_COUNT = "select count(*) from (select distinct word from message_entity_words where word like :search) as temp";
 
     private EntityManager entityManager;
     private ChatConfigService chatConfigService;
@@ -141,6 +163,59 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
+    public DataTableResponse<WordUsageStatistic> wordsUsageStatistic(Long chatId, DateRange dateRange, DataTableRequest request) {
+        List<String> columns = Arrays.asList("word", "global", "local", "delta");
+        String querySql = WORD_USAGE_SQL
+                .replace(":order_column", columns.get(request.getOrderColumn()))
+                .replace(":order_dir", request.getOrderDir());
+        Query nativeQuery = entityManager.createNativeQuery(querySql);
+        String searchValue = resolveSearchValue(request);
+        nativeQuery.setParameter("search", searchValue);
+        nativeQuery.setParameter("chat_id", chatId);
+        nativeQuery.setParameter("from", dateRange.getFrom());
+        nativeQuery.setParameter("to", dateRange.getTo());
+        nativeQuery.setParameter("offset", request.getStart());
+        nativeQuery.setParameter("limit", request.getLength());
+        List<Object[]> resultList = nativeQuery.getResultList();
+        List<WordUsageStatistic> statisticList = resultList.stream()
+                .map(this::mapToWordUsageStatistic)
+                .collect(Collectors.toList());
+        Integer recordsTotal = totalWordsCount();
+        Integer recordsFiltered = request.getSearchValue() == null ? recordsTotal : filteredWordsCount(searchValue);
+        return DataTableResponse.<WordUsageStatistic>builder()
+                .draw(request.getDraw())
+                .data(statisticList)
+                .recordsTotal(recordsTotal)
+                .recordsFiltered(recordsFiltered)
+                .build();
+    }
+
+    private WordUsageStatistic mapToWordUsageStatistic(Object[] row) {
+        return new WordUsageStatistic((String) row[0], (BigDecimal) row[1], (BigDecimal) row[2], (BigDecimal) row[3]);
+    }
+
+    private String resolveSearchValue(DataTableRequest request) {
+        String searchValue = request.getSearchValue();
+        if (searchValue == null) {
+            return "%";
+        } else if (searchValue.contains("%") || searchValue.contains("*")) {
+            return searchValue;
+        } else {
+            return searchValue + "%";
+        }
+    }
+
+    private int totalWordsCount() {
+        BigInteger result = (BigInteger) entityManager.createNativeQuery(TOTAL_WORDS_COUNT).getSingleResult();
+        return result.intValue();
+    }
+
+    private int filteredWordsCount(String search) {
+        BigInteger result = (BigInteger) entityManager.createNativeQuery(FILTERED_WORDS_COUNT).setParameter("search", search).getSingleResult();
+        return result.intValue();
+    }
+
+    @Deprecated
     public List<CountStatistic> wordsUsageStatistic(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);

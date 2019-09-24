@@ -1,9 +1,6 @@
 package ru.javazen.telegram.bot.datasource;
 
-import ru.javazen.telegram.bot.datasource.model.CountStatistic;
-import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
-import ru.javazen.telegram.bot.datasource.model.TimeInterval;
-import ru.javazen.telegram.bot.datasource.model.UserStatistic;
+import ru.javazen.telegram.bot.datasource.model.*;
 import ru.javazen.telegram.bot.util.DateRange;
 
 import java.util.List;
@@ -18,7 +15,7 @@ public interface ChatDataSource {
 
     List<CountStatistic> botUsagesByModule(Long chatId, DateRange dateRange);
 
-    List<CountStatistic> wordsUsageStatistic(Long chatId, DateRange dateRange);
+    DataTableResponse<WordUsageStatistic> wordsUsageStatistic(Long chatId, DateRange dateRange, DataTableRequest dataTableRequest);
 
     Long messagesCount(Long chatId, DateRange dateRange);
 }
