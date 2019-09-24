@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.javazen.telegram.bot.datasource.model.*;
 import ru.javazen.telegram.bot.model.*;
-import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.DateRange;
 
 import javax.persistence.EntityManager;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 @Repository
 @AllArgsConstructor
 public class CriteriaChatDataSource implements ChatDataSource {
-    private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
     private static final String ACTIVITY_CHART_SQL = "select generate_series, " +
             "u.user_id, u.first_name, u.last_name, u.username, " +
             "count(*) as count, sum(text_length) as length, sum(score) as score " +
@@ -54,11 +52,10 @@ public class CriteriaChatDataSource implements ChatDataSource {
             "group by word " +
             "order by :order_column :order_dir " +
             "limit :limit offset :offset";
-    public static final String TOTAL_WORDS_COUNT = "select count(*) from (select distinct word from message_entity_words) as temp";
-    public static final String FILTERED_WORDS_COUNT = "select count(*) from (select distinct word from message_entity_words where word like :search) as temp";
+    private static final String TOTAL_WORDS_COUNT = "select count(*) from (select distinct word from message_entity_words) as temp";
+    private static final String FILTERED_WORDS_COUNT = "select count(*) from (select distinct word from message_entity_words where word like :search) as temp";
 
     private EntityManager entityManager;
-    private ChatConfigService chatConfigService;
 
     @Override
     public List<UserStatistic> topActiveUsers(Long chatId, DateRange dateRange) {
@@ -89,23 +86,9 @@ public class CriteriaChatDataSource implements ChatDataSource {
         nativeQuery.setParameter("to", dateRange.getTo());
         nativeQuery.setParameter("period", interval.getInterval() + " " + interval.getUnit());
         List<Object[]> resultList = nativeQuery.getResultList();
-        DateFormat format = new SimpleDateFormat(resolveDateTimeFormat(interval.getUnit()));
+        DateFormat format = new SimpleDateFormat(interval.getUnit().getDatetimeFormat());
         format.setTimeZone(timeZone);
         return resultList.stream().map(obj -> mapToPeriodUserStatistic(obj, format)).collect(Collectors.toList());
-    }
-
-    private static String resolveDateTimeFormat(TimeInterval.Unit unit) {
-        switch (unit) {
-            case YEAR:
-                return "YYYY";
-            case MONTH:
-                return "YYYY-MM";
-            case DAY:
-                return "YYYY-MM-dd";
-            case HOUR:
-            default:
-                return "YYYY-MM-dd HH:mm";
-        }
     }
 
     private static PeriodUserStatistic mapToPeriodUserStatistic(Object[] arr, DateFormat format) {
@@ -215,31 +198,8 @@ public class CriteriaChatDataSource implements ChatDataSource {
         return result.intValue();
     }
 
-    @Deprecated
-    public List<CountStatistic> wordsUsageStatistic(Long chatId, DateRange dateRange) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
-
-        Root<MessageEntity> messages = query.from(MessageEntity.class);
-        Join<MessageEntity, String> wordJoin = messages.join(MessageEntity_.words);
-
-        query.where(
-                builder.greaterThanOrEqualTo(builder.length(wordJoin.as(String.class)), 3),
-                builder.equal(messages.get(MessageEntity_.chat), chatId),
-                builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
-        query.groupBy(wordJoin);
-
-        Expression<Long> count = builder.count(messages);
-        query.select(builder.construct(CountStatistic.class, wordJoin, count));
-        query.orderBy(builder.desc(count));
-        return entityManager.createQuery(query)
-                .setMaxResults(50)
-                .getResultList();
-    }
-
     @Override
     public Long messagesCount(Long chatId, DateRange dateRange) {
-        TimeZone timeZone = getTimeZone(chatId);
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = builder.createQuery(Long.class);
         Root<MessageEntity> messages = query.from(MessageEntity.class);
@@ -250,10 +210,5 @@ public class CriteriaChatDataSource implements ChatDataSource {
         List<Long> resultList = entityManager.createQuery(query)
                 .getResultList();
         return resultList.isEmpty() ? 0L : resultList.get(0);
-    }
-
-    private TimeZone getTimeZone(long chatId) {
-        String timeZoneOffset = chatConfigService.getProperty(chatId, TIMEZONE_OFFSET_CONFIG_KEY).orElse("+04:00");
-        return TimeZone.getTimeZone("GMT" + timeZoneOffset);
     }
 }
