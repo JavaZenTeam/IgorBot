@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 public class DataTableResponse<T> {
     private Integer draw;
-    private Integer recordsTotal;
-    private Integer recordsFiltered;
+    private Long recordsTotal;
+    private Long recordsFiltered;
     private List<T> data;
 }

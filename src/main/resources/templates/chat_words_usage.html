@@ -9,9 +9,8 @@
 <table class="table table-sm w-100 border" id="words-usage">
     <thead class="thead-light">
     <tr>
-        <th class="w-25">Word</th>
-        <th class="w-25">Global Usage</th>
-        <th class="w-25">Chat Usage</th>
+        <th class="w-50">Word</th>
+        <th class="w-25">Count</th>
         <th class="w-25">Delta</th>
     </tr>
     </thead>
@@ -34,23 +33,32 @@
                 className: "px-3"
             },
             {
-                data: 'global',
-                render: $.fn.dataTable.render.number( ' ', '.', 2 ),
-                className: "px-3 tbody-text-right"
-            },
-            {
-                data: 'local',
-                render: $.fn.dataTable.render.number( ' ', '.', 2 ),
+                data: 'count',
                 className: "px-3 tbody-text-right"
             },
             {
                 data: 'delta',
-                render: $.fn.dataTable.render.number( ' ', '.', 2 ),
+                render: function ( data, type, full, meta ) {
+                    return (data > 0 ? '+' : '') + (100.0 * data).toFixed(2) + '%';
+                },
                 className: "px-3 tbody-text-right"
             }
         ],
         order: [
-            [ 2, "desc" ]
-        ]
+            [ 1, "desc" ]
+        ],
+        createdRow: function(row, data, index, cells) {
+            var value = 100.0 * data.delta;
+            console.log(data);
+            if (value >= 2) {
+                $(cells[2]).addClass("table-success");
+            } else if (value >= 1) {
+                $(cells[2]).addClass("table-info");
+            } else if (value <= -2) {
+                $(cells[2]).addClass("table-danger");
+            } else if (value <= -1) {
+                $(cells[2]).addClass("table-warning");
+            }
+        }
     });
 </script>

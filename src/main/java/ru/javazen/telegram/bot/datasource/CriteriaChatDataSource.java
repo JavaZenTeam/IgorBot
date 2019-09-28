@@ -2,14 +2,16 @@ package ru.javazen.telegram.bot.datasource;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.javazen.telegram.bot.datasource.model.*;
 import ru.javazen.telegram.bot.model.*;
+import ru.javazen.telegram.bot.repository.DictionaryRepository;
 import ru.javazen.telegram.bot.util.DateRange;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.*;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -32,32 +34,30 @@ public class CriteriaChatDataSource implements ChatDataSource {
             "left join user_entity u on m.user_id = u.user_id " +
             "group by generate_series, u.user_id, u.first_name, u.last_name, u.username";
 
-    private static final String WORD_USAGE_SQL = "select word, sum(global) as global, sum(local) as local, sum(local)-sum(global) as delta " +
-            "from (select word, 1000000.0 * count(word) / (select count(word) from message_entity_words) as global, 0 as local " +
-            "      from message_entity_words w " +
-            "      group by word " +
-            "      union all " +
-            "      select word, 0, 1000000.0 * count(word) / (select count(word) " +
-            "                                                 from message_entity_words w " +
-            "                                                        join message_entity m " +
-            "                                                          on w.message_id = m.message_id and w.chat_id = m.chat_id " +
-            "                                                 where m.chat_id = :chat_id " +
-            "                                                   and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP)) " +
-            "      from message_entity_words w " +
-            "             join message_entity m on w.message_id = m.message_id and w.chat_id = m.chat_id " +
-            "      where m.chat_id = :chat_id " +
-            "        and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP) " +
-            "      group by word) temp " +
-            "where word like :search " +
-            "group by word " +
+    private static final String WORD_USAGE_SQL = "select w.word, " +
+            "count(*) as count, " +
+            "(count(*) / :chat_count) - (d.count - count(*)) / (:global_count - :chat_count) as delta " +
+            "from message_entity_words w " +
+            "join message_entity m on w.message_id = m.message_id and w.chat_id = m.chat_id " +
+            "right join dictionary_word d on w.word = d.word " +
+            "where m.chat_id = :chat_id " +
+            "  and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP) " +
+            "  and w.word like :search " +
+            "group by w.word, d.count " +
             "order by :order_column :order_dir " +
             "limit :limit offset :offset";
-    private static final String TOTAL_WORDS_COUNT = "select count(*) from (select distinct word from message_entity_words) as temp";
-    private static final String FILTERED_WORDS_COUNT = "select count(*) from (select distinct word from message_entity_words where word like :search) as temp";
+    private static final String TOTAL_WORDS_COUNT = "select count(*) " +
+            "from message_entity_words w join message_entity m on w.message_id = m.message_id and w.chat_id = m.chat_id " +
+            "where m.chat_id = :chat_id and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP)";
+    private static final String FILTERED_WORDS_COUNT = "select count(*) " +
+            "from message_entity_words w join message_entity m on w.message_id = m.message_id and w.chat_id = m.chat_id " +
+            "where word like :search and m.chat_id = :chat_id and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP)";
 
     private EntityManager entityManager;
+    private DictionaryRepository dictionaryRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserStatistic> topActiveUsers(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserStatistic> query = builder.createQuery(UserStatistic.class);
@@ -79,6 +79,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PeriodUserStatistic> activityChart(Long chatId, DateRange dateRange, TimeInterval interval, TimeZone timeZone) {
         Query nativeQuery = entityManager.createNativeQuery(ACTIVITY_CHART_SQL);
         nativeQuery.setParameter("chat_id", chatId);
@@ -105,6 +106,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CountStatistic> topStickers(Long chatId, DateRange dateRange, Integer maxResults) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
@@ -127,6 +129,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CountStatistic> botUsagesByModule(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
@@ -146,14 +149,21 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DataTableResponse<WordUsageStatistic> wordsUsageStatistic(Long chatId, DateRange dateRange, DataTableRequest request) {
-        List<String> columns = Arrays.asList("word", "global", "local", "delta");
+        Long globalCount = dictionaryRepository.sumCounts();
+        Long chatCount = chatWordsCount(chatId, dateRange);
+
+        List<String> columns = Arrays.asList("word", "count", "delta");
         String querySql = WORD_USAGE_SQL
                 .replace(":order_column", columns.get(request.getOrderColumn()))
                 .replace(":order_dir", request.getOrderDir());
+
         Query nativeQuery = entityManager.createNativeQuery(querySql);
         String searchValue = resolveSearchValue(request);
         nativeQuery.setParameter("search", searchValue);
+        nativeQuery.setParameter("chat_count", (double) chatCount);
+        nativeQuery.setParameter("global_count", (double) globalCount);
         nativeQuery.setParameter("chat_id", chatId);
         nativeQuery.setParameter("from", dateRange.getFrom());
         nativeQuery.setParameter("to", dateRange.getTo());
@@ -163,42 +173,55 @@ public class CriteriaChatDataSource implements ChatDataSource {
         List<WordUsageStatistic> statisticList = resultList.stream()
                 .map(this::mapToWordUsageStatistic)
                 .collect(Collectors.toList());
-        Integer recordsTotal = totalWordsCount();
-        Integer recordsFiltered = request.getSearchValue() == null ? recordsTotal : filteredWordsCount(searchValue);
+
+        Long recordsFiltered = StringUtils.isEmpty(request.getSearchValue())
+                ? chatCount
+                : filteredWordsCount(chatId, dateRange, searchValue);
+
         return DataTableResponse.<WordUsageStatistic>builder()
                 .draw(request.getDraw())
                 .data(statisticList)
-                .recordsTotal(recordsTotal)
+                .recordsTotal(chatCount)
                 .recordsFiltered(recordsFiltered)
                 .build();
     }
 
     private WordUsageStatistic mapToWordUsageStatistic(Object[] row) {
-        return new WordUsageStatistic((String) row[0], (BigDecimal) row[1], (BigDecimal) row[2], (BigDecimal) row[3]);
+        return new WordUsageStatistic((String) row[0], (BigInteger) row[1], (Double) row[2]);
     }
 
     private String resolveSearchValue(DataTableRequest request) {
         String searchValue = request.getSearchValue();
         if (searchValue == null) {
             return "%";
-        } else if (searchValue.contains("%") || searchValue.contains("*")) {
+        } else if (searchValue.contains("%") || searchValue.contains("_")) {
             return searchValue;
         } else {
             return searchValue + "%";
         }
     }
 
-    private int totalWordsCount() {
-        BigInteger result = (BigInteger) entityManager.createNativeQuery(TOTAL_WORDS_COUNT).getSingleResult();
-        return result.intValue();
+    private long chatWordsCount(Long chatId, DateRange dateRange) {
+        BigInteger result = (BigInteger) entityManager.createNativeQuery(TOTAL_WORDS_COUNT)
+                .setParameter("chat_id", chatId)
+                .setParameter("from", dateRange.getFrom())
+                .setParameter("to", dateRange.getTo())
+                .getSingleResult();
+        return result.longValue();
     }
 
-    private int filteredWordsCount(String search) {
-        BigInteger result = (BigInteger) entityManager.createNativeQuery(FILTERED_WORDS_COUNT).setParameter("search", search).getSingleResult();
-        return result.intValue();
+    private long filteredWordsCount(Long chatId, DateRange dateRange, String search) {
+        BigInteger result = (BigInteger) entityManager.createNativeQuery(FILTERED_WORDS_COUNT)
+                .setParameter("chat_id", chatId)
+                .setParameter("from", dateRange.getFrom())
+                .setParameter("to", dateRange.getTo())
+                .setParameter("search", search)
+                .getSingleResult();
+        return result.longValue();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Long messagesCount(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = builder.createQuery(Long.class);
