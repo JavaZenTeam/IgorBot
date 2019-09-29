@@ -31,6 +31,7 @@
     function behaveLikeArea() {
         chartControl.cumulative = true;
         chartControl.options.behaveLikeLine = false;
+        chartControl.options.fillOpacity = 1.0;
         chartControl.options.fillOpacity = 0.5;
         chartControl.setData(chartData, true);
         $('#chart-line-badge').hide();

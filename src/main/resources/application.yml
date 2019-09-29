@@ -19,6 +19,8 @@ bot:
 http:
   proxy:
     url: ${PROXY_URL:}
+dictionary:
+  sync.cron: ${IGOR_BOT_DICT_UPDATE_CRON:0 0 * * * *}
 ---
 spring:
   profiles: say-text

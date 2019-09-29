@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Setter
 @Getter
@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class WordUsageStatistic {
     private String word;
-    private BigDecimal global;
-    private BigDecimal local;
-    private BigDecimal delta;
+    private BigInteger count;
+    private Double delta;
 }
