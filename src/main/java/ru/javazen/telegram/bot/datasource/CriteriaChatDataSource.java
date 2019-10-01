@@ -195,7 +195,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
         if (searchValue == null) {
             return "%";
         } else if (searchValue.contains("%") || searchValue.contains("_")) {
-            return searchValue;
+            return searchValue.replaceAll("[%_]", "") + "%";
         } else {
             return searchValue + "%";
         }
