@@ -46,12 +46,17 @@ public class CriteriaChatDataSource implements ChatDataSource {
             "group by w.word, d.count " +
             "order by :order_column :order_dir " +
             "limit :limit offset :offset";
-    private static final String TOTAL_WORDS_COUNT = "select count(*) " +
-            "from message_entity_words w join message_entity m on w.message_id = m.message_id and w.chat_id = m.chat_id " +
-            "where m.chat_id = :chat_id and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP)";
-    private static final String FILTERED_WORDS_COUNT = "select count(*) " +
-            "from message_entity_words w join message_entity m on w.message_id = m.message_id and w.chat_id = m.chat_id " +
-            "where word like :search and m.chat_id = :chat_id and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP)";
+    private static final String TOTAL_WORDS_COUNT = "select count(*) from ( " +
+            "select distinct word from message_entity_words w " +
+            "join message_entity m on w.message_id = m.message_id and w.chat_id = m.chat_id " +
+            "where m.chat_id = :chat_id and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP)" +
+            ") as temp";
+    private static final String FILTERED_WORDS_COUNT = "select count(*) from ( " +
+            "select distinct word from message_entity_words w " +
+            "join message_entity m on w.message_id = m.message_id and w.chat_id = m.chat_id " +
+            "where m.chat_id = :chat_id and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP) " +
+            "and word like :search" +
+            ") as temp";
 
     private EntityManager entityManager;
     private DictionaryRepository dictionaryRepository;
