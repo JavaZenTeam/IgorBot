@@ -53,7 +53,6 @@
         ],
         createdRow: function(row, data, index, cells) {
             var value = 100.0 * data.delta;
-            console.log(data);
             if (value >= 2) {
                 $(cells[2]).addClass("table-success");
             } else if (value >= 1) {
