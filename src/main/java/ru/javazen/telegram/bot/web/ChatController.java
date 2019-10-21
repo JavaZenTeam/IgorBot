@@ -27,7 +27,7 @@ import java.util.TimeZone;
 @AllArgsConstructor
 @RequestMapping("/chat/{chatId}/")
 public class ChatController {
-    private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT +04:00"); //TODO get actual tz from user
+    private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT+04:00"); //TODO get actual tz from user
     private DefaultAbsSender bot;
     private ChatDataSource chatDataSource;
     private ChartDataConverter chartDataConverter;
