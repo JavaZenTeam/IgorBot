@@ -1,42 +1,72 @@
 <style>
-    #chart-line-badge:hover, #chart-area-badge:hover {
-        cursor: pointer;
+    .setting {
+        font-size: 85%;
+    }
+    .setting>select {
+        width: 120px;
+        font-size: 100%!important;
+        padding-top: 3px!important;
     }
 </style>
-<div class="bg-white border p-2 mb-3">
-    <div id="chart-line-badge"
-         class="badge badge-secondary m-2"
-         style="display: none"
-         onclick="behaveLikeArea()">Line
+<div class="activity-chart-container">
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <div>
+                <label class="setting">
+                    <span>Mode</span>
+                    <select name="activity-chart-mode" onchange="changeMode()"
+                            class="custom-select custom-select-sm form-control form-control-sm">
+                        <option value="DEFAULT">Default</option>
+                        <option value="SUM">Sum</option>
+                        <option value="RATIO">Ratio</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <div class="text-right">
+                <label class="setting">
+                    <span>Interval</span>
+                    <select name="activity-chart-interval" onchange="changeInterval()"
+                            class="custom-select custom-select-sm form-control form-control-sm"></select>
+                </label>
+            </div>
+        </div>
     </div>
-    <div id="chart-area-badge"
-         class="badge badge-primary m-2"
-         style="display: none"
-         onclick="behaveLikeLine()">Area
+    <div class="bg-white border p-2 mb-3">
+        <div id="activity-chart"></div>
     </div>
-    <div id="activity-chart"></div>
 </div>
 <script>
-    var chartControl, chartData;
+    var from, to;
+    var chartControl, chartData, chartYKeys;
+    var intervalOptions;
 
-    function behaveLikeLine() {
-        chartControl.cumulative = false;
-        chartControl.options.behaveLikeLine = true;
-        chartControl.options.fillOpacity = 0.0;
-        chartControl.setData(chartData, true);
-        $('#chart-line-badge').show();
-        $('#chart-area-badge').hide();
-    }
-
-    function behaveLikeArea() {
-        chartControl.cumulative = true;
-        chartControl.options.behaveLikeLine = false;
-        chartControl.options.fillOpacity = 1.0;
-        chartControl.options.fillOpacity = 0.5;
-        chartControl.setData(chartData, true);
-        $('#chart-line-badge').hide();
-        $('#chart-area-badge').show();
-    }
+    $(document).ready(function () {
+        from = $('#fromDate').val();
+        to = $('#toDate').val();
+        intervalOptions = getAvailableIntervalOptions();
+        renderIntervalOptions();
+        var interval = intervalOptions[0];
+        var path = window.location.pathname + "activity-chart";
+        var param = $.param({
+            from: from,
+            to: to,
+            interval: interval[0],
+            interval_unit: interval[1]
+        });
+        $.get(path + "?" + param)
+            .done(function (response) {
+                if (response['data'].length > 0 && response['data'][0].length > 1) {
+                    buildChart(response);
+                } else {
+                    $('#activity-chart-container').parent().replaceWith(
+                        '<div class="alert-info p-3 mb-3">' +
+                        'No data found for the selected period' +
+                        '</div>');
+                }
+            });
+    });
 
     function buildChart(response) {
         chartData = response['data'];
@@ -52,55 +82,116 @@
             dateFormat: format,
             hideHover: true,
             behaveLikeLine: true,
-            fillOpacity: 0.0
+            fillOpacity: 0.0,
+            smooth: false
         });
     }
 
-    $(document).ready(function () {
+    function changeMode() {
+        var mode = $('select[name=activity-chart-mode]').val();
+        switch (mode) {
+            case 'SUM': sumMode(); break;
+            case 'RATIO': ratioMode(); break;
+            default: defaultMode();
+        }
+    }
+
+    function defaultMode() {
+        chartControl.cumulative = false;
+        chartControl.options.behaveLikeLine = true;
+        chartControl.options.fillOpacity = 0.0;
+        chartControl.options.postUnits = '';
+        chartControl.setData(chartData);
+    }
+
+    function sumMode() {
+        chartControl.cumulative = true;
+        chartControl.options.behaveLikeLine = false;
+        chartControl.options.fillOpacity = 1.0;
+        chartControl.options.postUnits = '';
+        chartControl.setData(chartData);
+    }
+
+    function ratioMode() {
+        chartControl.cumulative = true;
+        chartControl.options.behaveLikeLine = false;
+        chartControl.options.fillOpacity = 1.0;
+        chartControl.options.postUnits = '%';
+        var data = chartData.map(function (item) {
+            var result = [item[0]];
+            var sum = item.slice(1).reduce(function (a, b) { return a + b });
+            for (var i = 1; i < item.length; i++) {
+                var ratio = sum === 0
+                    ? 1.0 / (item.length - 1.0) * 100.0
+                    : item[i] / sum * 100.0;
+                result.push(ratio.toFixed(1));
+            }
+            return result;
+        });
+        chartControl.setData(data);
+    }
+
+    function changeInterval() {
+        var intervalIndex = $('select[name=activity-chart-interval]').val();
+        refreshChartData(intervalOptions[intervalIndex]);
+    }
+    
+    function refreshChartData(interval) {
         var path = window.location.pathname + "activity-chart";
-        var interval = resolveInterval();
         var param = $.param({
-            from: $('#fromDate').val(),
-            to: $('#toDate').val(),
+            from: from,
+            to: to,
             interval: interval[0],
             interval_unit: interval[1]
         });
         $.get(path + "?" + param)
             .done(function (response) {
-                if (response['data'].length) {
-                    buildChart(response);
-                    $('#chart-line-badge').show();
-                } else {
-                    $('#activity-chart').parent().replaceWith(
-                        '<div class="alert-info p-3 mb-3">' +
-                        'No data found for the selected period' +
-                        '</div>');
-                }
+                chartData = response['data'];
+                var sample = chartData[0][0];
+                var format = resolveFormat(sample);
+                chartControl.xLabelFormat = format;
+                chartControl.dateFormat = format;
+                changeMode();
             });
-    });
-
-    function resolveInterval() {
-        var from = getDate($('#fromDate').val());
-        var to = getDate($('#toDate').val());
-        var durationMills = to.getTime() - from.getTime();
-        var durationDays = durationMills / (1000 * 60 * 60 * 24);
-        if (durationDays === 0) {
-            return [1, 'HOUR']
-        } else if (durationDays <= 3) {
-            return [3, 'HOUR']
-        } else if (durationDays <= 31) {
-            return [1, 'DAY']
-        } else if (durationDays <= 31 + 31 + 30) {
-            return [7, 'DAY']
-        } else if (durationDays <= 366) {
-            return [1, 'MONTH']
-        } else {
-            return [1, 'YEAR']
-        }
     }
 
-    function getDate(str) {
-        var a = str.split('.');
-        return new Date(new Date(a[2], a[1] - 1, a[0]));
+    function getAvailableIntervalOptions() {
+        var hoursInUnit = {
+            'HOUR': 1,
+            'DAY': 24,
+            'MONTH': 24 * 30,
+            'YEAR': 24 * 365
+        };
+        var intervalOptions = [
+            [1, 'HOUR'],
+            [2, 'HOUR'],
+            [3, 'HOUR'],
+            [1, 'DAY'],
+            [2, 'DAY'],
+            [3, 'DAY'],
+            [7, 'DAY'],
+            [1, 'MONTH'],
+            [3, 'MONTH'],
+            [1, 'YEAR']
+        ];
+        var periodDuration = 24 + (getTime(to) - getTime(from)) / (1000 * 60 * 60);
+        return intervalOptions.filter(function (item, i, arr) {
+            var intervalDuration = item[0] * hoursInUnit[item[1]];
+            return periodDuration >= 3 * intervalDuration &&
+                periodDuration <= 50 * intervalDuration;
+        });
+    }
+
+    function getTime(date) {
+        var a = date.split('.');
+        return new Date(a[2], a[1] - 1, a[0]).getTime();
+    }
+
+    function renderIntervalOptions() {
+        var selectElement = $('select[name=activity-chart-interval]');
+        intervalOptions.forEach(function(item, i, arr) {
+            var text = item[0] + ' ' + item[1].toLowerCase() + (item[0] > 1 ? 's' : '');
+            selectElement.append('<option value="' + i + '">' + text + '</option>');
+        })
     }
 </script>
