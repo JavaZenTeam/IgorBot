@@ -73,6 +73,8 @@ public class ChatController {
     @GetMapping("activity-chart")
     @ResponseBody
     public ChartData getChatActivityChart(@PathVariable("chatId") String chatIdStr,
+                                          @RequestParam(value = "attribute", defaultValue = "SCORE")
+                                                  ChartDataConverter.Attribute attribute,
                                           @RequestParam("interval")
                                                   int interval,
                                           @RequestParam("interval_unit")
@@ -87,7 +89,7 @@ public class ChatController {
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         List<PeriodUserStatistic> statistic =
                 chatDataSource.activityChart(chatId, dateRange, new TimeInterval(interval, unit), DEFAULT_TIME_ZONE);
-        return chartDataConverter.convert(statistic);
+        return chartDataConverter.convert(statistic, attribute);
     }
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
