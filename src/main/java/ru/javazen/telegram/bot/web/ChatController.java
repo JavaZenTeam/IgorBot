@@ -108,6 +108,22 @@ public class ChatController {
         return chatDataSource.wordsUsageStatistic(chatId, dateRange, request);
     }
 
+
+    @PreAuthorize("hasAuthority(#chatIdStr)")
+    @GetMapping("message-types")
+    @ResponseBody
+    public List<CountStatistic> getMessageTypesChar(@PathVariable("chatId") String chatIdStr,
+                                                      @RequestParam(value = "from")
+                                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                              LocalDate from,
+                                                      @RequestParam(value = "to")
+                                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                              LocalDate to) {
+        Long chatId = Long.valueOf(chatIdStr);
+        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
+        return chatDataSource.messageTypesStickers(chatId, dateRange);
+    }
+
     @ModelAttribute("chat")
     public Chat getChat(@ModelAttribute("chatId") Long chatId) throws TelegramApiException {
         return bot.execute(new GetChat(chatId));

@@ -5,7 +5,7 @@
     .setting>select {
         width: 120px;
         font-size: 100%!important;
-        padding-top: 3px!important;
+        padding-top: 4px!important;
     }
 </style>
 <div class="activity-chart-container">
@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="col-sm-12 col-md-4">
-            <div class="text-center">
+            <div class="text-lg-center">
                 <label class="setting">
                     <span>Attribute</span>
                     <select name="activity-chart-attribute" onchange="changeIntervalOrAttribute()"
@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="col-sm-12 col-md-4">
-            <div class="text-right">
+            <div class="text-lg-right">
                 <label class="setting">
                     <span>Interval</span>
                     <select name="activity-chart-interval" onchange="changeIntervalOrAttribute()"
@@ -52,7 +52,7 @@
 </div>
 <script>
     var from, to;
-    var chartControl, chartData, chartYKeys;
+    var chartControl, chartData;
     var intervalOptions;
 
     $(document).ready(function () {
