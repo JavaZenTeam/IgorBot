@@ -10,7 +10,7 @@
 </style>
 <div class="activity-chart-container">
     <div class="row">
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-4">
             <div>
                 <label class="setting">
                     <span>Mode</span>
@@ -23,11 +23,24 @@
                 </label>
             </div>
         </div>
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-4">
+            <div class="text-center">
+                <label class="setting">
+                    <span>Attribute</span>
+                    <select name="activity-chart-attribute" onchange="changeIntervalOrAttribute()"
+                            class="custom-select custom-select-sm form-control form-control-sm">
+                        <option value="SCORE">Score</option>
+                        <option value="MESSAGES">Messages</option>
+                        <option value="CHARACTERS">Characters</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-4">
             <div class="text-right">
                 <label class="setting">
                     <span>Interval</span>
-                    <select name="activity-chart-interval" onchange="changeInterval()"
+                    <select name="activity-chart-interval" onchange="changeIntervalOrAttribute()"
                             class="custom-select custom-select-sm form-control form-control-sm"></select>
                 </label>
             </div>
@@ -135,16 +148,18 @@
         chartControl.setData(data);
     }
 
-    function changeInterval() {
+    function changeIntervalOrAttribute() {
         var intervalIndex = $('select[name=activity-chart-interval]').val();
-        refreshChartData(intervalOptions[intervalIndex]);
+        var attribute = $('select[name=activity-chart-attribute]').val();
+        refreshChartData(intervalOptions[intervalIndex], attribute);
     }
     
-    function refreshChartData(interval) {
+    function refreshChartData(interval, attribute) {
         var path = window.location.pathname + "activity-chart";
         var param = $.param({
             from: from,
             to: to,
+            attribute: attribute,
             interval: interval[0],
             interval_unit: interval[1]
         });
