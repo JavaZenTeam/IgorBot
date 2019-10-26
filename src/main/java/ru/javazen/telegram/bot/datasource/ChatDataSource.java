@@ -13,6 +13,8 @@ public interface ChatDataSource {
 
     List<CountStatistic> topStickers(Long chatId, DateRange dateRange, Integer maxResults);
 
+    List<CountStatistic> messageTypesStickers(Long chatId, DateRange dateRange);
+
     List<CountStatistic> botUsagesByModule(Long chatId, DateRange dateRange);
 
     DataTableResponse<WordUsageStatistic> wordsUsageStatistic(Long chatId, DateRange dateRange, DataTableRequest dataTableRequest);
