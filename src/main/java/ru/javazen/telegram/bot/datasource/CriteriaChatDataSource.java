@@ -16,10 +16,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -34,6 +31,17 @@ public class CriteriaChatDataSource implements ChatDataSource {
             "left join user_entity u on m.user_id = u.user_id " +
             "group by generate_series, u.user_id, u.first_name, u.last_name, u.username";
 
+    private static final String MESSAGE_TYPES_SQL = "select " +
+            "case " +
+            "  when forward_user_id is not null then 'FORWARD' " +
+            "  when file_type is not null then file_type " +
+            "  else 'TEXT' " +
+            "end as type, " +
+            "count(*) as count " +
+            "from message_entity " +
+            "where chat_id = :chat_id " +
+            "  and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP) " +
+            "group by file_type, forward_user_id is not null";
     private static final String WORD_USAGE_SQL = "select w.word, " +
             "count(*) as count, " +
             "(count(*) / :chat_count) - (d.count - count(*)) / (:global_count - :chat_count) as delta " +
@@ -223,6 +231,21 @@ public class CriteriaChatDataSource implements ChatDataSource {
                 .setParameter("search", search)
                 .getSingleResult();
         return result.longValue();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<CountStatistic> messageTypesStickers(Long chatId, DateRange dateRange) {
+        List<Object[]> resultList = entityManager.createNativeQuery(MESSAGE_TYPES_SQL)
+                .setParameter("chat_id", chatId)
+                .setParameter("from", dateRange.getFrom())
+                .setParameter("to", dateRange.getTo())
+                .getResultList();
+
+        return resultList.stream()
+                .map(arr -> new CountStatistic((String) arr[0], ((BigInteger) arr[1]).longValue()))
+                .sorted(Comparator.comparing(CountStatistic::getKey))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -1,0 +1,48 @@
+<div id="message-types-donut-container">
+    <div class="bg-white border px-3 mb-3">
+        <div id="message-types-donut"></div>
+    </div>
+</div>
+<script>
+    var donutLabels = {
+        'FORWARD': 'Forward',
+        'TEXT': 'Text',
+        'PHOTO': 'Photo',
+        'AUDIO': 'Audio',
+        'DOCUMENT': 'Document',
+        'VIDEO': 'Video',
+        'VOICE': 'Voice',
+        'VIDEO_NOTE': 'Video note',
+        'STICKER': 'Sticker'
+    };
+
+    function mapDonutData(item) {
+        return {
+            label: donutLabels[item.key],
+            value: item.count
+        }
+    }
+
+    $(document).ready(function () {
+        var param = $.param({
+            from: $('#fromDate').val(),
+            to: $('#toDate').val()
+        });
+        var path = window.location.pathname + "message-types";
+        $.get(path + "?" + param)
+            .done(function (response) {
+                if (response.length > 0) {
+                    Morris.Donut({
+                        element: 'message-types-donut',
+                        data: response.map(mapDonutData),
+                        resize: true
+                    })
+                } else {
+                    $('#message-types-donut-container').parent().replaceWith(
+                        '<div class="alert-info p-3 mb-3">' +
+                        'No data found for the selected period' +
+                        '</div>');
+                }
+            });
+    });
+</script>
