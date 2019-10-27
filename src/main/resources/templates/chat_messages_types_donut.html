@@ -15,6 +15,17 @@
         'VIDEO_NOTE': 'Video note',
         'STICKER': 'Sticker'
     };
+    var colors = [
+        '#007bff',
+        '#28a745',
+        '#ffc107',
+        '#dc3545',
+        '#17a2b8',
+        '#6c757d',
+        '#1e7e34',
+        '#0062cc',
+        '#bd2130'
+    ];
 
     function mapDonutData(item) {
         return {
@@ -35,6 +46,7 @@
                     Morris.Donut({
                         element: 'message-types-donut',
                         data: response.map(mapDonutData),
+                        colors: colors,
                         resize: true
                     })
                 } else {

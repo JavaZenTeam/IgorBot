@@ -41,7 +41,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
             "from message_entity " +
             "where chat_id = :chat_id " +
             "  and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP) " +
-            "group by file_type, forward_user_id is not null";
+            "group by type";
     private static final String WORD_USAGE_SQL = "select w.word, " +
             "count(*) as count, " +
             "(count(*) / :chat_count) - (d.count - count(*)) / (:global_count - :chat_count) as delta " +
