@@ -49,7 +49,7 @@ public class SayTextHandler implements InlineQueryHandler {
 
         taskScheduler.schedule(() -> {
             if (text.equals(queries.get(userId))) {
-                String fileUrl = voiceService.getAsFileLink(text, VoiceId.Maxim);
+                String fileUrl = voiceService.getAsFileLink(text, userId, VoiceId.Maxim);
                 String randomId = RandomStringUtils.randomAlphanumeric(RANDOM_LENGTH);
 
                 InlineQueryResultVoice audio = new InlineQueryResultVoice();
