@@ -16,11 +16,13 @@ bot:
   token: ${IGOR_BOT_TOKEN}
   baseUrl: ${BASE_URL:http://127.0.0.1:${server.port}}
   supportChat: ${IGOR_BOT_SUPPORT_CHAT:}
+dictionary:
+  sync.cron: ${IGOR_BOT_DICT_UPDATE_CRON:0 0 * * * *}
 http:
   proxy:
     url: ${PROXY_URL:}
-dictionary:
-  sync.cron: ${IGOR_BOT_DICT_UPDATE_CRON:0 0 * * * *}
+server:
+  port: 8080
 ---
 spring:
   profiles: say-text
