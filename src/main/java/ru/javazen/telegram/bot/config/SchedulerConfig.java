@@ -3,17 +3,14 @@ package ru.javazen.telegram.bot.config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.javazen.telegram.bot.CompositeBot;
 import ru.javazen.telegram.bot.filter.RegexpFilter;
 import ru.javazen.telegram.bot.handler.FilterAdapter;
-import ru.javazen.telegram.bot.repository.MessageTaskRepository;
 import ru.javazen.telegram.bot.scheduler.SchedulerExtendNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.UnschedulerNotifyHandler;
 import ru.javazen.telegram.bot.scheduler.parser.ShiftTimeParser;
 import ru.javazen.telegram.bot.scheduler.parser.SpecificTimeParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
-import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerServiceImpl;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 
 import java.util.Arrays;
@@ -66,12 +63,6 @@ public class SchedulerConfig {
     public UnschedulerNotifyHandler unschedulerNotifyHandler(MessageSchedulerService messageSchedulerService,
                                                              @Qualifier("sadOkSupplier") Supplier<String> okSupplier) {
         return new UnschedulerNotifyHandler(messageSchedulerService, okSupplier);
-    }
-
-    @Bean
-    public MessageSchedulerService messageSchedulerService(CompositeBot compositeBot,
-                                                           MessageTaskRepository messageTaskRepository) {
-        return new MessageSchedulerServiceImpl(compositeBot, messageTaskRepository);
     }
 
     @Bean
