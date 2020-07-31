@@ -1,9 +1,9 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.telegram.telegrambots.api.methods.send.SendSticker;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.bots.AbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.base.MessageHandler;
 
 public class SimpleStickerSender implements MessageHandler {
@@ -16,7 +16,7 @@ public class SimpleStickerSender implements MessageHandler {
         sendSticker.setChatId(message.getChatId());
         sendSticker.setSticker(sticker);
 
-        sender.sendSticker(sendSticker);
+        sender.execute(sendSticker);
         return true;
     }
 

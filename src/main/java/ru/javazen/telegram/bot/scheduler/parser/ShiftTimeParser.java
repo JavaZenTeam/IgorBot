@@ -1,7 +1,7 @@
 package ru.javazen.telegram.bot.scheduler.parser;
 
 import org.springframework.util.StringUtils;
-import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Calendar;

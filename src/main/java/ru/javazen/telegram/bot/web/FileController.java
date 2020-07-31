@@ -8,10 +8,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.telegram.telegrambots.api.methods.GetFile;
-import org.telegram.telegrambots.api.objects.File;
+import org.telegram.telegrambots.meta.api.methods.GetFile;
+import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
