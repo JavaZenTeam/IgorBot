@@ -20,7 +20,7 @@ import java.io.IOException;
 @AllArgsConstructor
 public class FileController {
     private DefaultAbsSender bot;
-    private HttpClient httpClient;
+    private HttpClient telegramHttpClient;
 
     @GetMapping("/file/{fileId}")
     public void download(@PathVariable("fileId") String fileId, HttpServletResponse servletResponse) throws TelegramApiException, IOException {
@@ -29,7 +29,7 @@ public class FileController {
         File file = bot.execute(method);
         String fileUrl = file.getFileUrl(bot.getBotToken());
 
-        HttpResponse response = httpClient.execute(new HttpGet(fileUrl));
+        HttpResponse response = telegramHttpClient.execute(new HttpGet(fileUrl));
 
         IOUtils.copy(response.getEntity().getContent(), servletResponse.getOutputStream());
     }
