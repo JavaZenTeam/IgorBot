@@ -1,8 +1,8 @@
 package ru.javazen.telegram.bot.filter;
 
 import lombok.AllArgsConstructor;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.MessageEntity;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 @AllArgsConstructor
 public class CommandFilter implements MessageFilter {

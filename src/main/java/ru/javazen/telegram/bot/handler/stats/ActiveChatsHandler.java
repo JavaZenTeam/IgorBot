@@ -2,10 +2,10 @@ package ru.javazen.telegram.bot.handler.stats;
 
 import com.google.common.base.MoreObjects;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.bots.AbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.base.MessageHandler;
 import ru.javazen.telegram.bot.model.ChatEntity;
 import ru.javazen.telegram.bot.repository.ChatEntityRepository;
