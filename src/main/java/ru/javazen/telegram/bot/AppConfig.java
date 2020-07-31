@@ -37,9 +37,6 @@ import ru.javazen.telegram.bot.client.FileServiceClient;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 import ru.javazen.telegram.bot.handler.SayTextHandler;
 import ru.javazen.telegram.bot.handler.base.InlineQueryHandler;
-import ru.javazen.telegram.bot.repository.MessageTaskRepository;
-import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
-import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerServiceImpl;
 import ru.javazen.telegram.bot.service.VoiceService;
 import ru.javazen.telegram.bot.service.impl.VoiceServiceImpl;
 
@@ -108,12 +105,6 @@ public class AppConfig {
     @Bean
     public TaskScheduler taskScheduler() {
         return new ConcurrentTaskScheduler();
-    }
-
-    @Bean
-    public MessageSchedulerService messageSchedulerService(CompositeBot compositeBot,
-                                                           MessageTaskRepository messageTaskRepository) {
-        return new MessageSchedulerServiceImpl(compositeBot, messageTaskRepository);
     }
 
     @Bean
@@ -191,7 +182,7 @@ public class AppConfig {
     }
 
     @Bean
-    HttpClient httpClient(DefaultBotOptions options) {
+    HttpClient telegramHttpClient(DefaultBotOptions options) {
         return TelegramHttpClientBuilder.build(options);
     }
 
