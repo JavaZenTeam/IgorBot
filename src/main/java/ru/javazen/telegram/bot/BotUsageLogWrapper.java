@@ -1,16 +1,18 @@
 package ru.javazen.telegram.bot;
 
-import org.telegram.telegrambots.api.methods.BotApiMethod;
-import org.telegram.telegrambots.api.methods.groupadministration.SetChatPhoto;
-import org.telegram.telegrambots.api.methods.send.*;
-import org.telegram.telegrambots.api.methods.stickers.AddStickerToSet;
-import org.telegram.telegrambots.api.methods.stickers.CreateNewStickerSet;
-import org.telegram.telegrambots.api.methods.stickers.UploadStickerFile;
-import org.telegram.telegrambots.api.objects.File;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.bots.AbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
-import org.telegram.telegrambots.updateshandlers.SentCallback;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatPhoto;
+import org.telegram.telegrambots.meta.api.methods.send.*;
+import org.telegram.telegrambots.meta.api.methods.stickers.AddStickerToSet;
+import org.telegram.telegrambots.meta.api.methods.stickers.CreateNewStickerSet;
+import org.telegram.telegrambots.meta.api.methods.stickers.SetStickerSetThumb;
+import org.telegram.telegrambots.meta.api.methods.stickers.UploadStickerFile;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
+import org.telegram.telegrambots.meta.api.objects.File;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.updateshandlers.SentCallback;
 
 import java.io.Serializable;
 import java.util.List;
@@ -31,79 +33,96 @@ public class BotUsageLogWrapper extends AbsSender {
     }
 
     @Override
-    public Message sendDocument(SendDocument sendDocument) throws TelegramApiException {
-        Message response = sender.sendDocument(sendDocument);
+    public Message execute(SendDocument sendDocument) throws TelegramApiException {
+        Message response = sender.execute(sendDocument);
         if (response != null) sentMessage = response;
         return response;
     }
 
     @Override
-    public Message sendPhoto(SendPhoto sendPhoto) throws TelegramApiException {
-        Message response = sender.sendPhoto(sendPhoto);
+    public Message execute(SendPhoto sendPhoto) throws TelegramApiException {
+        Message response = sender.execute(sendPhoto);
         if (response != null) sentMessage = response;
         return response;
     }
 
     @Override
-    public Message sendVideo(SendVideo sendVideo) throws TelegramApiException {
-        Message response = sender.sendVideo(sendVideo);
+    public Message execute(SendVideo sendVideo) throws TelegramApiException {
+        Message response = sender.execute(sendVideo);
         if (response != null) sentMessage = response;
         return response;
     }
 
     @Override
-    public Message sendVideoNote(SendVideoNote sendVideoNote) throws TelegramApiException {
-        Message response = sender.sendVideoNote(sendVideoNote);
+    public Message execute(SendVideoNote sendVideoNote) throws TelegramApiException {
+        Message response = sender.execute(sendVideoNote);
         if (response != null) sentMessage = response;
         return response;
     }
 
     @Override
-    public Message sendSticker(SendSticker sendSticker) throws TelegramApiException {
-        Message response = sender.sendSticker(sendSticker);
+    public Message execute(SendSticker sendSticker) throws TelegramApiException {
+        Message response = sender.execute(sendSticker);
         if (response != null) sentMessage = response;
         return response;
     }
 
     @Override
-    public Message sendAudio(SendAudio sendAudio) throws TelegramApiException {
-        Message response = sender.sendAudio(sendAudio);
+    public Message execute(SendAudio sendAudio) throws TelegramApiException {
+        Message response = sender.execute(sendAudio);
         if (response != null) sentMessage = response;
         return response;
     }
 
     @Override
-    public Message sendVoice(SendVoice sendVoice) throws TelegramApiException {
-        Message response = sender.sendVoice(sendVoice);
+    public Message execute(SendVoice sendVoice) throws TelegramApiException {
+        Message response = sender.execute(sendVoice);
         if (response != null) sentMessage = response;
         return response;
     }
 
     @Override
-    public List<Message> sendMediaGroup(SendMediaGroup sendMediaGroup) throws TelegramApiException {
-        List<Message> response = sender.sendMediaGroup(sendMediaGroup);
+    public List<Message> execute(SendMediaGroup sendMediaGroup) throws TelegramApiException {
+        List<Message> response = sender.execute(sendMediaGroup);
         if (response != null && !response.isEmpty()) sentMessage = response.get(0);
         return response;
     }
 
     @Override
-    public Boolean setChatPhoto(SetChatPhoto setChatPhoto) throws TelegramApiException {
-        return sender.setChatPhoto(setChatPhoto);
+    public Boolean execute(SetChatPhoto setChatPhoto) throws TelegramApiException {
+        return sender.execute(setChatPhoto);
     }
 
     @Override
-    public Boolean addStickerToSet(AddStickerToSet addStickerToSet) throws TelegramApiException {
-        return sender.addStickerToSet(addStickerToSet);
+    public Boolean execute(AddStickerToSet addStickerToSet) throws TelegramApiException {
+        return sender.execute(addStickerToSet);
     }
 
     @Override
-    public Boolean createNewStickerSet(CreateNewStickerSet createNewStickerSet) throws TelegramApiException {
-        return sender.createNewStickerSet(createNewStickerSet);
+    public Boolean execute(SetStickerSetThumb setStickerSetThumb) throws TelegramApiException {
+        return sender.execute(setStickerSetThumb);
     }
 
     @Override
-    public File uploadStickerFile(UploadStickerFile uploadStickerFile) throws TelegramApiException {
-        return sender.uploadStickerFile(uploadStickerFile);
+    public Boolean execute(CreateNewStickerSet createNewStickerSet) throws TelegramApiException {
+        return sender.execute(createNewStickerSet);
+    }
+
+    @Override
+    public File execute(UploadStickerFile uploadStickerFile) throws TelegramApiException {
+        return sender.execute(uploadStickerFile);
+    }
+
+    @Override
+    public Serializable execute(EditMessageMedia editMessageMedia) throws TelegramApiException {
+        return sender.execute(editMessageMedia);
+    }
+
+    @Override
+    public Message execute(SendAnimation sendAnimation) throws TelegramApiException {
+        Message response = sender.execute(sendAnimation);
+        if (response != null) sentMessage = response;
+        return response;
     }
 
     @Override

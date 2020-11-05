@@ -1,51 +1,67 @@
 package ru.javazen.telegram.bot;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.TelegramBotsApi;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
-import org.telegram.telegrambots.generics.BotSession;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.BotSession;
 import ru.javazen.telegram.bot.handler.base.UpdateHandler;
+import ru.javazen.telegram.bot.logging.TelegramLogger;
 import ru.javazen.telegram.bot.service.MessageCollectorService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
+@Slf4j
+@Service
 public class CompositeBot extends TelegramLongPollingBot {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CompositeBot.class);
-    private static final String ROOT_PACKAGE_NAME = CompositeBot.class.getPackage().getName();
+
+    private final String name;
+    private final String token;
+
+    private final Supplier<String> startMessageSupplier;
+    private final MessageCollectorService messageCollectorService;
+
+    private TelegramLogger tgLogger;
 
     private Collection<UpdateHandler> updateHandlers = new ArrayList<>();
-    private Long supportChatId;
-    private Supplier<String> startMessageSupplier;
-
-    private String name;
-    private String token;
-    private BotSession session;
 
     private BotUsageLogWrapper wrapper = new BotUsageLogWrapper(this);
-    private MessageCollectorService messageCollectorService;
+    private BotSession session;
 
-    public CompositeBot(String name, String token, DefaultBotOptions options) {
+    @Autowired
+    public CompositeBot(@Value("${bot.name}") String name,
+                        @Value("${bot.token}") String token,
+                        @Qualifier("startSupplier") Supplier<String> startMessageSupplier,
+                        MessageCollectorService messageCollectorService,
+                        DefaultBotOptions options) {
         super(options);
         this.name = name;
         this.token = token;
+
+        this.startMessageSupplier = startMessageSupplier;
+        this.messageCollectorService = messageCollectorService;
     }
 
+    @Autowired
     public void setUpdateHandlers(Collection<UpdateHandler> updateHandlers) {
         this.updateHandlers.clear();
         this.updateHandlers.addAll(updateHandlers);
+    }
+
+    @Autowired
+    public void setTgLogger(TelegramLogger telegramLogger) {
+        this.tgLogger = telegramLogger;
     }
 
     @Override
@@ -70,7 +86,7 @@ public class CompositeBot extends TelegramLongPollingBot {
                 if (handled) {
                     sentMessage = wrapper.getSentMessage();
                     handlerName = handler.getName();
-                    LOGGER.debug("Update {} handled by {}", update, handlerName);
+                    log.debug("Update {} handled by {}", update, handlerName);
                     break;
                 }
             }
@@ -81,43 +97,9 @@ public class CompositeBot extends TelegramLongPollingBot {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Error on handling update", e);
-            if (supportChatId != null) {
-                sendErrorToSupport(e);
-            }
+            log.error("Error on handling update", e);
+            tgLogger.log(e);
         }
-    }
-
-    private void sendErrorToSupport(Exception e) {
-        String stackTraceString = Arrays.stream(e.getStackTrace())
-                .filter(el -> el.getClassName().startsWith(ROOT_PACKAGE_NAME))
-                .map(StackTraceElement::toString)
-                .collect(Collectors.joining("\n"));
-
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(supportChatId.toString());
-
-        String message = String.format("*Error!*\n%s\n```\n%s```", e, stackTraceString);
-        sendMessage.setText(message);
-        sendMessage.setParseMode("MARKDOWN");
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException te) {
-            LOGGER.error("Can't send message to support chat", te);
-        }
-    }
-
-    public void setSupportChatId(Long supportChatId) {
-        this.supportChatId = supportChatId;
-    }
-
-    public void setStartMessageSupplier(Supplier<String> startMessageSupplier) {
-        this.startMessageSupplier = startMessageSupplier;
-    }
-
-    @Autowired
-    public void setMessageCollectorService(MessageCollectorService messageCollectorService) {
-        this.messageCollectorService = messageCollectorService;
     }
 
     @PostConstruct
@@ -125,14 +107,8 @@ public class CompositeBot extends TelegramLongPollingBot {
         TelegramBotsApi botsApi = new TelegramBotsApi();
         session = botsApi.registerBot(this);
 
-        if (supportChatId != null && startMessageSupplier != null) {
-
-            SendMessage message = new SendMessage()
-                    .setChatId(supportChatId)
-                    .setText(startMessageSupplier.get());
-
-            execute(message);
-        }
+        log.info(String.format("'%s' bot started.", name));
+        tgLogger.log(startMessageSupplier.get());
     }
 
     @PreDestroy
@@ -140,5 +116,6 @@ public class CompositeBot extends TelegramLongPollingBot {
         if (session != null) {
             session.stop();
         }
+        log.info(String.format("'%s' bot stopped.", name));
     }
 }

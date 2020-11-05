@@ -2,8 +2,8 @@ package ru.javazen.telegram.bot.service.impl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.javazen.telegram.bot.model.BotUsageLog;
 import ru.javazen.telegram.bot.model.MessageEntity;
 import ru.javazen.telegram.bot.model.MessagePK;

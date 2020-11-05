@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
-import org.telegram.telegrambots.api.methods.AnswerInlineQuery;
-import org.telegram.telegrambots.api.objects.inlinequery.InlineQuery;
-import org.telegram.telegrambots.api.objects.inlinequery.result.InlineQueryResultVoice;
-import org.telegram.telegrambots.bots.AbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultVoice;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.base.InlineQueryHandler;
 import ru.javazen.telegram.bot.service.VoiceService;
 

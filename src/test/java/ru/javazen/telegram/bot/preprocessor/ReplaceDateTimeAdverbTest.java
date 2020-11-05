@@ -3,7 +3,7 @@ package ru.javazen.telegram.bot.preprocessor;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

@@ -1,12 +1,12 @@
 package ru.javazen.telegram.bot.handler;
 
 
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.send.SendSticker;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.User;
-import org.telegram.telegrambots.bots.AbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.base.MessageHandler;
 
 import java.util.Collection;
@@ -50,7 +50,7 @@ public class ContinueRepeatableSequence implements MessageHandler {
             SendSticker sendSticker = new SendSticker();
             sendSticker.setChatId(message.getChatId());
             sendSticker.setSticker(message.getSticker().getFileId());
-            sender.sendSticker(sendSticker);
+            sender.execute(sendSticker);
             messageQueue.clear();
             return true;
         }

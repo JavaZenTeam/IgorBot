@@ -1,7 +1,7 @@
 package ru.javazen.telegram.bot.filter;
 
 
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 public interface Filter {
     /**

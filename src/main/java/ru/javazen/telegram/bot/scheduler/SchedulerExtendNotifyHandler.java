@@ -1,9 +1,10 @@
 package ru.javazen.telegram.bot.scheduler;
 
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.bots.AbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import lombok.extern.slf4j.Slf4j;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
 import ru.javazen.telegram.bot.scheduler.parser.ScheduledMessageParser;
 import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
@@ -14,6 +15,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.function.Supplier;
 
+@Slf4j
 public class SchedulerExtendNotifyHandler implements TextMessageHandler {
 
     private final MessageSchedulerService messageSchedulerService;
@@ -52,9 +54,10 @@ public class SchedulerExtendNotifyHandler implements TextMessageHandler {
         }
 
         long additionalTime = result.getDate().getTime() - new Date().getTime();
-        if (messageSchedulerService.extendTaskByChatAndMessage(
+        if (message.getReplyToMessage() != null && messageSchedulerService.extendTaskByChatAndMessage(
                 message.getChatId(), message.getReplyToMessage().getMessageId(), additionalTime)) {
             sender.execute(new SendMessage(message.getChatId(), successResponseSupplier.get()));
+            log.debug("Task extended");
             return true;
         }
 

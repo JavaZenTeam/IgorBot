@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.util;
 
-import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 public abstract class MessageHelper {
     public static String getActualText(Message message){

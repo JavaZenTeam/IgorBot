@@ -1,9 +1,9 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.BeanNameAware;
-import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.bots.AbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.filter.Filter;
 import ru.javazen.telegram.bot.handler.base.UpdateHandler;
 
