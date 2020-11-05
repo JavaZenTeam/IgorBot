@@ -9,15 +9,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.junidecode.Junidecode;
 import org.apache.commons.codec.language.DoubleMetaphone;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -29,38 +24,26 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.springframework.util.StringUtils;
-import org.telegram.telegrambots.ApiContext;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.facilities.TelegramHttpClientBuilder;
+import org.telegram.telegrambots.meta.ApiContext;
 import ru.javazen.telegram.bot.client.FileServiceClient;
 import ru.javazen.telegram.bot.comparator.RandomComparator;
 import ru.javazen.telegram.bot.handler.SayTextHandler;
 import ru.javazen.telegram.bot.handler.base.InlineQueryHandler;
-import ru.javazen.telegram.bot.repository.MessageTaskRepository;
-import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerService;
-import ru.javazen.telegram.bot.scheduler.service.MessageSchedulerServiceImpl;
 import ru.javazen.telegram.bot.service.VoiceService;
 import ru.javazen.telegram.bot.service.impl.VoiceServiceImpl;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Random;
-import java.util.StringTokenizer;
 import java.util.function.Function;
 
 
 @Configuration
 @EnableCaching
 @EnableScheduling
+@Slf4j
 public class AppConfig {
-
-    /*@Bean(destroyMethod = "destroy")
-    public Client client(){
-        ClientConfig clientConfig = new DefaultClientConfig();
-        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-        return Client.create(clientConfig);
-    }*/
 
     @Bean
     @Scope("prototype")
@@ -111,46 +94,40 @@ public class AppConfig {
     }
 
     @Bean
-    public MessageSchedulerService messageSchedulerService(CompositeBot compositeBot,
-                                                           MessageTaskRepository messageTaskRepository) {
-        return new MessageSchedulerServiceImpl(compositeBot, messageTaskRepository);
-    }
-
-    @Bean
     public DefaultBotOptions proxyBotOptions(
             @Value("${http.proxy.url}") String proxyUrl) throws MalformedURLException {
         DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
 
-        if (!StringUtils.isEmpty(proxyUrl)) {
+        /*if (!StringUtils.isEmpty(proxyUrl)) {
             URL url = new URL(proxyUrl);
             String proxyHost = url.getHost();
             int proxyPort = url.getPort();
-            HttpHost httpHost = new HttpHost(proxyHost, proxyPort);
 
+            log.debug("Http proxy provided: [{}:{}]", proxyHost, proxyPort);
             String userInfo = url.getUserInfo();
             boolean isAuth = !StringUtils.isEmpty(userInfo);
             if (isAuth) {
                 StringTokenizer tokenizer = new StringTokenizer(userInfo, ":");
                 String username = tokenizer.nextToken();
                 String password = tokenizer.nextToken();
+                log.debug("Http proxy with authentication, will configure Authenticator. " +
+                        "Username: [{}]", username);
 
-                CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                credsProvider.setCredentials(
-                        new AuthScope(proxyHost, proxyPort),
-                        new UsernamePasswordCredentials(username, password));
-                botOptions.setCredentialsProvider(credsProvider);
+                Authenticator.setDefault(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password.toCharArray());
+                    }
+                });
 
+                // Todo: fix 407 Proxy Authentication Required
+                // https://github.com/rubenlagus/TelegramBots/wiki/Using-Http-Proxy
             }
 
-            RequestConfig requestConfig = RequestConfig.custom()
-                    .setProxy(httpHost)
-                    .setAuthenticationEnabled(isAuth)
-                    .build();
-
-            botOptions.setRequestConfig(requestConfig);
-
-            botOptions.setHttpProxy(httpHost);
-        }
+            botOptions.setProxyHost(proxyHost);
+            botOptions.setProxyPort(proxyPort);
+            botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
+        }*/
         return botOptions;
     }
 
@@ -191,7 +168,7 @@ public class AppConfig {
     }
 
     @Bean
-    HttpClient httpClient(DefaultBotOptions options) {
+    HttpClient telegramHttpClient(DefaultBotOptions options) {
         return TelegramHttpClientBuilder.build(options);
     }
 

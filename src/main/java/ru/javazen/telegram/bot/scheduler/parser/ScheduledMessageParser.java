@@ -3,7 +3,7 @@ package ru.javazen.telegram.bot.scheduler.parser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.Date;
 

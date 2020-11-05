@@ -1,7 +1,7 @@
 package ru.javazen.telegram.bot.service;
 
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 public interface MessageCollectorService {
     void saveUpdate(Update update);

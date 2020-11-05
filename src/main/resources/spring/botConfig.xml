@@ -461,15 +461,9 @@
         </constructor-arg>
     </bean>
 
-    <!--suppress SpringXmlAutowireExplicitlyInspection -->
-    <bean id="bot" class="ru.javazen.telegram.bot.CompositeBot" autowire="constructor">
-        <constructor-arg name="name" value="${bot.name}"/>
-        <constructor-arg name="token" value="${bot.token}"/>
-
-        <property name="supportChatId" value="${bot.supportChat}"/>
-        <property name="startMessageSupplier" ref="startSupplier"/>
-        <property name="updateHandlers">
-            <list>
+    <bean id="updateHandlers" class="java.util.ArrayList">
+        <constructor-arg name="c">
+            <list value-type="ru.javazen.telegram.bot.handler.base.UpdateHandler">
                 <ref bean="anniversaryMessageCongratulations"/>
                 <ref bean="sayTextHandler"/>
                 <ref bean="messageCollectorSaveTextSwitch"/>
@@ -498,14 +492,13 @@
                 <ref bean="randomYesNoAnswerModule"/>
                 <ref bean="counter"/>
                 <ref bean="getStickerByIdModule"/>
-                <!--<ref bean="randomFacePalmModule"/>-->
                 <ref bean="lowLevelJokesToggle"/>
                 <ref bean="lowLevelJokes"/>
                 <ref bean="songSingerModule"/>
                 <ref bean="secretAndSacred"/>
                 <ref bean="boysForAll"/>
             </list>
-        </property>
+        </constructor-arg>
     </bean>
 
 </beans>

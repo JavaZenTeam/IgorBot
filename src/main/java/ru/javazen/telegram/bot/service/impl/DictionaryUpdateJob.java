@@ -22,9 +22,9 @@ public class DictionaryUpdateJob  {
     @EventListener(ContextRefreshedEvent.class)
     @Scheduled(cron = "${dictionary.sync.cron}")
     public void sync() {
-        log.info("dictionary sync started");
+        log.debug("dictionary sync started");
         dictionaryRepository.truncate();
         dictionaryRepository.sync();
-        log.info("dictionary sync completed");
+        log.debug("dictionary sync completed");
     }
 }

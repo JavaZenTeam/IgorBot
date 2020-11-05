@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.scheduler.parser;
 
-import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.MessageHelper;
 

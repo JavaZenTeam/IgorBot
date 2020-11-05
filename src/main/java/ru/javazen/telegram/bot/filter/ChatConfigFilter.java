@@ -2,7 +2,7 @@ package ru.javazen.telegram.bot.filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
-import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 
 public class ChatConfigFilter implements MessageFilter {
