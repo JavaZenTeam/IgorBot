@@ -1,13 +1,14 @@
 package ru.javazen.telegram.bot.scheduler.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.bots.AbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.CompositeBot;
+import ru.javazen.telegram.bot.logging.TelegramLogger;
 import ru.javazen.telegram.bot.model.MessageTask;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
 import ru.javazen.telegram.bot.util.DateInterval;
@@ -20,9 +21,9 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 
+@Service
+@Slf4j
 public class MessageSchedulerServiceImpl implements MessageSchedulerService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageSchedulerServiceImpl.class);
 
     private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
 
@@ -30,10 +31,12 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
     private final CompositeBot telegramBot;
     private final MessageTaskRepository messageTaskRepository;
+    private final TelegramLogger tgLogger;
 
-    public MessageSchedulerServiceImpl(CompositeBot telegramBot, MessageTaskRepository messageTaskRepository) {
+    public MessageSchedulerServiceImpl(CompositeBot telegramBot, MessageTaskRepository messageTaskRepository, TelegramLogger tgLogger) {
         this.telegramBot = telegramBot;
         this.messageTaskRepository = messageTaskRepository;
+        this.tgLogger = tgLogger;
     }
 
     @Override
@@ -105,7 +108,9 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
         return taskScheduler.schedule(() -> {
             FutureTask futureTask = futureTasks.get(task.getId());
             if (futureTask == null) {
-                throw new RuntimeException("Can't find future for task: " + task.getId());
+                RuntimeException ex = new RuntimeException("Can't find future for task: " + task.getId());
+                tgLogger.log(ex);
+                throw ex;
             }
 
             try {
@@ -116,14 +121,17 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                 try {
                     futureTask.getSender().execute(sendMessage);
                 } catch (RuntimeException rex) {
-                    LOGGER.error("Something is wrong with task with {} id. Error message: {}", task.getId(), rex.getMessage());
+                    log.error("Something is wrong with task with {} id. Error message: {}", task.getId(), rex.getMessage());
+                    tgLogger.log(rex);
                     throw rex;
                 } catch (TelegramApiException te) {
-                    LOGGER.error("Can't send message", te);
+                    log.error("Can't send message", te);
+                    tgLogger.log(e);
                     throw new RuntimeException(te);
                 }
             } catch (TelegramApiException e) {
-                LOGGER.error("Can't send message", e);
+                log.error("Can't send message", e);
+                tgLogger.log(e);
                 throw new RuntimeException(e);
             }
 
