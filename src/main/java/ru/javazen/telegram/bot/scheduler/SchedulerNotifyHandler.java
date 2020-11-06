@@ -1,5 +1,6 @@
 package ru.javazen.telegram.bot.scheduler;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -23,7 +24,7 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
 
     private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
 
-    private final MessageSchedulerService messageSchedulerService;
+    private MessageSchedulerService messageSchedulerService;
     private final int daysLimit;
     private final Supplier<String> successResponseSupplier;
     private final List<ScheduledMessageParser> scheduledMessageParsers;
@@ -38,20 +39,23 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
     //format.setTimeZone(TimeZone.getTimeZone("GMT+4:00"));
 
 
-    public SchedulerNotifyHandler(MessageSchedulerService messageSchedulerService,
-                                  int daysLimit,
+    public SchedulerNotifyHandler(int daysLimit,
                                   Supplier<String> successResponseSupplier,
                                   List<ScheduledMessageParser> scheduledMessageParsers,
                                   ChatConfigService chatConfigService,
                                   int repetitionSecondsLimit,
                                   int repetitionMaxTimesUnderLimit) {
-        this.messageSchedulerService = messageSchedulerService;
         this.daysLimit = daysLimit;
         this.successResponseSupplier = successResponseSupplier;
         this.scheduledMessageParsers = scheduledMessageParsers;
         this.chatConfigService = chatConfigService;
         this.repetitionSecondsLimit = repetitionSecondsLimit;
         this.repetitionMaxTimesUnderLimit = repetitionMaxTimesUnderLimit;
+    }
+
+    @Autowired
+    public MessageSchedulerService getMessageSchedulerService() {
+        return messageSchedulerService;
     }
 
     @Override

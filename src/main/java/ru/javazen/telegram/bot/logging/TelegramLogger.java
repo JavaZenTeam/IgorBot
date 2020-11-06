@@ -1,6 +1,7 @@
 package ru.javazen.telegram.bot.logging;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -20,12 +21,16 @@ public class TelegramLogger {
 
     private static final String ROOT_PACKAGE_NAME = IgorBotApplication.class.getPackage().getName();
 
-    private final AbsSender sender;
+    private AbsSender sender;
     private final String supportChatId;
 
-    public TelegramLogger(AbsSender sender, @Value("${bot.supportChat}") String supportChatId) {
-        this.sender = sender;
+    public TelegramLogger(@Value("${bot.supportChat}") String supportChatId) {
         this.supportChatId = supportChatId;
+    }
+
+    @Autowired
+    public void setSender(AbsSender sender) {
+        this.sender = sender;
     }
 
     /**
