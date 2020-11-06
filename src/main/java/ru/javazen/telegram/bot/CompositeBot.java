@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -55,14 +54,12 @@ public class CompositeBot extends TelegramLongPollingBot {
     }
 
     @Autowired
-    @Lazy
     public void setUpdateHandlers(Collection<UpdateHandler> updateHandlers) {
         this.updateHandlers.clear();
         this.updateHandlers.addAll(updateHandlers);
     }
 
     @Autowired
-    @Lazy
     public void setTgLogger(TelegramLogger telegramLogger) {
         this.tgLogger = telegramLogger;
     }
