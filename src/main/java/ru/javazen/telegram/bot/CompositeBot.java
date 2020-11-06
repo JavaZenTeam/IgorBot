@@ -108,6 +108,7 @@ public class CompositeBot extends TelegramLongPollingBot {
         session = botsApi.registerBot(this);
 
         log.info(String.format("'%s' bot started.", name));
+        tgLogger.setSender(this);
         tgLogger.log(startMessageSupplier.get());
     }
 

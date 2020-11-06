@@ -1,24 +1,34 @@
 package ru.javazen.telegram.bot.scheduler.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.javazen.telegram.bot.CompositeBot;
 import ru.javazen.telegram.bot.logging.TelegramLogger;
 import ru.javazen.telegram.bot.model.MessageTask;
+import ru.javazen.telegram.bot.model.UserEntity;
 import ru.javazen.telegram.bot.repository.MessageTaskRepository;
+import ru.javazen.telegram.bot.repository.UserEntityRepository;
+import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.DateInterval;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
+
+import static ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler.TIMEZONE_OFFSET_CONFIG_KEY;
 
 
 @Service
@@ -29,14 +39,35 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
     private Map<Long, FutureTask> futureTasks = new HashMap<>();
 
-    private final CompositeBot telegramBot;
     private final MessageTaskRepository messageTaskRepository;
-    private final TelegramLogger tgLogger;
 
-    public MessageSchedulerServiceImpl(CompositeBot telegramBot, MessageTaskRepository messageTaskRepository, TelegramLogger tgLogger) {
-        this.telegramBot = telegramBot;
+    private CompositeBot telegramBot;
+    private TelegramLogger tgLogger;
+    private UserEntityRepository userEntityRepository;
+    private ChatConfigService chatConfigService;
+
+    public MessageSchedulerServiceImpl(MessageTaskRepository messageTaskRepository) {
         this.messageTaskRepository = messageTaskRepository;
+    }
+
+    @Autowired
+    public void setTelegramBot(CompositeBot telegramBot) {
+        this.telegramBot = telegramBot;
+    }
+
+    @Autowired
+    public void setTgLogger(TelegramLogger tgLogger) {
         this.tgLogger = tgLogger;
+    }
+
+    @Autowired
+    public void setUserEntityRepository(UserEntityRepository userEntityRepository) {
+        this.userEntityRepository = userEntityRepository;
+    }
+
+    @Autowired
+    public void setChatConfigService(ChatConfigService chatConfigService) {
+        this.chatConfigService = chatConfigService;
     }
 
     @Override
@@ -115,9 +146,35 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
             try {
                 futureTask.getSender().execute(sendMessage);
-            } catch (RuntimeException e) {
+            } catch (TelegramApiRequestException e) {
                 // for case when reply message was removed. TODO - get cause of send error for detect tis case
-                sendMessage.setReplyToMessageId(null);
+                DateFormat format = new SimpleDateFormat("HH:mm dd.MM.yy");
+                TimeZone timeZone = TimeZone.getTimeZone("GMT" + chatConfigService.getProperty(
+                        task.getChatId(),
+                        TIMEZONE_OFFSET_CONFIG_KEY).orElse("+04:00"));
+
+                format.setTimeZone(timeZone);
+
+                String formattedDate = format.format(new Date(task.getTimeOfCompletion()));
+
+                if (e.getApiResponse().contains("reply message not found")) {
+                    sendMessage.setReplyToMessageId(null);
+                    String username = findUsernameById(task.getUserId().intValue());
+                    username = username == null ? "Незнакомец под номером '" + task.getUserId() + "'" : "@" + username;
+
+                    sendMessage.setText(username +  ", как-то давно (" + formattedDate + ") ты просил меня напомнить: " + sendMessage.getText());
+                } else if (e.getApiResponse().contains("group chat was upgraded to a supergroup chat")) {
+                    sendMessage.setChatId(e.getParameters().getMigrateToChatId());
+                    sendMessage.setText("Когда-то (" + formattedDate + ") вы просили напомнить. Но я не мог с вами связаться. В общем, вот: " + sendMessage.getText());
+                } else if (e.getApiResponse().contains("chat not found")) {
+                    sendMessage.setChatId(task.getUserId());
+                    sendMessage.setReplyToMessageId(null);
+                    sendMessage.setText("Когда-то (" + formattedDate + ") ты завел напоминание. Но чата больше нет. В общем, вот: " + sendMessage.getText());
+                } else {
+                    log.error("Can't send message", e);
+                    tgLogger.log(e);
+                    throw new RuntimeException(e);
+                }
                 try {
                     futureTask.getSender().execute(sendMessage);
                 } catch (RuntimeException rex) {
@@ -126,13 +183,13 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                     throw rex;
                 } catch (TelegramApiException te) {
                     log.error("Can't send message", te);
-                    tgLogger.log(e);
+                    tgLogger.log(te);
                     throw new RuntimeException(te);
                 }
-            } catch (TelegramApiException e) {
-                log.error("Can't send message", e);
-                tgLogger.log(e);
-                throw new RuntimeException(e);
+            } catch (TelegramApiException te) {
+                log.error("Can't send message", te);
+                tgLogger.log(te);
+                throw new RuntimeException(te);
             }
 
             Integer repeatCount = task.getRepeatCount();
@@ -157,6 +214,13 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
         }
     }
 
+    private String findUsernameById(Integer id) {
+        UserEntity userEntity = userEntityRepository.findByUserId(id);
+        if (userEntity != null) {
+            return userEntity.getUsername();
+        }
+        return null;
+    }
 
     private static class FutureTask {
         private Long taskId;
