@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -47,13 +46,13 @@ public class SchedulerNotifyHandlerTest {
     @Before
     public void init() {
         handler = new SchedulerNotifyHandler(
-                messageSchedulerService,
                 DAYS_LIMIT,
                 () -> "ok",
                 Collections.singletonList(parser),
                 chatConfigService,
                 REPETITION_SECONDS_LIMIT,
                 REPETITION_TIMES_LIMIT);
+        handler.setMessageSchedulerService(messageSchedulerService);
 
         message = mock(Message.class);
 
