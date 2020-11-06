@@ -54,8 +54,8 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
     }
 
     @Autowired
-    public MessageSchedulerService getMessageSchedulerService() {
-        return messageSchedulerService;
+    public void setMessageSchedulerService(MessageSchedulerService messageSchedulerService) {
+        this.messageSchedulerService = messageSchedulerService;
     }
 
     @Override
