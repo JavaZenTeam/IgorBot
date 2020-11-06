@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 
 public class SchedulerNotifyHandler implements TextMessageHandler {
 
-    private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
+    public static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
 
     private MessageSchedulerService messageSchedulerService;
     private final int daysLimit;

@@ -193,13 +193,6 @@
         </constructor-arg>
     </bean>
 
-    <bean id="chatBridgeWithDenis" class="ru.javazen.telegram.bot.handler.ChatBridge">
-        <!--Chat with normal people-->
-        <property name="firstChat" value="-1001045629601"/>
-        <!--Chat with Denis-->
-        <property name="secondChat" value="-1001038770422"/>
-    </bean>
-
     <bean id="getStickerByIdModule" class="ru.javazen.telegram.bot.handler.GetStickerById">
         <property name="pattern" value="/sticker (.+)"/>
     </bean>
