@@ -24,14 +24,12 @@ public class SchedulerConfig {
     public static final int MAX_REPETITION_UNDER_LIMIT = 50;
 
     @Bean("scheduler")
-    public SchedulerNotifyHandler schedulerNotifyHandler(MessageSchedulerService messageSchedulerService,
-                                                         @Qualifier("okSupplier") Supplier<String> okSupplier,
+    public SchedulerNotifyHandler schedulerNotifyHandler(@Qualifier("okSupplier") Supplier<String> okSupplier,
                                                          ShiftTimeParser shiftTimeParser,
                                                          SpecificTimeParser specificTimeParser,
                                                          ChatConfigService chatConfigService) {
 
         return new SchedulerNotifyHandler(
-                messageSchedulerService,
                 DAYS_LIMIT,
                 okSupplier,
                 Arrays.asList(shiftTimeParser, specificTimeParser),
