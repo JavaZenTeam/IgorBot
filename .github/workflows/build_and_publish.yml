@@ -1,0 +1,23 @@
+name: Publish on Docker Hub
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  build_and_pub:
+    runs-on: ubuntu-latest
+    env:
+      LOGIN: ${{ secrets.DOCKER_LOGIN }}
+      NAME: ${{ secrets.DOCKER_NAME }}
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/igor-bot
+          tag_with_ref: true
