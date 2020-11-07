@@ -1,6 +1,0 @@
-services:
-  - docker
-
-script:
-  - chmod +x ./ci/build-docker.sh
-  - ./ci/build-docker.sh
