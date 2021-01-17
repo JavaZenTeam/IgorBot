@@ -3,7 +3,7 @@
         position: relative;
         padding-bottom: 100%;
     }
-    .square img {
+    .square img,tgs-player {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -21,7 +21,8 @@
             <div th:each="sticker, iter : ${topStickers}" class="p-2 col-4 col-lg-6">
                 <span class="position-absolute badge badge-secondary" style="z-index: 1" th:text="${sticker.count}"></span>
                 <div class="square">
-                    <img th:src="${'/file/' + sticker.key}"/>
+                    <img th:src="${'/file/' + sticker.key}" onerror="this.style.display = 'None'"/>
+                    <tgs-player autoplay loop mode="normal" th:src="${'/file/' + sticker.key}" onerror="this.style.display = 'None'"></tgs-player>
                 </div>
         </div>
         </div>
