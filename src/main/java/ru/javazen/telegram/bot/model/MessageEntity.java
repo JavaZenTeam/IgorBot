@@ -39,6 +39,8 @@ public class MessageEntity {
     @Column(length = 4096)
     private String fileId;
 
+    private String fileUniqueId;
+
     @Column(length = 10)
     @Enumerated(EnumType.STRING)
     private FileType fileType;
