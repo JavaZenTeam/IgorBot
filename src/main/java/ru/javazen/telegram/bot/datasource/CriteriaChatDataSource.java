@@ -129,9 +129,10 @@ public class CriteriaChatDataSource implements ChatDataSource {
                 builder.equal(messages.get(MessageEntity_.fileType), FileType.STICKER),
                 builder.equal(messages.get(MessageEntity_.chat), chatId),
                 builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
-        Path<String> fileId = messages.get(MessageEntity_.fileId);
-        query.groupBy(fileId);
+        Path<String> fileUniqueId = messages.get(MessageEntity_.fileUniqueId);
+        query.groupBy(fileUniqueId);
 
+        Expression<String> fileId = builder.greatest(messages.get(MessageEntity_.fileId));
         Expression<Long> count = builder.count(messages);
         query.select(builder.construct(CountStatistic.class, fileId, count));
         query.orderBy(builder.desc(count));

@@ -35,6 +35,7 @@ public class ModelMapperConfig {
                 map(source.getForwardFrom(), destination.getForwardFrom());
                 using(fileTypeConverter).map(source, destination.getFileType());
                 using(fileIdConverter).map(source, destination.getFileId());
+                using(fileUniqueIdConverter).map(source, destination.getFileUniqueId());
                 using(wordsConverter).map(source.getText(), destination.getWords());
             }
         };
@@ -76,25 +77,25 @@ public class ModelMapperConfig {
         };
     }
 
-    private Converter<Message, String> textConverter = ctx -> MessageHelper.getActualText(ctx.getSource());
+    private final Converter<Message, String> textConverter = ctx -> MessageHelper.getActualText(ctx.getSource());
 
-    private Converter<Message, Integer> textLengthConverter = ctx -> {
+    private final Converter<Message, Integer> textLengthConverter = ctx -> {
         String text = MessageHelper.getActualText(ctx.getSource());
         return text != null ? text.length() : 0;
     };
 
-    private Converter<Message, Double> scoreConverter = ctx -> {
+    private final Converter<Message, Double> scoreConverter = ctx -> {
         String text = MessageHelper.getActualText(ctx.getSource());
         int length = text != null ? text.length() : 30;
         return Math.sqrt(length);
     };
 
-    private Converter<Integer, Date> dateConverter = ctx -> new Date(1000L * ctx.getSource());
+    private final Converter<Integer, Date> dateConverter = ctx -> new Date(1000L * ctx.getSource());
 
     private static final Pattern SPLIT_PATTERN = Pattern.compile("\\P{L}*(^|\\s+|$)\\P{L}*", Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern FILTER_PATTERN = Pattern.compile("^[-\\p{L}]+$", Pattern.UNICODE_CHARACTER_CLASS);
 
-    private Converter<String, List<String>> wordsConverter = ctx ->
+    private final Converter<String, List<String>> wordsConverter = ctx ->
             ctx.getSource() == null
                     ? Collections.emptyList()
                     : SPLIT_PATTERN.splitAsStream(ctx.getSource())
@@ -102,7 +103,7 @@ public class ModelMapperConfig {
                             .map(String::toLowerCase)
                             .collect(Collectors.toList());
 
-    private Converter<Message, FileType> fileTypeConverter = ctx -> {
+    private final Converter<Message, FileType> fileTypeConverter = ctx -> {
         if (ctx.getSource().getPhoto() != null) return FileType.PHOTO;
         if (ctx.getSource().getAudio() != null) return FileType.AUDIO;
         if (ctx.getSource().getDocument() != null) return FileType.DOCUMENT;
@@ -114,7 +115,7 @@ public class ModelMapperConfig {
         return null;
     };
 
-    private Converter<Message, String> fileIdConverter = ctx -> {
+    private final Converter<Message, String> fileIdConverter = ctx -> {
         if (ctx.getSource().getPhoto() != null)
             return ctx.getSource().getPhoto().stream()
                     .map(PhotoSize::getFileId)
@@ -129,8 +130,23 @@ public class ModelMapperConfig {
         return null;
     };
 
+    private final Converter<Message, String> fileUniqueIdConverter = ctx -> {
+        if (ctx.getSource().getPhoto() != null)
+            return ctx.getSource().getPhoto().stream()
+                    .map(PhotoSize::getFileUniqueId)
+                    .collect(Collectors.joining(","));
+        if (ctx.getSource().getAudio() != null) return ctx.getSource().getAudio().getFileUniqueId();
+        if (ctx.getSource().getDocument() != null) return ctx.getSource().getDocument().getFileUniqueId();
+        if (ctx.getSource().getVideo() != null) return ctx.getSource().getVideo().getFileUniqueId();
+        if (ctx.getSource().getVoice() != null) return ctx.getSource().getVoice().getFileUniqueId();
+        if (ctx.getSource().getVideoNote() != null) return ctx.getSource().getVideoNote().getFileUniqueId();
+        if (ctx.getSource().getSticker() != null) return ctx.getSource().getSticker().getFileUniqueId();
+
+        return null;
+    };
+
     @Bean
-    public ModelMapper modelMapper(List<PropertyMap> propertyMaps) {
+    public ModelMapper modelMapper(List<PropertyMap<?, ?>> propertyMaps) {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setAmbiguityIgnored(true);
         propertyMaps.forEach(mapper::addMappings);
