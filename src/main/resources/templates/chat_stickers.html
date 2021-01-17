@@ -22,7 +22,7 @@
                 <span class="position-absolute badge badge-secondary" style="z-index: 1" th:text="${sticker.count}"></span>
                 <div class="square">
                     <img th:src="${'/file/' + sticker.key}" onerror="this.style.display = 'None'"/>
-                    <tgs-player autoplay loop mode="normal" th:src="${'/file/' + sticker.key}" onerror="this.style.display = 'None'"></tgs-player>
+                    <tgs-player autoplay loop mode="normal" th:src="${'/file/' + sticker.key}"></tgs-player>
                 </div>
         </div>
         </div>
