@@ -2,6 +2,7 @@ package ru.javazen.telegram.bot.scheduler.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
     }
 
     @Autowired
+    @Lazy
     public void setTelegramBot(CompositeBot telegramBot) {
         this.telegramBot = telegramBot;
     }
