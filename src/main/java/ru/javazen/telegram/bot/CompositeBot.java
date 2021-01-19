@@ -54,7 +54,7 @@ public class CompositeBot extends TelegramLongPollingBot {
     }
 
     @Autowired
-    public void setUpdateHandlers(Collection<UpdateHandler> updateHandlers) {
+    public void setUpdateHandlers(@Qualifier("updateHandlers") Collection<UpdateHandler> updateHandlers) {
         this.updateHandlers.clear();
         this.updateHandlers.addAll(updateHandlers);
     }
