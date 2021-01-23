@@ -17,6 +17,9 @@ public class AnniversaryMessageCongratulations implements MessageHandler {
 
     @Override
     public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
+        if (!message.getChat().isSuperGroupChat()) {
+            return false; //message id works as counter starting from 1 only in Super groups
+        }
         if (messageIdPattern.matcher(message.getMessageId().toString()).matches()) {
             String text = MessageFormat.format(templateSupplier.get(), message.getMessageId());
             sender.execute(new SendMessage(message.getChatId(), text).setReplyToMessageId(message.getMessageId()));
