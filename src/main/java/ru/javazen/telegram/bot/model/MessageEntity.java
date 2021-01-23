@@ -6,7 +6,6 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table
@@ -48,12 +47,4 @@ public class MessageEntity {
     @JoinColumn(name="forward_user_id")
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private UserEntity forwardFrom;
-
-    @ElementCollection
-    @Column(name = "word")
-    @CollectionTable(joinColumns = {
-            @JoinColumn(name = "chat_id"),
-            @JoinColumn(name = "message_id"),
-    })
-    private List<String> words;
 }

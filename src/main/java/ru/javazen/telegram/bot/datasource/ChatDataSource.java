@@ -16,8 +16,4 @@ public interface ChatDataSource {
     List<CountStatistic> messageTypesStickers(Long chatId, DateRange dateRange);
 
     List<CountStatistic> botUsagesByModule(Long chatId, DateRange dateRange);
-
-    DataTableResponse<WordUsageStatistic> wordsUsageStatistic(Long chatId, DateRange dateRange, DataTableRequest dataTableRequest);
-
-    Long messagesCount(Long chatId, DateRange dateRange);
 }

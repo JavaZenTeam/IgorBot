@@ -12,8 +12,6 @@ import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.service.MessageCollectorService;
 
-import java.util.Collections;
-
 public class MessageCollectorServiceImpl implements MessageCollectorService {
     private ChatConfigService chatConfigService;
     private MessageRepository messageRepository;
@@ -35,7 +33,6 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
         MessageEntity entity = modelMapper.map(message, MessageEntity.class);
         if (!saveText(message)) {
             entity.setText(null);
-            entity.setWords(Collections.emptyList());
         }
         if (entity.getUser().equals(entity.getForwardFrom())) {
             entity.setForwardFrom(entity.getUser());
