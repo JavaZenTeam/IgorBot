@@ -28,10 +28,10 @@ import java.util.TimeZone;
 @RequestMapping("/chat/{chatId}/")
 public class ChatController {
     private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT+04:00"); //TODO get actual tz from user
-    private DefaultAbsSender bot;
-    private ChatDataSource chatDataSource;
-    private ChartDataConverter chartDataConverter;
-    private MessageRepository messageRepository;
+    private final DefaultAbsSender bot;
+    private final ChatDataSource chatDataSource;
+    private final ChartDataConverter chartDataConverter;
+    private final MessageRepository messageRepository;
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
     @GetMapping
@@ -61,10 +61,7 @@ public class ChatController {
         List<UserStatistic> topActiveUsers = chatDataSource.topActiveUsers(chatId, dateRange);
         model.addAttribute("topActiveUsers", topActiveUsers);
         model.addAttribute("totalScore", topActiveUsers.stream().mapToDouble(UserStatistic::getScore).sum());
-//        model.addAttribute("botUsagesByModule", chatDataSource.botUsagesByModule(chatId, fromDate, toDate));
-//        model.addAttribute("messagesCount", chatDataSource.messagesCount(chatId, fromDate, toDate));
         model.addAttribute("topStickers", chatDataSource.topStickers(chatId, dateRange, 6));
-//        model.addAttribute("wordsUsageStatistic", chatDataSource.wordsUsageStatistic(chatId, dateRange));
 
         return "chat";
     }
@@ -93,32 +90,15 @@ public class ChatController {
     }
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
-    @GetMapping("words-usage")
-    @ResponseBody
-    public DataTableResponse getWordUsageDataTable(@PathVariable("chatId") String chatIdStr,
-                                                   @RequestParam(value = "from")
-                                                   @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                           LocalDate from,
-                                                   @RequestParam(value = "to")
-                                                   @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                           LocalDate to,
-                                                   DataTableRequest request) {
-        Long chatId = Long.valueOf(chatIdStr);
-        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
-        return chatDataSource.wordsUsageStatistic(chatId, dateRange, request);
-    }
-
-
-    @PreAuthorize("hasAuthority(#chatIdStr)")
     @GetMapping("message-types")
     @ResponseBody
     public List<CountStatistic> getMessageTypesChar(@PathVariable("chatId") String chatIdStr,
-                                                      @RequestParam(value = "from")
-                                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                              LocalDate from,
-                                                      @RequestParam(value = "to")
-                                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                              LocalDate to) {
+                                                    @RequestParam(value = "from")
+                                                    @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                            LocalDate from,
+                                                    @RequestParam(value = "to")
+                                                    @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                            LocalDate to) {
         Long chatId = Long.valueOf(chatIdStr);
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         return chatDataSource.messageTypesStickers(chatId, dateRange);

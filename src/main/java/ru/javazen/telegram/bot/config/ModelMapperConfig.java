@@ -12,10 +12,8 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import ru.javazen.telegram.bot.model.*;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -36,7 +34,6 @@ public class ModelMapperConfig {
                 using(fileTypeConverter).map(source, destination.getFileType());
                 using(fileIdConverter).map(source, destination.getFileId());
                 using(fileUniqueIdConverter).map(source, destination.getFileUniqueId());
-                using(wordsConverter).map(source.getText(), destination.getWords());
             }
         };
     }
@@ -91,17 +88,6 @@ public class ModelMapperConfig {
     };
 
     private final Converter<Integer, Date> dateConverter = ctx -> new Date(1000L * ctx.getSource());
-
-    private static final Pattern SPLIT_PATTERN = Pattern.compile("\\P{L}*(^|\\s+|$)\\P{L}*", Pattern.UNICODE_CHARACTER_CLASS);
-    private static final Pattern FILTER_PATTERN = Pattern.compile("^[-\\p{L}]+$", Pattern.UNICODE_CHARACTER_CLASS);
-
-    private final Converter<String, List<String>> wordsConverter = ctx ->
-            ctx.getSource() == null
-                    ? Collections.emptyList()
-                    : SPLIT_PATTERN.splitAsStream(ctx.getSource())
-                            .filter(FILTER_PATTERN.asPredicate())
-                            .map(String::toLowerCase)
-                            .collect(Collectors.toList());
 
     private final Converter<Message, FileType> fileTypeConverter = ctx -> {
         if (ctx.getSource().getPhoto() != null) return FileType.PHOTO;

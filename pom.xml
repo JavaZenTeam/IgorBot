@@ -148,11 +148,6 @@
             <artifactId>bootstrap-datepicker</artifactId>
             <version>1.9.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>datatables</artifactId>
-            <version>1.10.19</version>
-        </dependency>
 
         <dependency>
             <groupId>javax.xml.bind</groupId>
