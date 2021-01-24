@@ -5,6 +5,7 @@ spring:
     hibernate:
       ddl-auto: validate
     properties:
+      hibernate.event.merge.entity_copy_observer: allow
       hibernate.jdbc.time_zone: UTC
       #skip error org.postgresql.jdbc.PgConnection.createClob() not implemented
       hibernate.jdbc.lob.non_contextual_creation: true
