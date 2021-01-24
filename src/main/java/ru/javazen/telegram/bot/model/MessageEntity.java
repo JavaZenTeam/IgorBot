@@ -5,7 +5,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table
@@ -21,7 +23,7 @@ public class MessageEntity {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private ChatEntity chat;
 
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private UserEntity user;
 
@@ -44,7 +46,29 @@ public class MessageEntity {
     @Enumerated(EnumType.STRING)
     private FileType fileType;
 
-    @JoinColumn(name="forward_user_id")
+    @JoinColumn(name = "forward_user_id")
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private UserEntity forwardFrom;
+
+    @Enumerated(EnumType.STRING)
+    private EventType eventType;
+
+    @JoinTable(
+            name = "message_entity_member",
+            joinColumns = {
+                    @JoinColumn(name = "chat_id"),
+                    @JoinColumn(name = "message_id")
+            },
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<UserEntity> members;
+
+    public void setMember(UserEntity member) {
+        setMembers(Collections.singleton(member));
+    }
+
+    public UserEntity getMember() {
+        return members.stream().findFirst().orElse(null);
+    }
 }

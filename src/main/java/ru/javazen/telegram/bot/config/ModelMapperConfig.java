@@ -1,20 +1,25 @@
 package ru.javazen.telegram.bot.config;
 
+import org.modelmapper.Conditions;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.User;
 import ru.javazen.telegram.bot.model.*;
+import ru.javazen.telegram.bot.util.CustomConditions;
 import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.Optional.ofNullable;
 
 @Configuration
 public class ModelMapperConfig {
@@ -34,6 +39,11 @@ public class ModelMapperConfig {
                 using(fileTypeConverter).map(source, destination.getFileType());
                 using(fileIdConverter).map(source, destination.getFileId());
                 using(fileUniqueIdConverter).map(source, destination.getFileUniqueId());
+                when(CustomConditions.isNotEmpty())
+                        .map(source.getNewChatMembers(), destination.getMembers());
+                when(Conditions.isNotNull())
+                        .map(source.getLeftChatMember(), destination.getMember());
+                using(eventTypeConverter).map(source, destination.getEventType());
             }
         };
     }
@@ -74,7 +84,10 @@ public class ModelMapperConfig {
         };
     }
 
-    private final Converter<Message, String> textConverter = ctx -> MessageHelper.getActualText(ctx.getSource());
+    private final Converter<Message, String> textConverter = ctx ->
+            ofNullable(MessageHelper.getActualText(ctx.getSource()))
+                    .or(() -> ofNullable(ctx.getSource().getPinnedMessage()).map(MessageHelper::getActualText))
+                    .orElse(null);
 
     private final Converter<Message, Integer> textLengthConverter = ctx -> {
         String text = MessageHelper.getActualText(ctx.getSource());
@@ -89,45 +102,71 @@ public class ModelMapperConfig {
 
     private final Converter<Integer, Date> dateConverter = ctx -> new Date(1000L * ctx.getSource());
 
-    private final Converter<Message, FileType> fileTypeConverter = ctx -> {
-        if (ctx.getSource().getPhoto() != null) return FileType.PHOTO;
-        if (ctx.getSource().getAudio() != null) return FileType.AUDIO;
-        if (ctx.getSource().getDocument() != null) return FileType.DOCUMENT;
-        if (ctx.getSource().getVideo() != null) return FileType.VIDEO;
-        if (ctx.getSource().getVoice() != null) return FileType.VOICE;
-        if (ctx.getSource().getVideoNote() != null) return FileType.VIDEO_NOTE;
-        if (ctx.getSource().getSticker() != null) return FileType.STICKER;
+    private final Converter<Message, FileType> fileTypeConverter = ctx ->
+            ofNullable(resolveFileType(ctx.getSource()))
+                    .or(() -> ofNullable(ctx.getSource().getPinnedMessage()).map(this::resolveFileType))
+                    .orElse(null);
+
+    private FileType resolveFileType(Message message) {
+        if (message.getPhoto() != null) return FileType.PHOTO;
+        if (message.getAudio() != null) return FileType.AUDIO;
+        if (message.getDocument() != null) return FileType.DOCUMENT;
+        if (message.getVideo() != null) return FileType.VIDEO;
+        if (message.getVoice() != null) return FileType.VOICE;
+        if (message.getVideoNote() != null) return FileType.VIDEO_NOTE;
+        if (message.getSticker() != null) return FileType.STICKER;
 
         return null;
-    };
+    }
 
-    private final Converter<Message, String> fileIdConverter = ctx -> {
-        if (ctx.getSource().getPhoto() != null)
-            return ctx.getSource().getPhoto().stream()
+    private final Converter<Message, String> fileIdConverter = ctx ->
+            ofNullable(resolveFileId(ctx.getSource()))
+                    .or(() -> ofNullable(ctx.getSource().getPinnedMessage()).map(this::resolveFileId))
+                    .orElse(null);
+
+    private String resolveFileId(Message message) {
+        if (message.getPhoto() != null)
+            return message.getPhoto().stream()
                     .map(PhotoSize::getFileId)
                     .collect(Collectors.joining(","));
-        if (ctx.getSource().getAudio() != null) return ctx.getSource().getAudio().getFileId();
-        if (ctx.getSource().getDocument() != null) return ctx.getSource().getDocument().getFileId();
-        if (ctx.getSource().getVideo() != null) return ctx.getSource().getVideo().getFileId();
-        if (ctx.getSource().getVoice() != null) return ctx.getSource().getVoice().getFileId();
-        if (ctx.getSource().getVideoNote() != null) return ctx.getSource().getVideoNote().getFileId();
-        if (ctx.getSource().getSticker() != null) return ctx.getSource().getSticker().getFileId();
+        if (message.getAudio() != null) return message.getAudio().getFileId();
+        if (message.getDocument() != null) return message.getDocument().getFileId();
+        if (message.getVideo() != null) return message.getVideo().getFileId();
+        if (message.getVoice() != null) return message.getVoice().getFileId();
+        if (message.getVideoNote() != null) return message.getVideoNote().getFileId();
+        if (message.getSticker() != null) return message.getSticker().getFileId();
 
         return null;
-    };
+    }
 
-    private final Converter<Message, String> fileUniqueIdConverter = ctx -> {
-        if (ctx.getSource().getPhoto() != null)
-            return ctx.getSource().getPhoto().stream()
-                    .map(PhotoSize::getFileUniqueId)
+    private final Converter<Message, String> fileUniqueIdConverter = ctx ->
+            ofNullable(resolveFileUniqueId(ctx.getSource()))
+                    .or(() -> ofNullable(ctx.getSource().getPinnedMessage()).map(this::resolveFileUniqueId))
+                    .orElse(null);
+
+    private String resolveFileUniqueId(Message message) {
+        if (message.getPhoto() != null)
+            return message.getPhoto().stream()
+                    .map(PhotoSize::getFileId)
                     .collect(Collectors.joining(","));
-        if (ctx.getSource().getAudio() != null) return ctx.getSource().getAudio().getFileUniqueId();
-        if (ctx.getSource().getDocument() != null) return ctx.getSource().getDocument().getFileUniqueId();
-        if (ctx.getSource().getVideo() != null) return ctx.getSource().getVideo().getFileUniqueId();
-        if (ctx.getSource().getVoice() != null) return ctx.getSource().getVoice().getFileUniqueId();
-        if (ctx.getSource().getVideoNote() != null) return ctx.getSource().getVideoNote().getFileUniqueId();
-        if (ctx.getSource().getSticker() != null) return ctx.getSource().getSticker().getFileUniqueId();
+        if (message.getAudio() != null) return message.getAudio().getFileUniqueId();
+        if (message.getDocument() != null) return message.getDocument().getFileUniqueId();
+        if (message.getVideo() != null) return message.getVideo().getFileUniqueId();
+        if (message.getVoice() != null) return message.getVoice().getFileUniqueId();
+        if (message.getVideoNote() != null) return message.getVideoNote().getFileUniqueId();
+        if (message.getSticker() != null) return message.getSticker().getFileUniqueId();
 
+        return null;
+    }
+
+    private final Converter<Message, EventType> eventTypeConverter = ctx -> {
+        Message message = ctx.getSource();
+        if (message.getPinnedMessage() != null) return EventType.PINNED_MESSAGE;
+        if (message.getNewChatTitle() != null) return EventType.NEW_TITLE;
+        if (!CollectionUtils.isEmpty(message.getNewChatPhoto())) return EventType.NEW_PHOTO;
+        if (Boolean.TRUE.equals(message.getDeleteChatPhoto())) return EventType.DELETED_PHOTO;
+        if (!CollectionUtils.isEmpty(message.getNewChatMembers())) return EventType.NEW_MEMBERS;
+        if (message.getLeftChatMember() != null) return EventType.LEFT_MEMBER;
         return null;
     };
 

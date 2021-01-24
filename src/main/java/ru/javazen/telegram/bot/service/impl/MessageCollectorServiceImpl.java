@@ -25,7 +25,9 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
         if (update.getMessage() != null) {
             saveMessage(update.getMessage());
         }
-        //TODO save not only messages
+        if (update.getEditedMessage() != null) {
+            saveMessage(update.getEditedMessage());
+        }
     }
 
     @Override
@@ -43,12 +45,14 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     @Override
     public void saveBotUsage(Update update, Message botResponse, String handlerName) {
         Message message = update.getMessage();
-        if (message == null) return; //TODO save not only messages
+        if (message == null) {
+            return;
+        }
 
         BotUsageLog botUsageLog = new BotUsageLog();
         botUsageLog.setTarget(modelMapper.map(botResponse, MessagePK.class));
         botUsageLog.setSource(modelMapper.map(update.getMessage(), MessageEntity.class));
-        if (!saveText(message)) {
+        if (saveText(message)) {
             botUsageLog.setText(botResponse.getText());
         }
         botUsageLog.setModuleName(handlerName);
