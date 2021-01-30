@@ -111,7 +111,7 @@
             <span th:text="${chat.firstName}"></span>
             <span th:text="${chat.lastName}"></span>
         </h1>
-        <p class="text-secondary font-weight-bold">
+        <p id="chat-type-holder" class="text-secondary font-weight-bold">
             <span th:if="${chat.isChannelChat()}">channel</span>
             <span th:if="${chat.isGroupChat()}">group</span>
             <span th:if="${chat.isSuperGroupChat()}">super group</span>
