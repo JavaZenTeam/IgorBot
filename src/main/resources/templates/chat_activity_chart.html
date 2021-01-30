@@ -162,7 +162,8 @@
             to: to,
             attribute: attribute,
             interval: interval[0],
-            interval_unit: interval[1]
+            interval_unit: interval[1],
+            type: $('#chat-type-holder > span').text(),
         });
         $.get(path + "?" + param)
             .done(function (response) {
