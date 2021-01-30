@@ -1,24 +1,22 @@
 <div xmlns:th="http://www.thymeleaf.org" class="fix-height">
-    <table class="table table-bordered table-sm bg-white" th:if="${!topActiveUsers.isEmpty()}">
+    <table class="table table-bordered table-sm bg-white" th:if="${!activityStatistic.isEmpty()}">
         <thead class="thead-light text-center">
         <tr>
             <th width="8%">#</th>
-            <th width="37%">User</th>
+            <th th:text="${chat.isUserChat() ? 'Chat' : 'User'}" width="37%"></th>
             <th width="25%">Activity</th>
             <th width="15%">Messages</th>
             <th width="15%">Characters</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="user, iter : ${topActiveUsers}">
+        <tr th:each="item, iter : ${activityStatistic}">
             <td th:text="${iter.index} + 1" class="text-right"></td>
-            <td>
-                <span th:text="${user.user.firstName}"></span>
-                <span th:text="${user.user.lastName}"></span>
+            <td th:text="${item.subject.label}">
             </td>
-            <td th:with="activity=${100.0 * user.score / totalScore}, activityStr=${#numbers.formatDecimal(activity, 0, 0)}">
+            <td th:with="activity=${100.0 * item.score / totalScore}, activityStr=${#numbers.formatDecimal(activity, 0, 0)}">
                 <div class="progress" style="height: 1.5rem"
-                     th:title="${#numbers.formatDecimal(user.score, 0, 0)} + ' points'">
+                     th:title="${#numbers.formatDecimal(item.score, 0, 0)} + ' points'">
                     <div class="progress-bar" role="progressbar"
                          th:style="'width: ' + ${activityStr} + '%;'">
                         <div th:if="${activity >= 40}"
@@ -28,12 +26,12 @@
                          th:text="${activityStr} + '%'"></div>
                 </div>
             </td>
-            <td th:text="${user.count}" class="text-right"></td>
-            <td th:text="${user.length}" class="text-right"></td>
+            <td th:text="${item.count}" class="text-right"></td>
+            <td th:text="${item.length}" class="text-right"></td>
         </tr>
         </tbody>
     </table>
-    <div class="alert-info p-3 mb-3" th:if="${topActiveUsers.isEmpty()}">
+    <div class="alert-info p-3 mb-3" th:if="${activityStatistic.isEmpty()}">
         No messages found for the selected period
     </div>
 </div>
