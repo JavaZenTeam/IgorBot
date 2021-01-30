@@ -90,7 +90,10 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
         if (arr[1] == null) {
             return new PeriodStatistic.ChatPeriodStatistic(period);
         } else {
-            ChatEntity chat = new ChatEntity((Long) arr[1], (String) arr[2], (String) arr[3]);
+            long chatId = ((BigInteger) arr[1]).longValue();
+            String chatUsername = (String) arr[2];
+            String chatTitle = (String) arr[3];
+            ChatEntity chat = new ChatEntity(chatId, chatUsername, chatTitle);
             long count = ((BigInteger) arr[5]).longValue();
             long length = ((BigInteger) arr[6]).longValue();
             double score = (Double) arr[7];
