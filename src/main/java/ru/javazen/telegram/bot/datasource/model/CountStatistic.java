@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CountStatistic {
-    private String key;
-    private Long count;
+    private final String key;
+    private final Long count;
 }

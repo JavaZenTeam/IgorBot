@@ -37,7 +37,8 @@
     $(document).ready(function () {
         var param = $.param({
             from: $('#fromDate').val(),
-            to: $('#toDate').val()
+            to: $('#toDate').val(),
+            type: $('#chat-type-holder > span').text()
         });
         var path = window.location.pathname + "message-types";
         $.get(path + "?" + param)

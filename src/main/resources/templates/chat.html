@@ -123,7 +123,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
-                <h4>Top Active Users</h4>
+                <h4>Top Activity</h4>
                 <div th:insert="chat_activity_table"></div>
                 <h4>Activity chart</h4>
                 <div th:insert="chat_activity_chart"></div>
@@ -138,7 +138,7 @@
     </div>
 </div>
 <div class="bg-white border-top p-3">
-    <!--/*@thymesVar id="bot" type="org.telegram.telegrambots.api.objects.User"*/-->
+    <!--/*@thymesVar id="bot" type="org.telegram.telegrambots.meta.api.objects.User"*/-->
     <div class="container clearfix">
         <a class="float-right"
            th:href="${'https://t.me/' + bot.userName}"
