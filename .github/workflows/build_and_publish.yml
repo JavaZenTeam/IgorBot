@@ -27,6 +27,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+          driver-opts: env.BUILDKIT_STEP_LOG_MAX_SIZE=10485760
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
