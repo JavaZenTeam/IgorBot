@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javazen.telegram.bot.datasource.model.CountStatistic;
-import ru.javazen.telegram.bot.datasource.model.PeriodUserStatistic;
+import ru.javazen.telegram.bot.datasource.model.PeriodStatistic;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
-import ru.javazen.telegram.bot.datasource.model.UserStatistic;
+import ru.javazen.telegram.bot.datasource.model.Statistic;
 import ru.javazen.telegram.bot.model.*;
 import ru.javazen.telegram.bot.util.DateRange;
 
@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 
 @Repository
 @AllArgsConstructor
-public class CriteriaChatDataSource implements ChatDataSource {
+public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> {
+
     private static final String ACTIVITY_CHART_SQL = "select generate_series, " +
             "u.user_id, u.first_name, u.last_name, u.username, " +
             "count(*) as count, sum(text_length) as length, sum(score) as score " +
@@ -51,9 +52,9 @@ public class CriteriaChatDataSource implements ChatDataSource {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserStatistic> topActiveUsers(Long chatId, DateRange dateRange) {
+    public List<Statistic.UserStatistic> topActivity(Long chatId, DateRange dateRange) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserStatistic> query = builder.createQuery(UserStatistic.class);
+        CriteriaQuery<Statistic.UserStatistic> query = builder.createQuery(Statistic.UserStatistic.class);
 
         Root<MessageEntity> messages = query.from(MessageEntity.class);
         Join<MessageEntity, UserEntity> userJoin = messages.join(MessageEntity_.user);
@@ -65,7 +66,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
         Expression<Long> count = builder.count(messages);
         Expression<Long> length = builder.sumAsLong(messages.get(MessageEntity_.textLength));
         Expression<Double> score = builder.sum(messages.get(MessageEntity_.score));
-        query.select(builder.construct(UserStatistic.class, userJoin, count, length, score));
+        query.select(builder.construct(Statistic.UserStatistic.class, userJoin, count, length, score));
         query.orderBy(builder.desc(score));
 
         return entityManager.createQuery(query).getResultList();
@@ -73,7 +74,7 @@ public class CriteriaChatDataSource implements ChatDataSource {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PeriodUserStatistic> activityChart(Long chatId, DateRange dateRange, TimeInterval interval, TimeZone timeZone) {
+    public List<PeriodStatistic.UserPeriodStatistic> activityChart(Long chatId, DateRange dateRange, TimeInterval interval, TimeZone timeZone) {
         Query nativeQuery = entityManager.createNativeQuery(ACTIVITY_CHART_SQL);
         nativeQuery.setParameter("chat_id", chatId);
         nativeQuery.setParameter("from", dateRange.getFrom());
@@ -85,16 +86,16 @@ public class CriteriaChatDataSource implements ChatDataSource {
         return resultList.stream().map(obj -> mapToPeriodUserStatistic(obj, format)).collect(Collectors.toList());
     }
 
-    private static PeriodUserStatistic mapToPeriodUserStatistic(Object[] arr, DateFormat format) {
+    private static PeriodStatistic.UserPeriodStatistic mapToPeriodUserStatistic(Object[] arr, DateFormat format) {
         String period = format.format((Timestamp) arr[0]);
         if (arr[1] == null) {
-            return new PeriodUserStatistic(period);
+            return new PeriodStatistic.UserPeriodStatistic(period);
         } else {
             UserEntity user = new UserEntity((Integer) arr[1], (String) arr[2], (String) arr[3], (String) arr[4]);
             long count = ((BigInteger) arr[5]).longValue();
             long length = ((BigInteger) arr[6]).longValue();
             double score = (Double) arr[7];
-            return new PeriodUserStatistic(period, user, count, length, score);
+            return new PeriodStatistic.UserPeriodStatistic(period, user, count, length, score);
         }
     }
 
@@ -123,28 +124,8 @@ public class CriteriaChatDataSource implements ChatDataSource {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<CountStatistic> botUsagesByModule(Long chatId, DateRange dateRange) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
-
-        Root<BotUsageLog> botUsages = query.from(BotUsageLog.class);
-        Join<BotUsageLog, MessageEntity> messageJoin = botUsages.join(BotUsageLog_.source);
-
-        query.where(
-                builder.equal(messageJoin.get(MessageEntity_.chat), chatId),
-                builder.between(messageJoin.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
-        query.groupBy(botUsages.get(BotUsageLog_.moduleName));
-
-        Expression<Long> count = builder.count(botUsages);
-        query.select(builder.construct(CountStatistic.class, botUsages.get(BotUsageLog_.moduleName), count));
-        query.orderBy(builder.desc(count));
-        return entityManager.createQuery(query).getResultList();
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
-    public List<CountStatistic> messageTypesStickers(Long chatId, DateRange dateRange) {
+    public List<CountStatistic> messageTypesChart(Long chatId, DateRange dateRange) {
         List<Object[]> resultList = entityManager.createNativeQuery(MESSAGE_TYPES_SQL)
                 .setParameter("chat_id", chatId)
                 .setParameter("from", dateRange.getFrom())
