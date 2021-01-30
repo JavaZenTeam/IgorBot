@@ -107,7 +107,7 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
         Root<MessageEntity> messages = query.from(MessageEntity.class);
         query.where(
                 builder.equal(messages.get(MessageEntity_.fileType), FileType.STICKER),
-                builder.equal(messages.get(MessageEntity_.chat), userId),
+                builder.equal(messages.get(MessageEntity_.user), userId),
                 builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
         Path<String> fileUniqueId = messages.get(MessageEntity_.fileUniqueId);
         query.groupBy(fileUniqueId);

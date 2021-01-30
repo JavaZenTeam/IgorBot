@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.Optional;
 
 @Entity
 @Data
@@ -22,4 +23,8 @@ public class ChatEntity {
     @Column(length = 512)
     private String title;
 
+    public String getLabel() {
+        return Optional.ofNullable(getTitle())
+                .orElse("Private chat");
+    }
 }

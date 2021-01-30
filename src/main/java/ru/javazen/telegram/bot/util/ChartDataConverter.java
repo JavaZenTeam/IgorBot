@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.summingLong;
 
@@ -59,12 +58,10 @@ public class ChartDataConverter {
 
     private String formatLabel(Object subject) {
         if (subject instanceof UserEntity userEntity) {
-            return Stream.of(userEntity.getFirstName(), userEntity.getLastName())
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining(" "));
+            return userEntity.getLabel();
         }
         if (subject instanceof ChatEntity chatEntity) {
-            return Optional.ofNullable(chatEntity.getTitle()).orElse("Private chat");
+            return chatEntity.getLabel();
         }
         return subject.toString();
     }

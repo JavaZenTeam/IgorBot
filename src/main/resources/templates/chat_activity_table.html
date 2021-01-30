@@ -3,8 +3,7 @@
         <thead class="thead-light text-center">
         <tr>
             <th width="8%">#</th>
-            <th th:if="${chat.isUserChat()}" width="37%">Chat</th>
-            <th th:if="${!chat.isUserChat()}" width="37%">User</th>
+            <th th:text="${chat.isUserChat() ? 'Chat' : 'User'}" width="37%"></th>
             <th width="25%">Activity</th>
             <th width="15%">Messages</th>
             <th width="15%">Characters</th>
@@ -13,11 +12,7 @@
         <tbody>
         <tr th:each="item, iter : ${activityStatistic}">
             <td th:text="${iter.index} + 1" class="text-right"></td>
-            <td>
-                <span th:if="${!chat.isUserChat()}" th:text="${item.subject.firstName}"></span>
-                <span th:if="${!chat.isUserChat()}" th:text="${item.subject.lastName}"></span>
-                <span th:if="${chat.isUserChat()}" th:text="${item.subject.title}"></span>
-                <span th:if="${chat.isUserChat() && item.subject.title == null}">Private chat</span>
+            <td th:text="${item.subject.label}">
             </td>
             <td th:with="activity=${100.0 * item.score / totalScore}, activityStr=${#numbers.formatDecimal(activity, 0, 0)}">
                 <div class="progress" style="height: 1.5rem"
