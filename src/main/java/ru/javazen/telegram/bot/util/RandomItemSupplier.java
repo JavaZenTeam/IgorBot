@@ -1,8 +1,6 @@
-package ru.javazen.telegram.bot.function;
+package ru.javazen.telegram.bot.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
-import ru.javazen.telegram.bot.container.SizedItemsContainer;
 
 import java.util.Map;
 import java.util.Random;
@@ -27,7 +25,6 @@ public class RandomItemSupplier<T> implements Supplier<T> {
         this.container = container;
     }
 
-    @Required
     public void setOptionRatios(Map<T, Double> optionRatios){
         optionRatios.forEach((option, ratio) -> container.put(option, ratio));
     }

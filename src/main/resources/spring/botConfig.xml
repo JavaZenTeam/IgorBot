@@ -227,7 +227,7 @@
     <bean id="songSinger" class="ru.javazen.telegram.bot.handler.SongSinger" scope="prototype">
         <constructor-arg name="repository" ref="songRepository"/>
     </bean>
-    <bean id="songRepository" class="ru.javazen.telegram.bot.service.SongRepositoryImpl">
+    <bean id="songRepository" class="ru.javazen.telegram.bot.service.impl.SongRepositoryImpl">
         <constructor-arg name="encoder" ref="songEncoder"/>
         <constructor-arg name="songs" ref="songs"/>
     </bean>
@@ -359,7 +359,7 @@
                   value="и+го+рь,? (к[оа]гда|есл?[еи]) (?&lt;userFlag&gt;у меня |я )?(?&lt;trigger&gt;.+?),? (г[оа]вори|ск[оа]ж[иы]) (?&lt;response&gt;.+)"/>
         <property name="successResponseSupplier" ref="okSupplier"/>
         <property name="tooManyDuplicatesErrorSupplier">
-            <bean class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+            <bean class="ru.javazen.telegram.bot.util.RandomItemSupplier">
                 <property name="optionRatios">
                     <map>
                         <entry key="Может хватит уже?" value="4"/>

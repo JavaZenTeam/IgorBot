@@ -2,6 +2,7 @@ package ru.javazen.telegram.bot.service;
 
 import org.junit.Before;
 import org.junit.Test;
+import ru.javazen.telegram.bot.service.impl.SongRepositoryImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,22 +17,22 @@ public class SongRepositoryImplTest {
     private SongRepository songRepository;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         songRepository = new SongRepositoryImpl();
     }
 
     @Test
-    public void saveNullSong() throws Exception {
+    public void saveNullSong() {
         assertNull(songRepository.saveSong(null));
     }
 
     @Test
-    public void saveEmptySong() throws Exception {
+    public void saveEmptySong() {
         assertNull(songRepository.saveSong(Collections.emptyList()));
     }
 
     @Test
-    public void saveSong() throws Exception {
+    public void saveSong() {
         SongRepository.SongLine line = songRepository.saveSong(asList("1", "2", "3"));
         assertEquals("1", line.getString());
         assertEquals("2", line.getNextLine().getString());
@@ -41,7 +42,7 @@ public class SongRepositoryImplTest {
 
 
     @Test
-    public void saveLongSong() throws Exception {
+    public void saveLongSong() {
         List<String> longSong = IntStream.range(0, 2 << 8)
                 .mapToObj(Integer::toHexString)
                 .collect(Collectors.toList());
@@ -54,24 +55,24 @@ public class SongRepositoryImplTest {
     }
 
     @Test
-    public void findNull() throws Exception {
+    public void findNull() {
         songRepository.saveSong(asList("1", "2", "3"));
         assertNull(songRepository.findSong(null));
     }
 
     @Test
-    public void findLineWhenNoSongs() throws Exception {
+    public void findLineWhenNoSongs() {
         assertNull(songRepository.findSong("1"));
     }
 
     @Test
-    public void findNotExisting() throws Exception {
+    public void findNotExisting() {
         songRepository.saveSong(asList("1", "2", "3"));
         assertNull(songRepository.findSong("AAA"));
     }
 
     @Test
-    public void findFirstLine() throws Exception {
+    public void findFirstLine() {
         songRepository.saveSong(asList("AAA", "BBB", "CCC"));
         SongRepository.SongLine line = songRepository.findSong("AAA");
         assertEquals("AAA", line.getString());
@@ -79,7 +80,7 @@ public class SongRepositoryImplTest {
     }
 
     @Test
-    public void findNotFirstLine() throws Exception {
+    public void findNotFirstLine() {
         songRepository.saveSong(asList("AAA", "BBB", "CCC", "DDD"));
         SongRepository.SongLine line = songRepository.findSong("CCC");
         assertEquals("CCC", line.getString());
@@ -87,7 +88,7 @@ public class SongRepositoryImplTest {
     }
 
     @Test
-    public void findLastLine() throws Exception {
+    public void findLastLine() {
         songRepository.saveSong(asList("AAA", "BBB", "CCC"));
         SongRepository.SongLine line = songRepository.findSong("CCC");
         assertEquals("CCC", line.getString());
@@ -95,7 +96,7 @@ public class SongRepositoryImplTest {
     }
 
     @Test
-    public void findLineInSeveralSongs() throws Exception {
+    public void findLineInSeveralSongs() {
         songRepository.saveSong(asList("1AAA", "1BBB", "1CCC"));
         songRepository.saveSong(asList("2AAA", "2BBB", "2CCC"));
         songRepository.saveSong(asList("3AAA", "3BBB", "3CCC"));
@@ -105,7 +106,7 @@ public class SongRepositoryImplTest {
     }
 
     @Test
-    public void findNextLineInSong() throws Exception {
+    public void findNextLineInSong() {
         songRepository.saveSong(asList("1AAA", "BBB", "1CCC"));
         songRepository.saveSong(asList("2AAA", "BBB", "2CCC"));
         songRepository.saveSong(asList("3AAA", "BBB", "3CCC"));
@@ -117,7 +118,7 @@ public class SongRepositoryImplTest {
 
 
     @Test
-    public void findDistantNextLineInSong() throws Exception {
+    public void findDistantNextLineInSong() {
         songRepository.saveSong(asList("1AAA", "1BBB", "1CCC", "DDD", "1EEE"));
         songRepository.saveSong(asList("2AAA", "2BBB", "2CCC", "DDD", "2EEE"));
         songRepository.saveSong(asList("3AAA", "3BBB", "3CCC", "DDD", "3EEE"));
