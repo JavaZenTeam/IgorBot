@@ -24,17 +24,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Getter(AccessLevel.PROTECTED)
 public class SubscriptionServiceImpl implements SubscriptionService {
     private static final String QUOTE = "\"";
 
-    @Getter(AccessLevel.PROTECTED)
     private final SubscriptionRepository repository;
 
     /**
      * key: Reply messagePK
      * value: origin subscriptionPK
      */
-    @Getter(AccessLevel.PROTECTED)
     private final Cache<MessagePK, MessagePK> replies = CacheBuilder.newBuilder()
             .expireAfterWrite(Duration.ofHours(6))
             .build();
@@ -43,14 +42,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
      * key: chatId
      * value: all Subscriptions in the chat
      */
-    @Getter(AccessLevel.PROTECTED)
-    private final LoadingCache<Long, List<Subscription>> subscriptions = initSubscriptionCache();
-
-    private LoadingCache<Long, List<Subscription>> initSubscriptionCache() {
-        return CacheBuilder.newBuilder()
-                .expireAfterAccess(Duration.ofHours(2))
-                .build(CacheLoader.from((key) -> getRepository().findAllBySubscriptionPK_ChatId(key)));
-    }
+    private final LoadingCache<Long, List<Subscription>> subscriptions = CacheBuilder.newBuilder()
+            .expireAfterAccess(Duration.ofHours(2))
+            .build(CacheLoader.from((key) -> getRepository().findAllBySubscriptionPK_ChatId(key)));
 
     @Override
     public void createSubscription(Subscription template) {
