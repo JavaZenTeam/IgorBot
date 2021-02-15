@@ -116,14 +116,14 @@
         <property name="optionRatios" ref="start"/>
     </bean>
 
-    <util:map id="anniversaryCongratulations">
+    <util:map id="milestoneCongratulations">
         <entry key="Achievement Get! {0} сообщений в чате" value="1"/>
         <entry key="Это было сообщение номер {0}. Здорово, правда?!" value="1"/>
         <entry key="Опа, а у нас тут уже {0} сообщений" value="1"/>
         <entry key="В этом чате {0} сообщений уже. Одумайтесь!" value="1"/>
         <entry key="Вы стали автором {0}-ого сообщения в этом чате! Можете 2 раза улыбнуться" value="1"/>
     </util:map>
-    <bean id="anniversaryCongratulationSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
-        <property name="optionRatios" ref="anniversaryCongratulations"/>
+    <bean id="milestoneCongratulationSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+        <property name="optionRatios" ref="milestoneCongratulations"/>
     </bean>
 </beans>
