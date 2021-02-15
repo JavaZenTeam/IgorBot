@@ -28,7 +28,7 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.facilities.TelegramHttpClientBuilder;
 import org.telegram.telegrambots.meta.ApiContext;
 import ru.javazen.telegram.bot.client.FileServiceClient;
-import ru.javazen.telegram.bot.comparator.RandomComparator;
+import ru.javazen.telegram.bot.util.comparator.RandomComparator;
 import ru.javazen.telegram.bot.handler.SayTextHandler;
 import ru.javazen.telegram.bot.handler.base.InlineQueryHandler;
 import ru.javazen.telegram.bot.service.VoiceService;

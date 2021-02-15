@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot.preprocessor;
+package ru.javazen.telegram.bot.util.preprocessor;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -13,7 +13,7 @@ public class ReplaceDateTimeAdverbTest {
     private static final long SAMPLE_DATE = 1471460820;//17.08.2016 22:07:00
 
     @Test
-    public void testReplaceNowToCurrentTime() throws Exception {
+    public void testReplaceNowToCurrentTime() {
         ReplaceDateTimeAdverb instance = new ReplaceDateTimeAdverb("now", "dd.MM.yyyy HH:mm:ss");
         Message message = mock(Message.class);
         when(message.getDate()).thenReturn(Long.valueOf(SAMPLE_DATE).intValue());
@@ -24,7 +24,7 @@ public class ReplaceDateTimeAdverbTest {
     }
 
     @Test
-    public void testReplaceTodayToCurrentDay() throws Exception {
+    public void testReplaceTodayToCurrentDay() {
         ReplaceDateTimeAdverb instance = new ReplaceDateTimeAdverb("today", "dd.MM.yy");
         Message message = mock(Message.class);
         when(message.getDate()).thenReturn(Long.valueOf(SAMPLE_DATE).intValue());
@@ -35,7 +35,7 @@ public class ReplaceDateTimeAdverbTest {
     }
 
     @Test
-    public void testReplaceTomorrowToNextDay() throws Exception {
+    public void testReplaceTomorrowToNextDay() {
         ReplaceDateTimeAdverb instance = new ReplaceDateTimeAdverb("tomorrow", "dd.MM.yy", 5, 1);
         Message message = mock(Message.class);
         when(message.getDate()).thenReturn(Long.valueOf(SAMPLE_DATE).intValue());
@@ -46,7 +46,7 @@ public class ReplaceDateTimeAdverbTest {
     }
 
     @Test
-    public void testReplaceYesterdayToPrevDay() throws Exception {
+    public void testReplaceYesterdayToPrevDay() {
         ReplaceDateTimeAdverb instance = new ReplaceDateTimeAdverb("yesterday", "dd.MM.yy", 5, -1);
         Message message = mock(Message.class);
         when(message.getDate()).thenReturn(Long.valueOf(SAMPLE_DATE).intValue());

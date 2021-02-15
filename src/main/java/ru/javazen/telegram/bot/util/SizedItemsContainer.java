@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot.container;
+package ru.javazen.telegram.bot.util;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -9,16 +9,14 @@ import java.util.TreeMap;
 
 @Component
 @Scope("prototype")
-public class SizedItemsContainerTreeMapImpl<T> implements SizedItemsContainer<T> {
-    private TreeMap<Double, T> treeMap = new TreeMap<>();
+public class SizedItemsContainer<T>  {
+    private final TreeMap<Double, T> treeMap = new TreeMap<>();
 
-    @Override
     public void put(T item, Double size) {
         if (size <= 0) throw new IllegalArgumentException("size should be positive");
         treeMap.put(size + size(), item);
     }
 
-    @Override
     public T get(Double index) {
         return Optional
                 .ofNullable(treeMap.higherEntry(index))
@@ -26,7 +24,6 @@ public class SizedItemsContainerTreeMapImpl<T> implements SizedItemsContainer<T>
                 .orElse(null);
     }
 
-    @Override
     public Double size() {
         return treeMap.isEmpty() ? 0.0 : treeMap.lastKey();
     }

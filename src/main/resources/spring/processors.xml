@@ -5,7 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <util:list id="preprocessors" value-type="java.util.function.BiFunction">
-        <bean class="ru.javazen.telegram.bot.preprocessor.ReplaceFirstPersonPronouns">
+        <bean class="ru.javazen.telegram.bot.util.preprocessor.ReplaceFirstPersonPronouns">
             <constructor-arg name="pronouns">
                 <list>
                     <value>я</value>
@@ -15,33 +15,33 @@
                 </list>
             </constructor-arg>
         </bean>
-        <bean class="ru.javazen.telegram.bot.preprocessor.ReplaceDateTimeAdverb">
+        <bean class="ru.javazen.telegram.bot.util.preprocessor.ReplaceDateTimeAdverb">
             <constructor-arg name="adverb" value="сейчас"/>
             <constructor-arg name="formatPattern" value="ddMMyyHHmmssSSS"/>
         </bean>
-        <bean class="ru.javazen.telegram.bot.preprocessor.ReplaceDateTimeAdverb">
+        <bean class="ru.javazen.telegram.bot.util.preprocessor.ReplaceDateTimeAdverb">
             <constructor-arg name="adverb" value="сегодня"/>
             <constructor-arg name="formatPattern" value="ddMMyy"/>
         </bean>
-        <bean class="ru.javazen.telegram.bot.preprocessor.ReplaceDateTimeAdverb">
+        <bean class="ru.javazen.telegram.bot.util.preprocessor.ReplaceDateTimeAdverb">
             <constructor-arg name="adverb" value="завтра"/>
             <constructor-arg name="formatPattern" value="ddMMyy"/>
             <constructor-arg name="offsetField" value="5"/><!--Date-->
             <constructor-arg name="offsetAmount" value="1"/>
         </bean>
-        <bean class="ru.javazen.telegram.bot.preprocessor.ReplaceDateTimeAdverb">
+        <bean class="ru.javazen.telegram.bot.util.preprocessor.ReplaceDateTimeAdverb">
             <constructor-arg name="adverb" value="послезавтра"/>
             <constructor-arg name="formatPattern" value="ddMMyy"/>
             <constructor-arg name="offsetField" value="5"/><!--Date-->
             <constructor-arg name="offsetAmount" value="2"/>
         </bean>
-        <bean class="ru.javazen.telegram.bot.preprocessor.ReplaceDateTimeAdverb">
+        <bean class="ru.javazen.telegram.bot.util.preprocessor.ReplaceDateTimeAdverb">
             <constructor-arg name="adverb" value="вчера"/>
             <constructor-arg name="formatPattern" value="ddMMyy"/>
             <constructor-arg name="offsetField" value="5"/><!--Date-->
             <constructor-arg name="offsetAmount" value="-1"/>
         </bean>
-        <bean class="ru.javazen.telegram.bot.preprocessor.ReplaceDateTimeAdverb">
+        <bean class="ru.javazen.telegram.bot.util.preprocessor.ReplaceDateTimeAdverb">
             <constructor-arg name="adverb" value="позавчера"/>
             <constructor-arg name="formatPattern" value="ddMMyy"/>
             <constructor-arg name="offsetField" value="5"/><!--Date-->

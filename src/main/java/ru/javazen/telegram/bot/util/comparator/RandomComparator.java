@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot.comparator;
+package ru.javazen.telegram.bot.util.comparator;
 
 import java.util.Comparator;
 import java.util.Random;

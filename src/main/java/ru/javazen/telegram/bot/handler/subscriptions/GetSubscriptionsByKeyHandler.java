@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
-import ru.javazen.telegram.bot.model.MessagePK;
 import ru.javazen.telegram.bot.model.Subscription;
 import ru.javazen.telegram.bot.service.SubscriptionService;
 
@@ -27,13 +26,8 @@ public class GetSubscriptionsByKeyHandler implements TextMessageHandler {
         if (!matcher.matches()) return false;
 
         String trigger = matcher.group("trigger");
-
-        Subscription template = new Subscription();
-        template.setSubscriptionPK(new MessagePK(message.getChat().getId(), message.getMessageId()));
-        template.setUserId(message.getFrom().getId());
-        template.setTrigger(trigger);
-
-        List<Subscription> subscriptions = subscriptionService.catchSubscriptions(template);
+        Long chatId = message.getChat().getId();
+        List<Subscription> subscriptions = subscriptionService.catchSubscriptions(chatId, message.getFrom().getId(), trigger);
 
         if (subscriptions.isEmpty()){
             sender.execute(new SendMessage(message.getChatId(), onEmptyResponseSupplier.get()));
@@ -41,7 +35,7 @@ public class GetSubscriptionsByKeyHandler implements TextMessageHandler {
 
         for (Subscription s : subscriptions) {
             SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(String.valueOf(s.getSubscriptionPK().getChatId()));
+            sendMessage.setChatId(chatId);
             sendMessage.setReplyToMessageId(s.getSubscriptionPK().getMessageId());
             sendMessage.setText(s.getResponse());
 

@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot.preprocessor;
+package ru.javazen.telegram.bot.util.preprocessor;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 

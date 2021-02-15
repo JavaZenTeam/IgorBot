@@ -5,8 +5,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.container.SizedItemsContainer;
 import ru.javazen.telegram.bot.handler.base.TextMessageHandler;
+import ru.javazen.telegram.bot.util.SizedItemsContainer;
 
 import java.util.List;
 import java.util.Map;

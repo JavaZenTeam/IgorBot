@@ -1,4 +1,6 @@
-package ru.javazen.telegram.bot.service;
+package ru.javazen.telegram.bot.service.impl;
+
+import ru.javazen.telegram.bot.service.SongRepository;
 
 import java.util.Collection;
 import java.util.HashMap;
