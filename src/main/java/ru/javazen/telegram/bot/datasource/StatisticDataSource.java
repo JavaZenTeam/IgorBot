@@ -6,6 +6,7 @@ import ru.javazen.telegram.bot.datasource.model.Statistic;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
 import ru.javazen.telegram.bot.util.DateRange;
 
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -17,4 +18,6 @@ public interface StatisticDataSource<T> {
     List<CountStatistic> topStickers(Long chatId, DateRange dateRange, Integer maxResults);
 
     List<CountStatistic> messageTypesChart(Long chatId, DateRange dateRange);
+
+    Integer messageCountByDate(Long chatId, Date date);
 }

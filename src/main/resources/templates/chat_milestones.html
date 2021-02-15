@@ -1,0 +1,42 @@
+<div xmlns:th="http://www.thymeleaf.org" th:with="
+    progressFull = ${milestoneSummary.nextMilestone() - milestoneSummary.prevMilestone()},
+    progressPrev = ${milestoneSummary.prevPosition() - milestoneSummary.prevMilestone()},
+    progressCurr = ${milestoneSummary.currPosition() - milestoneSummary.prevPosition()}">
+    <!--/*@thymesVar id="milestoneSummary" type="ru.javazen.telegram.bot.util.MilestoneHelper.MilestoneSummary"*/-->
+    <!--/*@thymesVar id="dateRange" type="ru.javazen.telegram.bot.util.DateRange"*/-->
+    <div class="clearfix">
+        <div class="small float-left" th:text="${milestoneSummary.prevMilestone()}"></div>
+        <div class="small float-right" th:text="${milestoneSummary.nextMilestone()}"></div>
+    </div>
+    <div class="progress mb-2" th:title="${milestoneSummary.currPosition()} + ' at the end of the period. ' +
+                                         ${milestoneSummary.nextMilestone() - milestoneSummary.currPosition()} + ' to the next stage.'">
+        <div class="progress-bar"
+             th:title="${milestoneSummary.prevPosition()} + ' at the start of the period. ' +
+                       ${progressPrev} + ' from the previous stage.'"
+             th:style="'width: ' + ${#numbers.formatDecimal(100.0 * progressPrev / progressFull, 1, 0)} + '%;'"></div>
+        <div class="progress-bar bg-success"
+             th:title="${progressCurr} + ' for the period. ' +
+                       ${milestoneSummary.currPosition() - milestoneSummary.prevMilestone()} + ' from the previous stage.'"
+             th:style="'width: ' + ${#numbers.formatDecimal(100.0 * progressCurr / progressFull, 1, 0)} + '%;'"></div>
+    </div>
+    <div class="bg-white border mb-3 px-3 py-2 d-flex flex-wrap">
+        <div class="col-8 p-1">
+            <span>Total messages</span>
+        </div>
+        <div class="col-4 p-1 text-right font-weight-bold text-primary">
+            <span th:text="${milestoneSummary.currPosition()}"></span>
+        </div>
+        <div class="col-8 p-1">
+            <span>Selected period</span>
+        </div>
+        <div class="col-4 p-1 text-right font-weight-bold text-success">
+            <span th:text="${progressCurr}"></span>
+        </div>
+        <div class="col-8 p-1">
+            <span>Average per day</span>
+        </div>
+        <div class="col-4 p-1 text-right font-weight-bold text-dark">
+            <span th:text="${#numbers.formatDecimal(1.0 * progressCurr / dateRange.days(), 1, 0)}"></span>
+        </div>
+    </div>
+</div>
