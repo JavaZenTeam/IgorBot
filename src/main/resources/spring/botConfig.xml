@@ -232,10 +232,9 @@
         <constructor-arg name="songs" ref="songs"/>
     </bean>
 
-    <bean id="anniversaryMessageCongratulations"
-          class="ru.javazen.telegram.bot.handler.AnniversaryMessageCongratulations">
-        <property name="messageIdPattern" value="\d0{3,}"/>
-        <property name="templateSupplier" ref="anniversaryCongratulationSupplier"/>
+    <bean id="milestoneCongratulationsHandler"
+          class="ru.javazen.telegram.bot.handler.MilestoneCongratulations">
+        <property name="templateSupplier" ref="milestoneCongratulationSupplier"/>
     </bean>
 
     <bean id="continueRepeatableSequenceModule" class="ru.javazen.telegram.bot.handler.InstanceForChatController">
@@ -457,7 +456,7 @@
     <bean id="updateHandlers" class="java.util.ArrayList">
         <constructor-arg name="c">
             <list value-type="ru.javazen.telegram.bot.handler.base.UpdateHandler">
-                <ref bean="anniversaryMessageCongratulations"/>
+                <ref bean="milestoneCongratulationsHandler"/>
                 <ref bean="sayTextHandler"/>
                 <ref bean="messageCollectorSaveTextSwitch"/>
                 <ref bean="pinnedForwarderSwitch"/>
