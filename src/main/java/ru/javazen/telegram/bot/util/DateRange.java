@@ -33,6 +33,6 @@ public class DateRange {
     }
 
     public long days() {
-        return ChronoUnit.DAYS.between(fromDate, toDate);
+        return ChronoUnit.DAYS.between(fromDate, toDate) + 1;
     }
 }
