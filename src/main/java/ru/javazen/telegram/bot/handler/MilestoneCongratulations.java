@@ -1,5 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -12,9 +13,10 @@ import java.text.MessageFormat;
 import java.util.function.Supplier;
 
 @Setter
+@RequiredArgsConstructor
 public class MilestoneCongratulations implements MessageHandler {
+    private final MilestoneHelper milestoneHelper;
     private Supplier<String> templateSupplier;
-    private MilestoneHelper milestoneHelper;
 
     @Override
     public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
