@@ -26,7 +26,7 @@
         <entry key="чиво" value="1"/>
         <entry key="каво" value="1"/>
     </util:map>
-    <bean id="doNotUnderstandSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+    <bean id="doNotUnderstandSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="doNotUnderstand"/>
     </bean>
 
@@ -35,7 +35,7 @@
         <entry key="лан" value="2"/>
         <entry key="будет сделано!" value="1"/>
     </util:map>
-    <bean id="okSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+    <bean id="okSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="ok"/>
     </bean>
 
@@ -44,7 +44,7 @@
         <entry key="наканецта" value="2"/>
         <entry key="о да, детка" value="1"/>
     </util:map>
-    <bean id="happyOkSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+    <bean id="happyOkSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="happyOk"/>
     </bean>
 
@@ -53,7 +53,7 @@
         <entry key="ой всё" value="2"/>
         <entry key=":(" value="1"/>
     </util:map>
-    <bean id="sadOkSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+    <bean id="sadOkSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="sadOk"/>
     </bean>
 
@@ -63,7 +63,7 @@
         <entry key="трыц" value="1"/>
         <entry key="бумс" value="1"/>
     </util:map>
-    <bean id="defaultSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+    <bean id="defaultSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="default"/>
     </bean>
 
@@ -71,7 +71,7 @@
         <entry key="ничего(" value="2"/>
         <entry key="пустота..." value="1"/>
     </util:map>
-    <bean id="emptySupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+    <bean id="emptySupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="empty"/>
     </bean>
 
@@ -112,7 +112,7 @@
         <entry key="ПАЦАНЫЫЫ ОБЪЕЕЕЕЕКТ ААААААААААААААААААААААААААААААААААА" value="1"/>
         <entry key="ХУЯБВДРИКА" value="1"/>
     </util:map>
-    <bean id="startSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+    <bean id="startSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="start"/>
     </bean>
 
@@ -123,7 +123,7 @@
         <entry key="В этом чате {0} сообщений уже. Одумайтесь!" value="1"/>
         <entry key="Вы стали автором {0}-ого сообщения в этом чате! Можете 2 раза улыбнуться" value="1"/>
     </util:map>
-    <bean id="milestoneCongratulationSupplier" class="ru.javazen.telegram.bot.function.RandomItemSupplier">
+    <bean id="milestoneCongratulationSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="milestoneCongratulations"/>
     </bean>
 </beans>

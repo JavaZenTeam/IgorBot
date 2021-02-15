@@ -1,64 +1,38 @@
 package ru.javazen.telegram.bot.model;
 
-import javax.persistence.Column;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import ru.javazen.telegram.bot.util.StringMatchRule;
+import ru.javazen.telegram.bot.util.WordSplitter;
+
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Entity
-@Table
+@Data
+@EqualsAndHashCode(of = "subscriptionPK")
 public class Subscription {
     @EmbeddedId
     private MessagePK subscriptionPK;
 
-    @Column
     private Integer userId;
 
-    @Column(nullable = false)
     private String trigger;
 
-    @Column(nullable = false)
     private String response;
 
-    public MessagePK getSubscriptionPK() {
-        return subscriptionPK;
-    }
+    @Transient
+    @Getter(lazy = true)
+    private final List<String> words = WordSplitter.getInstance().apply(getTrigger());
 
-    public void setSubscriptionPK(MessagePK subscriptionPK) {
-        this.subscriptionPK = subscriptionPK;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getTrigger() {
-        return trigger;
-    }
-
-    public void setTrigger(String trigger) {
-        this.trigger = trigger;
-    }
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
-
-    @Override
-    public String toString() {
-        return "Subscription{" +
-                "subscriptionPK=" + subscriptionPK +
-                ", userId=" + userId +
-                ", trigger='" + trigger + '\'' +
-                ", response='" + response + '\'' +
-                '}';
-    }
+    @Transient
+    @Getter(lazy = true)
+    private final List<Predicate<String>> rules = getWords().stream()
+            .map(StringMatchRule::resolvePredicate)
+            .collect(Collectors.toList());
 }

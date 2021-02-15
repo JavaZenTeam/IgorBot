@@ -1,73 +1,98 @@
 package ru.javazen.telegram.bot.service.impl;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.javazen.telegram.bot.model.MessagePK;
 import ru.javazen.telegram.bot.model.Subscription;
 import ru.javazen.telegram.bot.repository.SubscriptionRepository;
 import ru.javazen.telegram.bot.service.SubscriptionService;
+import ru.javazen.telegram.bot.util.SequenceMatcher;
+import ru.javazen.telegram.bot.util.StringMatchRule;
+import ru.javazen.telegram.bot.util.StringUtils;
+import ru.javazen.telegram.bot.util.WordSplitter;
 
-import java.util.HashMap;
+import java.time.Duration;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Getter(AccessLevel.PROTECTED)
 public class SubscriptionServiceImpl implements SubscriptionService {
-    private SubscriptionRepository repository;
-    private Map<Long, Map<Integer, Integer>> chatReplies = new HashMap<>();
+    private static final String QUOTE = "\"";
 
-    @Autowired
-    public SubscriptionServiceImpl(SubscriptionRepository repository) {
-        this.repository = repository;
-    }
+    private final SubscriptionRepository repository;
+
+    /**
+     * key: Reply messagePK
+     * value: origin subscriptionPK
+     */
+    private final Cache<MessagePK, MessagePK> replies = CacheBuilder.newBuilder()
+            .expireAfterWrite(Duration.ofHours(6))
+            .build();
+
+    /**
+     * key: chatId
+     * value: all Subscriptions in the chat
+     */
+    private final LoadingCache<Long, List<Subscription>> subscriptions = CacheBuilder.newBuilder()
+            .expireAfterAccess(Duration.ofHours(2))
+            .build(CacheLoader.from((key) -> getRepository().findAllBySubscriptionPK_ChatId(key)));
 
     @Override
-    public Subscription createSubscription(Subscription template) {
-        Subscription subscription = new Subscription();
-        BeanUtils.copyProperties(template, subscription);
-        validate(subscription);
-        return repository.save(subscription);
+    public void createSubscription(Subscription template) {
+        getSubscriptions().invalidate(template.getSubscriptionPK().getChatId());
+        validate(template);
+        repository.save(template);
     }
 
     private void validate(Subscription subscription) {
-        Long countDuplicates = repository.countAllBySubscriptionPK_ChatIdAndUserIdAndTrigger(
+        Long countDuplicates = repository.countAllBySubscriptionPK_ChatIdAndUserId(
                 subscription.getSubscriptionPK().getChatId(),
-                subscription.getUserId(),
-                subscription.getTrigger());
-        if (countDuplicates >= 3) {
+                subscription.getUserId());
+        if (countDuplicates >= 100) {
             throw new TooManyDuplicatesException();
         }
     }
 
     @Override
-    public List<Subscription> catchSubscriptions(Subscription template) {
-        return repository.findAllByChatIdAndTriggerAndUserId(
-                template.getSubscriptionPK().getChatId(),
-                template.getTrigger(),
-                template.getUserId());
+    public List<Subscription> catchSubscriptions(Long chatId, Integer userId, String text) {
+        List<String> words = WordSplitter.getInstance().apply(text);
+        List<Subscription> subscriptions = getSubscriptions().getUnchecked(chatId);
+        return subscriptions.stream()
+                .filter(s -> s.getUserId() == null || s.getUserId().equals(userId))
+                .filter(s -> s.getTrigger().startsWith(QUOTE) && s.getTrigger().endsWith(QUOTE)
+                        ? StringMatchRule.resolvePredicate(StringUtils.cutFirstLast(s.getTrigger())).test(text)
+                        : SequenceMatcher.<String>getInstance().test(s.getRules(), words))
+                .collect(Collectors.toList());
     }
 
     @Override
     public void saveSubscriptionReply(MessagePK subscriptionPK, int replyMessageId) {
-        Map<Integer, Integer> replies = chatReplies.computeIfAbsent(subscriptionPK.getChatId(), (key) -> new HashMap<>());
-        replies.put(replyMessageId, subscriptionPK.getMessageId());
+        getReplies().put(new MessagePK(subscriptionPK.getChatId(), replyMessageId), subscriptionPK);
     }
 
     @Override
     public boolean cancelSubscriptionByPK(MessagePK subscriptionPK) {
-        Subscription subscription = repository.findById(subscriptionPK).orElse(null);
-        if (subscription == null) return false;
-        repository.delete(subscription);
-        return true;
+        return repository.findById(subscriptionPK)
+                .map(subscription -> {
+                    repository.delete(subscription);
+                    return true;
+                })
+                .orElse(false);
     }
 
     @Override
     public boolean cancelSubscriptionByReply(MessagePK replyMessagePK) {
-        Map<Integer, Integer> replies = chatReplies.get(replyMessagePK.getChatId());
-        if (replies == null) return false;
-        Integer messageId = replies.remove(replyMessagePK.getMessageId());
-        return messageId != null &&
-                cancelSubscriptionByPK(new MessagePK(replyMessagePK.getChatId(), messageId));
+        return Optional.ofNullable(getReplies().getIfPresent(replyMessagePK))
+                .map(this::cancelSubscriptionByPK)
+                .orElse(false);
     }
 }
