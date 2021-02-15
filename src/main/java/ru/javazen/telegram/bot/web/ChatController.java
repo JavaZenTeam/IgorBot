@@ -19,6 +19,7 @@ import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.util.ChartDataConverter;
 import ru.javazen.telegram.bot.util.DateRange;
 import ru.javazen.telegram.bot.util.DateRanges;
+import ru.javazen.telegram.bot.util.MilestoneHelper;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -36,6 +37,7 @@ public class ChatController {
     private final StatisticDataSource<ChatEntity> userDataSource;
     private final ChartDataConverter chartDataConverter;
     private final MessageRepository messageRepository;
+    private final MilestoneHelper milestoneHelper;
 
     @PreAuthorize("hasAuthority(#chatIdStr)")
     @GetMapping
@@ -54,12 +56,11 @@ public class ChatController {
         if (range == DateRanges.CUSTOM) {
             dateRange = new DateRange(from, to, timeZone);
         } else if (range == DateRanges.ALL_TIME) {
-            dateRange = new DateRange(messageRepository.startChatDate(chatId), new Date());
+            dateRange = new DateRange(messageRepository.startChatDate(chatId), new Date(), timeZone);
         }
 
-        model.addAttribute("toDate", dateRange.getTo());
-        model.addAttribute("fromDate", dateRange.getFrom());
-        model.addAttribute("range", range.name());
+        model.addAttribute("dateRange", dateRange);
+        model.addAttribute("dateRangeName", range.name());
 
         Chat chat = getChat(chatId);
         model.addAttribute("chat", chat);
@@ -70,6 +71,10 @@ public class ChatController {
         model.addAttribute("activityStatistic", activityStatistic);
         model.addAttribute("totalScore", activityStatistic.stream().mapToDouble(Statistic::getScore).sum());
         model.addAttribute("topStickers", dataSource.topStickers(chatId, dateRange, 6));
+
+        Integer prevMessageCount = dataSource.messageCountByDate(chatId, dateRange.getFrom());
+        Integer currMessageCount = dataSource.messageCountByDate(chatId, dateRange.getTo());
+        model.addAttribute("milestoneSummary", milestoneHelper.getMilestoneSummary(prevMessageCount, currMessageCount));
 
         return "chat";
     }

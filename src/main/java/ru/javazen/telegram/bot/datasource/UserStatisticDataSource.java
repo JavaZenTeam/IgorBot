@@ -17,10 +17,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -38,6 +35,7 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
     private static final String MESSAGE_TYPES_SQL = "select " +
             "case " +
             "  when forward_user_id is not null then 'FORWARD' " +
+            "  when event_type is not null then 'EVENT' " +
             "  when file_type is not null then file_type " +
             "  else 'TEXT' " +
             "end as type, " +
@@ -138,5 +136,19 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
                 .map(arr -> new CountStatistic((String) arr[0], ((BigInteger) arr[1]).longValue()))
                 .sorted(Comparator.comparing(CountStatistic::getKey))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Integer messageCountByDate(Long chatId, Date date) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        Root<MessageEntity> messages = query.from(MessageEntity.class);
+        query.where(
+                builder.equal(messages.get(MessageEntity_.user), chatId),
+                builder.lessThanOrEqualTo(messages.get(MessageEntity_.date), date)
+        );
+        query.select(builder.count(messages.get(MessageEntity_.messagePK).get(MessagePK_.messageId)));
+        return Optional.ofNullable(entityManager.createQuery(query).getSingleResult())
+                .map(Long::intValue).orElse(0);
     }
 }
