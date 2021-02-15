@@ -1,4 +1,4 @@
-package ru.javazen.telegram.bot.container;
+package ru.javazen.telegram.bot.util;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -6,18 +6,18 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class SizedItemsContainerTreeMapImplTest {
-    private SizedItemsContainer<String> container = new SizedItemsContainerTreeMapImpl<>();
+public class SizedItemsContainerTest {
+    private final SizedItemsContainer<String> container = new SizedItemsContainer<>();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         container.put("A", 1.0);
         container.put("B", 2.0);
         container.put("C", 1.5);
     }
 
     @Test
-    public void get() throws Exception {
+    public void get() {
         assertEquals("A", container.get(0.0));
         assertEquals("A", container.get(0.5));
 
@@ -34,7 +34,7 @@ public class SizedItemsContainerTreeMapImplTest {
     }
 
     @Test
-    public void size() throws Exception {
+    public void size() {
         assertEquals(1.0 + 2.0 + 1.5, container.size(), 0);
     }
 
