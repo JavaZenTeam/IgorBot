@@ -49,6 +49,7 @@
                     Morris.Donut({
                         element: 'message-types-donut',
                         data: response.map(mapDonutData),
+                        formatter: formatInteger,
                         colors: colors,
                         resize: true
                     })
