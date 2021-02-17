@@ -11,7 +11,7 @@ import ru.javazen.telegram.bot.security.authentication.AuthenticationTokenFilter
 import ru.javazen.telegram.bot.security.authentication.TokenAuthenticationProvider;
 
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled=true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -21,8 +21,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
+                .formLogin().disable()
                 .authorizeRequests()
-                .anyRequest().authenticated()
+                .antMatchers("/chat/*").authenticated()
                 .and()
                 .csrf().disable()
                 .logout()

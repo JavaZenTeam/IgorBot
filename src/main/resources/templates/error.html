@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title th:text="${httpStatus.reasonPhrase}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
+    <script type="text/javascript" src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/popper.js/1.14.1/umd/popper.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/script.js"></script>
+    <style>
+        .img-holder img {
+            height: 180px;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-white border-bottom p-3 ">
+    <div class="container clearfix">
+        <div th:switch="${httpStatus.value()}" class="float-left mr-3 img-holder">
+            <img th:case="403" src="/file/CAACAgIAAx0CUD2tfgACBE5gLSRv9LWrLWBCGTtzPvAS_lw71gACaQAD6NbiEv7ZQbY_n4ToHgQ">
+            <img th:case="404" src="/file/CAACAgIAAx0CUD2tfgACBIBgLSsPS_gjahS2jjHVgTCM8tVNJAACJAUAAujW4hIoMPdbijtLah4E">
+            <img th:case="*" src="/file/CAACAgQAAx0CUD2tfgACBJxgLS3pR_Ttluw7yhqJCk1e5_SBtAAC2AgAAt5A-Adzk0Y-JG4MdR4E">
+        </div>
+        <h1 class="display-4 pt-5" th:text="${httpStatus.reasonPhrase}"></h1>
+        <p class="text-secondary font-weight-bold" th:text="${httpStatus.value()} + ' error'"></p>
+    </div>
+</div>
+<div class="bg-light border-bottom p-3">
+    <div class="container">
+        <div th:switch="${httpStatus.value()}">
+            <div th:case="403">
+                <p>Sorry, but you don't have permissions to see this page.</p>
+                <p>Please, enter command <code>/chat_stats</code> in your chat to get a valid link.</p>
+            </div>
+            <div th:case="404">
+                <p>Sorry, but the page you requested was not found.</p>
+                <p>Please, enter command <code>/chat_stats</code> in your chat to get a valid link.</p>
+            </div>
+            <div th:case="*">
+                <p>Sorry, something went wrong.</p>
+                <p>Please, describe your problem on <a href="https://github.com/JavaZenTeam/IgorBot/issues">our GitHub</a>. We will resolve it soon.</p>
+            </div>
+        </div>
+
+        <!--/*@thymesVar id="bot" type="org.telegram.telegrambots.meta.api.objects.User"*/-->
+        <div class="container clearfix">
+            <a class="float-right"
+               th:href="${'https://t.me/' + bot.userName}"
+               th:text="${'@' + bot.userName}"></a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
