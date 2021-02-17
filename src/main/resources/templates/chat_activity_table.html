@@ -1,9 +1,11 @@
 <div xmlns:th="http://www.thymeleaf.org" class="fix-height">
+    <!--/*@thymesVar id="activityStatistic" type="java.util.List"*/-->
+    <!--/*@thymesVar id="chat" type="org.telegram.telegrambots.meta.api.objects.Chat"*/-->
     <table class="table table-bordered table-sm bg-white" th:if="${!activityStatistic.isEmpty()}">
         <thead class="thead-light text-center">
         <tr>
             <th width="8%">#</th>
-            <th th:text="${chat.isUserChat() ? 'Chat' : 'User'}" width="37%"></th>
+            <th width="37%" th:text="${chat.isUserChat() ? 'Chat' : 'User'}" ></th>
             <th width="25%">Activity</th>
             <th width="15%">Messages</th>
             <th width="15%">Characters</th>
@@ -14,11 +16,11 @@
             <td th:text="${iter.index} + 1" class="text-right"></td>
             <td th:text="${item.subject.label}">
             </td>
-            <td th:with="activity=${100.0 * item.score / totalScore}, activityStr=${#numbers.formatDecimal(activity, 0, 0)}">
+            <td th:with="activity=${100.0 * item.score / totalScore}, activityStr=${#numbers.formatDecimal(activity, 1, 0)}">
                 <div class="progress" style="height: 1.5rem"
-                     th:title="${#numbers.formatDecimal(item.score, 0, 0)} + ' points'">
+                     th:title="${#numbers.formatInteger(item.score, 0, 'WHITESPACE')} + ' points'">
                     <div class="progress-bar" role="progressbar"
-                         th:style="'width: ' + ${activityStr} + '%;'">
+                         th:style="'width: ' + ${activityStr} + '%; min-width: 1%'">
                         <div th:if="${activity >= 40}"
                              th:text="${activityStr} + '%'"></div>
                     </div>
@@ -26,8 +28,8 @@
                          th:text="${activityStr} + '%'"></div>
                 </div>
             </td>
-            <td th:text="${item.count}" class="text-right"></td>
-            <td th:text="${item.length}" class="text-right"></td>
+            <td th:text="${#numbers.formatInteger(item.count, 1, 'WHITESPACE')}" class="text-right"></td>
+            <td th:text="${#numbers.formatInteger(item.length, 1, 'WHITESPACE')}" class="text-right"></td>
         </tr>
         </tbody>
     </table>
