@@ -1,3 +1,7 @@
+function formatInteger(number) {
+    return new Intl.NumberFormat('ru-RU').format(number);
+}
+
 function formatYear(timestamp) {
     var date = new Date(timestamp);
     return date.getFullYear();
@@ -25,7 +29,7 @@ function formatTime(timestamp) {
     return parts.join(':');
 }
 
-function resolveFormat(dateStr) {
+function resolveDateFormat(dateStr) {
     var len = dateStr.length;
     if (len === 'YYYY'.length) {
         return formatYear
