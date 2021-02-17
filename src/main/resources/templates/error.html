@@ -18,9 +18,9 @@
 <div class="bg-white border-bottom p-3 ">
     <div class="container clearfix">
         <div th:switch="${httpStatus.value()}" class="float-left mr-3 img-holder">
-            <img th:case="403" src="/file/CAACAgIAAx0CUD2tfgACBE5gLSRv9LWrLWBCGTtzPvAS_lw71gACaQAD6NbiEv7ZQbY_n4ToHgQ">
-            <img th:case="404" src="/file/CAACAgIAAx0CUD2tfgACBIBgLSsPS_gjahS2jjHVgTCM8tVNJAACJAUAAujW4hIoMPdbijtLah4E">
-            <img th:case="*" src="/file/CAACAgQAAx0CUD2tfgACBJxgLS3pR_Ttluw7yhqJCk1e5_SBtAAC2AgAAt5A-Adzk0Y-JG4MdR4E">
+            <img th:case="403" src="/sticker_error_403.webp"/>
+            <img th:case="404" src="/sticker_error_404.webp">
+            <img th:case="*" src="/sticker_error.webp">
         </div>
         <h1 class="display-4 pt-5" th:text="${httpStatus.reasonPhrase}"></h1>
         <p class="text-secondary font-weight-bold" th:text="${httpStatus.value()} + ' error'"></p>
