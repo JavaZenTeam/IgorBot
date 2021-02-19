@@ -84,6 +84,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return repository.findById(subscriptionPK)
                 .map(subscription -> {
                     repository.delete(subscription);
+                    getSubscriptions().invalidate(subscriptionPK.getChatId());
                     return true;
                 })
                 .orElse(false);
