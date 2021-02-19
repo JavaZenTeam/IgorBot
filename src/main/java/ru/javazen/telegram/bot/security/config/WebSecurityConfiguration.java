@@ -21,9 +21,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-                .formLogin().disable()
                 .authorizeRequests()
-                .antMatchers("/chat/*").authenticated()
                 .and()
                 .csrf().disable()
                 .logout()
