@@ -1,35 +1,23 @@
 package ru.javazen.telegram.bot.web;
 
-import lombok.AllArgsConstructor;
-import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
+import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
-
+@Slf4j
 @Controller
-@AllArgsConstructor
-public class ErrorPagesController implements ErrorController {
+public class ErrorPagesController extends BasicErrorController {
     private final DefaultAbsSender bot;
 
-    @Override
-    public String getErrorPath() {
-        return "error";
-    }
-
-    @GetMapping("error")
-    public String getErrorPage(HttpServletRequest request, Model model) {
-        Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        int statusCode = Integer.parseInt(status.toString());
-        model.addAttribute("httpStatus", HttpStatus.resolve(statusCode));
-        return "error";
+    public ErrorPagesController(ErrorAttributes errorAttributes, ServerProperties serverProperties, DefaultAbsSender bot) {
+        super(errorAttributes, serverProperties.getError());
+        this.bot = bot;
     }
 
     @ModelAttribute("bot")
