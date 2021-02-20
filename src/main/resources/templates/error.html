@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
+<!--/*@thymesVar id="status" type="java.lang.Integer"*/-->
+<!--/*@thymesVar id="error" type="java.lang.String"*/-->
 <head>
-    <title th:text="${httpStatus.reasonPhrase}"></title>
+    <title th:text="${error}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
     <script type="text/javascript" src="/webjars/jquery/3.0.0/jquery.min.js"></script>
@@ -17,18 +19,18 @@
 <body>
 <div class="bg-white border-bottom p-3 ">
     <div class="container clearfix">
-        <div th:switch="${httpStatus.value()}" class="float-left mr-3 img-holder">
+        <div th:switch="${status}" class="float-left mr-3 img-holder">
             <img th:case="403" src="/sticker_error_403.webp"/>
             <img th:case="404" src="/sticker_error_404.webp">
             <img th:case="*" src="/sticker_error.webp">
         </div>
-        <h1 class="display-4 pt-5" th:text="${httpStatus.reasonPhrase}"></h1>
-        <p class="text-secondary font-weight-bold" th:text="${httpStatus.value()} + ' error'"></p>
+        <h1 class="display-4 pt-5" th:text="${error}"></h1>
+        <p class="text-secondary font-weight-bold" th:text="${status} + ' error'"></p>
     </div>
 </div>
 <div class="bg-light border-bottom p-3">
     <div class="container">
-        <div th:switch="${httpStatus.value()}">
+        <div th:switch="${status}">
             <div th:case="403">
                 <p>Sorry, but you don't have permissions to see this page.</p>
                 <p>Please, enter command <code>/chat_stats</code> in your chat to get a valid link.</p>
