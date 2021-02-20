@@ -42,7 +42,7 @@
             to: $('#toDate').val(),
             type: $('#chat-type-holder > span').text()
         });
-        var path = window.location.pathname + "message-types";
+        var path = window.location.pathname + "/message-types";
         $.get(path + "?" + param)
             .done(function (response) {
                 if (response.length > 0) {

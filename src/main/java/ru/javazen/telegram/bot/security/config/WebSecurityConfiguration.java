@@ -18,21 +18,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private TokenAuthenticationProvider tokenAuthenticationProvider;
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
-        http
-                .authorizeRequests()
-                .and()
-                .csrf().disable()
-                .logout()
-                .permitAll();
-
+    protected void configure(HttpSecurity http) {
         http.addFilterAfter(new AuthenticationTokenFilter(), BasicAuthenticationFilter.class);
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) {
-
         auth.authenticationProvider(tokenAuthenticationProvider);
     }
 }
