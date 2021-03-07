@@ -1,6 +1,7 @@
 package ru.javazen.telegram.bot.web;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -16,10 +17,7 @@ import ru.javazen.telegram.bot.datasource.model.*;
 import ru.javazen.telegram.bot.model.ChatEntity;
 import ru.javazen.telegram.bot.model.UserEntity;
 import ru.javazen.telegram.bot.repository.MessageRepository;
-import ru.javazen.telegram.bot.util.ChartDataConverter;
-import ru.javazen.telegram.bot.util.DateRange;
-import ru.javazen.telegram.bot.util.DateRanges;
-import ru.javazen.telegram.bot.util.MilestoneHelper;
+import ru.javazen.telegram.bot.util.*;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -27,11 +25,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
+@Slf4j
 @Controller
 @AllArgsConstructor
 @RequestMapping("/chat/{chatId}")
 public class ChatController {
     private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT+04:00"); //TODO get actual tz from user
+    private static final int MAX_ACTIVITY_SIZE = 8;
+
     private final DefaultAbsSender bot;
     private final StatisticDataSource<UserEntity> chatDataSource;
     private final StatisticDataSource<ChatEntity> userDataSource;
@@ -69,7 +70,9 @@ public class ChatController {
 
         var activityStatistic = dataSource.topActivity(chatId, dateRange);
         model.addAttribute("activityStatistic", activityStatistic);
-        model.addAttribute("totalScore", activityStatistic.stream().mapToDouble(Statistic::getScore).sum());
+        Long scoreLimit = calcScoreLimitToFitSize(activityStatistic);
+        model.addAttribute("scoreLimit", scoreLimit);
+        model.addAttribute("otherSum", sumOtherStats(activityStatistic, scoreLimit));
         model.addAttribute("topStickers", dataSource.topStickers(chatId, dateRange, 6));
 
         Integer prevMessageCount = dataSource.messageCountByDate(chatId, dateRange.getFrom());
@@ -77,6 +80,41 @@ public class ChatController {
         model.addAttribute("milestoneSummary", milestoneHelper.getMilestoneSummary(prevMessageCount, currMessageCount));
 
         return "chat";
+    }
+
+    private Long calcScoreLimitToFitSize(List<? extends Statistic<?>> data) {
+        if (data.size() > MAX_ACTIVITY_SIZE) {
+            long[] values = data.stream().mapToLong(Statistic::getScorePercentage).sorted().toArray();
+            long scoreLimit = values[data.size() - MAX_ACTIVITY_SIZE];
+            long filtered = data.stream()
+                    .filter(item -> item.getScorePercentage() <= scoreLimit)
+                    .count();
+            if (filtered < 3) {
+                return null;
+            } else {
+                return scoreLimit;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Statistic.AbstractStatistic<?> sumOtherStats(List<? extends Statistic<?>> activityStatistic, Long scoreLimit) {
+        if (scoreLimit == null) {
+            return null;
+        }
+        return activityStatistic.stream()
+                .filter(item -> item.getScorePercentage() <= scoreLimit)
+                .map(Statistic.AbstractStatistic.class::cast)
+                .reduce((t1, t2) -> new Statistic.StringStatistic(
+                        "Other",
+                        t1.getCount() + t2.getCount(),
+                        t1.getLength() + t2.getLength(),
+                        t1.getScore() + t2.getScore(),
+                        t1.getDataset())
+                )
+                .orElse(null);
     }
 
     @PreAuthorize("hasAuthority(#chatIdStr)")

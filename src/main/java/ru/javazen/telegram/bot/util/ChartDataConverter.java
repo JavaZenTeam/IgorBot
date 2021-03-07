@@ -5,13 +5,12 @@ import lombok.Getter;
 import org.springframework.stereotype.Component;
 import ru.javazen.telegram.bot.datasource.model.ChartData;
 import ru.javazen.telegram.bot.datasource.model.PeriodStatistic;
-import ru.javazen.telegram.bot.model.ChatEntity;
-import ru.javazen.telegram.bot.model.UserEntity;
+import ru.javazen.telegram.bot.model.IdSupplier;
+import ru.javazen.telegram.bot.model.LabelSupplier;
 
 import java.util.*;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.summingLong;
 
@@ -29,8 +28,7 @@ public class ChartDataConverter {
                 .sorted(Comparator.comparing(totalCounts::get).reversed())
                 .collect(Collectors.toList());
         ChartData target = new ChartData();
-        target.setXKey(0);
-        target.setYKeys(IntStream.range(1, subjects.size() + 1).toArray());
+        target.setIds(subjects.stream().mapToLong(this::extractId).toArray());
         target.setLabels(subjects.stream().map(this::formatLabel).toArray(String[]::new));
         Object[][] data = source.stream()
                 .collect(Collectors.groupingBy(PeriodStatistic::getPeriod))
@@ -56,12 +54,16 @@ public class ChartDataConverter {
         return result;
     }
 
-    private String formatLabel(Object subject) {
-        if (subject instanceof UserEntity userEntity) {
-            return userEntity.getLabel();
+    private long extractId(Object subject) {
+        if (subject instanceof IdSupplier idSupplier) {
+            return idSupplier.getId();
         }
-        if (subject instanceof ChatEntity chatEntity) {
-            return chatEntity.getLabel();
+        return 0;
+    }
+
+    private String formatLabel(Object subject) {
+        if (subject instanceof LabelSupplier labelSupplier) {
+            return labelSupplier.getLabel();
         }
         return subject.toString();
     }
