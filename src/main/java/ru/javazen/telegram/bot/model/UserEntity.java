@@ -13,7 +13,7 @@ import java.util.Optional;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity {
+public class UserEntity implements IdSupplier, LabelSupplier {
     @Id
     private Integer userId;
 
@@ -26,11 +26,17 @@ public class UserEntity {
     @Column(length = 32)
     private String username;
 
+    @Override
     public String getLabel() {
         return Optional.ofNullable(getFirstName())
                 .map(firstName -> Optional.ofNullable(getLastName())
                         .map(lastName -> firstName + " " + lastName)
                         .orElse(firstName))
                 .orElse(getLastName());
+    }
+
+    @Override
+    public long getId() {
+        return getUserId();
     }
 }

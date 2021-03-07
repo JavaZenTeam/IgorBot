@@ -24,13 +24,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> {
     private static final String ACTIVITY_CHART_SQL = "select generate_series, " +
-        "c.chat_id, c.username, c.title, " +
-        "count(*) as count, sum(text_length) as length, sum(score) as score " +
-        "from generate_series(cast(:from as TIMESTAMP), cast(:to as TIMESTAMP), cast(:period as INTERVAL)) " +
-        "left join message_entity m on user_id = :user_id " +
-        "and date >= generate_series and date < generate_series + cast(:period as INTERVAL) " +
-        "left join chat_entity c on m.chat_id = c.chat_id " +
-        "group by generate_series, c.chat_id, c.username, c.title";
+            "c.chat_id, c.username, c.title, " +
+            "count(*) as count, sum(text_length) as length, sum(score) as score " +
+            "from generate_series(cast(:from as TIMESTAMP), cast(:to as TIMESTAMP), cast(:period as INTERVAL)) " +
+            "left join message_entity m on user_id = :user_id " +
+            "and date >= generate_series and date < generate_series + cast(:period as INTERVAL) " +
+            "left join chat_entity c on m.chat_id = c.chat_id " +
+            "group by generate_series, c.chat_id, c.username, c.title";
 
     private static final String MESSAGE_TYPES_SQL = "select " +
             "case " +
@@ -66,7 +66,9 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
         query.select(builder.construct(Statistic.ChatStatistic.class, chatJoin, count, length, score));
         query.orderBy(builder.desc(score));
 
-        return entityManager.createQuery(query).getResultList();
+        List<Statistic.ChatStatistic> dataset = entityManager.createQuery(query).getResultList();
+        dataset.forEach(item -> item.setDataset(dataset));
+        return dataset;
     }
 
     @Override
@@ -80,7 +82,11 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
         List<Object[]> resultList = nativeQuery.getResultList();
         DateFormat format = new SimpleDateFormat(interval.getUnit().getDatetimeFormat());
         format.setTimeZone(timeZone);
-        return resultList.stream().map(obj -> mapToPeriodChatStatistic(obj, format)).collect(Collectors.toList());
+        var dataset = resultList.stream()
+                .map(obj -> mapToPeriodChatStatistic(obj, format))
+                .collect(Collectors.toList());
+        dataset.forEach(item -> item.setDataset(dataset));
+        return dataset;
     }
 
     private static PeriodStatistic.ChatPeriodStatistic mapToPeriodChatStatistic(Object[] arr, DateFormat format) {

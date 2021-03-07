@@ -71,7 +71,9 @@ public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> 
         query.select(builder.construct(Statistic.UserStatistic.class, userJoin, count, length, score));
         query.orderBy(builder.desc(score));
 
-        return entityManager.createQuery(query).getResultList();
+        List<Statistic.UserStatistic> dataset = entityManager.createQuery(query).getResultList();
+        dataset.forEach(item -> item.setDataset(dataset));
+        return dataset;
     }
 
     @Override
@@ -85,7 +87,11 @@ public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> 
         List<Object[]> resultList = nativeQuery.getResultList();
         DateFormat format = new SimpleDateFormat(interval.getUnit().getDatetimeFormat());
         format.setTimeZone(timeZone);
-        return resultList.stream().map(obj -> mapToPeriodUserStatistic(obj, format)).collect(Collectors.toList());
+        var dataset = resultList.stream()
+                .map(obj -> mapToPeriodUserStatistic(obj, format))
+                .collect(Collectors.toList());
+        dataset.forEach(item -> item.setDataset(dataset));
+        return dataset;
     }
 
     private static PeriodStatistic.UserPeriodStatistic mapToPeriodUserStatistic(Object[] arr, DateFormat format) {
