@@ -13,7 +13,7 @@ import java.util.Optional;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatEntity {
+public class ChatEntity implements IdSupplier, LabelSupplier {
     @Id
     private long chatId;
 
@@ -23,8 +23,14 @@ public class ChatEntity {
     @Column(length = 512)
     private String title;
 
+    @Override
     public String getLabel() {
         return Optional.ofNullable(getTitle())
                 .orElse("Private chat");
+    }
+
+    @Override
+    public long getId() {
+        return getChatId();
     }
 }
