@@ -6,17 +6,14 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class TimeInterval {
-    private final int interval;
+    private final int quantity;
     private final Unit unit;
 
-    @AllArgsConstructor
-    @Getter
     public enum Unit {
-        YEAR("yyyy"),
-        MONTH("yyyy-MM"),
-        DAY("yyyy-MM-dd"),
-        HOUR("yyyy-MM-dd HH:mm");
-        private final String datetimeFormat;
+        YEAR,
+        MONTH,
+        DAY,
+        HOUR,
+        ;
     }
-
 }

@@ -32,6 +32,11 @@
             <span th:if="${chat.isSuperGroupChat()}">super group</span>
             <span th:if="${chat.isUserChat()}">user</span>
         </p>
+        <script>
+            function getChatType() {
+                return $('#chat-type-holder > span').text()
+            }
+        </script>
     </div>
 </div>
 <div class="bg-light p-3 ">

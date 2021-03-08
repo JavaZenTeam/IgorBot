@@ -15,9 +15,12 @@ import javax.persistence.Query;
 import javax.persistence.criteria.*;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -73,26 +76,28 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
 
     @Override
     @Transactional(readOnly = true)
-    public List<PeriodStatistic.ChatPeriodStatistic> activityChart(Long userId, DateRange dateRange, TimeInterval interval, TimeZone timeZone) {
+    public List<PeriodStatistic.ChatPeriodStatistic> activityChart(Long userId, DateRange dateRange, TimeInterval interval, ZoneId timeZone) {
         Query nativeQuery = entityManager.createNativeQuery(ACTIVITY_CHART_SQL);
         nativeQuery.setParameter("user_id", userId);
         nativeQuery.setParameter("from", dateRange.getFrom());
         nativeQuery.setParameter("to", dateRange.getTo());
-        nativeQuery.setParameter("period", interval.getInterval() + " " + interval.getUnit());
+        nativeQuery.setParameter("period", interval.getQuantity() + " " + interval.getUnit());
         List<Object[]> resultList = nativeQuery.getResultList();
-        DateFormat format = new SimpleDateFormat(interval.getUnit().getDatetimeFormat());
-        format.setTimeZone(timeZone);
         var dataset = resultList.stream()
-                .map(obj -> mapToPeriodChatStatistic(obj, format))
+                .map(obj -> mapToPeriodChatStatistic(obj, timeZone))
                 .collect(Collectors.toList());
         dataset.forEach(item -> item.setDataset(dataset));
         return dataset;
     }
 
-    private static PeriodStatistic.ChatPeriodStatistic mapToPeriodChatStatistic(Object[] arr, DateFormat format) {
-        String period = format.format((Timestamp) arr[0]);
+    private static PeriodStatistic.ChatPeriodStatistic mapToPeriodChatStatistic(Object[] arr, ZoneId userZone) {
+        Timestamp periodTimestamp = (Timestamp) arr[0];
+        LocalDateTime periodDateTime = periodTimestamp.toLocalDateTime()
+                .atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(userZone)
+                .toLocalDateTime();
         if (arr[1] == null) {
-            return new PeriodStatistic.ChatPeriodStatistic(period);
+            return new PeriodStatistic.ChatPeriodStatistic(periodDateTime);
         } else {
             long chatId = ((BigInteger) arr[1]).longValue();
             String chatUsername = (String) arr[2];
@@ -101,7 +106,7 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
             long count = ((BigInteger) arr[4]).longValue();
             long length = ((BigInteger) arr[5]).longValue();
             double score = (Double) arr[6];
-            return new PeriodStatistic.ChatPeriodStatistic(period, chat, count, length, score);
+            return new PeriodStatistic.ChatPeriodStatistic(periodDateTime, chat, count, length, score);
         }
     }
 

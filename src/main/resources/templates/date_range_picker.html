@@ -78,11 +78,19 @@
         weekStart: 1
     });
 
+    function getFromDate() {
+        return $('#fromDate').val();
+    }
+
+    function getToDate() {
+        return $('#toDate').val();
+    }
+
     function selectRange(range) {
         window.location.search = $.param({range: range})
     }
 
     function selectCustomRange() {
-        window.location.search = $.param({range: 'CUSTOM', from: $('#fromDate').val(), to: $('#toDate').val()});
+        window.location.search = $.param({range: 'CUSTOM', from: getFromDate(), to: getToDate()});
     }
 </script>

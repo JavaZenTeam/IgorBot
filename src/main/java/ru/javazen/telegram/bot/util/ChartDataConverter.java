@@ -8,6 +8,7 @@ import ru.javazen.telegram.bot.datasource.model.PeriodStatistic;
 import ru.javazen.telegram.bot.model.IdSupplier;
 import ru.javazen.telegram.bot.model.LabelSupplier;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
@@ -33,18 +34,18 @@ public class ChartDataConverter {
         Object[][] data = source.stream()
                 .collect(Collectors.groupingBy(PeriodStatistic::getPeriod))
                 .entrySet().stream()
-                .map(entry -> formatDataRow(entry, subjects, attribute))
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> formatDataRow(entry.getKey(), entry.getValue(), subjects, attribute))
                 .toArray(Object[][]::new);
         target.setData(data);
         return target;
     }
 
-    private Object[] formatDataRow(Map.Entry<String, ? extends List<? extends PeriodStatistic<?>>> entry,
+    private Object[] formatDataRow(LocalDateTime period, List<? extends PeriodStatistic<?>> statistic,
                                    List<Object> subjects, Attribute attribute) {
-        List<? extends PeriodStatistic<?>> statistic = entry.getValue();
         Object[] result = new Object[subjects.size() + 1];
         Arrays.fill(result, 0);
-        result[0] = entry.getKey();
+        result[0] = period.toString();
         for (PeriodStatistic<?> userStatistic : statistic) {
             if (userStatistic.getSubject() != null) {
                 int index = subjects.indexOf(userStatistic.getSubject());

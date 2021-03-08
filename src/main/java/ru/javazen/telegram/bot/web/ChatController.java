@@ -44,12 +44,12 @@ public class ChatController {
     @GetMapping
     public String getChatView(@PathVariable("chatId") String chatIdStr, Model model,
                               TimeZone timeZone,
-                              @RequestParam(value = "range", required = false, defaultValue = "LAST_WEEK")
+                              @RequestParam(defaultValue = "LAST_WEEK")
                                       DateRanges range,
-                              @RequestParam(value = "from", required = false)
+                              @RequestParam(required = false)
                               @DateTimeFormat(pattern = "dd.MM.yyyy")
                                       LocalDate from,
-                              @RequestParam(value = "to", required = false)
+                              @RequestParam(required = false)
                               @DateTimeFormat(pattern = "dd.MM.yyyy")
                                       LocalDate to) throws TelegramApiException {
         Long chatId = Long.valueOf(chatIdStr);
@@ -121,24 +121,24 @@ public class ChatController {
     @GetMapping("activity-chart")
     @ResponseBody
     public ChartData getChatActivityChart(@PathVariable("chatId") String chatIdStr,
-                                          @RequestParam(value = "attribute", defaultValue = "SCORE")
+                                          @RequestParam(defaultValue = "SCORE")
                                                   ChartDataConverter.Attribute attribute,
-                                          @RequestParam("interval")
-                                                  int interval,
-                                          @RequestParam("interval_unit")
-                                                  TimeInterval.Unit unit,
-                                          @RequestParam(value = "from")
+                                          @RequestParam(defaultValue = "1")
+                                                  int intervalQuantity,
+                                          @RequestParam(defaultValue = "DAY")
+                                                  TimeInterval.Unit intervalUnit,
+                                          @RequestParam
                                           @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                   LocalDate from,
-                                          @RequestParam(value = "to")
+                                          @RequestParam
                                           @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                   LocalDate to,
-                                          @RequestParam String type) {
+                                          @RequestParam(required = false) String chatType) {
         Long chatId = Long.valueOf(chatIdStr);
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
-        TimeInterval timeInterval = new TimeInterval(interval, unit);
-        var dataSource = Objects.equals(type, "user") ? userDataSource : chatDataSource;
-        var statistic = dataSource.activityChart(chatId, dateRange, timeInterval, DEFAULT_TIME_ZONE);
+        TimeInterval timeInterval = new TimeInterval(intervalQuantity, intervalUnit);
+        var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
+        var statistic = dataSource.activityChart(chatId, dateRange, timeInterval, DEFAULT_TIME_ZONE.toZoneId());
         return chartDataConverter.convert(statistic, attribute);
     }
 
@@ -146,16 +146,16 @@ public class ChatController {
     @GetMapping("message-types")
     @ResponseBody
     public List<CountStatistic> getMessageTypesChart(@PathVariable("chatId") String chatIdStr,
-                                                     @RequestParam(value = "from")
+                                                     @RequestParam
                                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                              LocalDate from,
-                                                     @RequestParam(value = "to")
+                                                     @RequestParam
                                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                              LocalDate to,
-                                                     @RequestParam String type) {
+                                                     @RequestParam(required = false) String chatType) {
         Long chatId = Long.valueOf(chatIdStr);
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
-        var dataSource = Objects.equals(type, "user") ? userDataSource : chatDataSource;
+        var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
         return dataSource.messageTypesChart(chatId, dateRange);
     }
 

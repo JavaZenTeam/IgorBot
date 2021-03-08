@@ -4,19 +4,21 @@ import lombok.Getter;
 import ru.javazen.telegram.bot.model.ChatEntity;
 import ru.javazen.telegram.bot.model.UserEntity;
 
+import java.time.LocalDateTime;
+
 public interface PeriodStatistic<T> extends Statistic<T> {
-    String getPeriod();
+    LocalDateTime getPeriod();
 
     @Getter
     class UserPeriodStatistic extends Statistic.UserStatistic implements PeriodStatistic<UserEntity> {
-        private final String period;
+        private final LocalDateTime period;
 
-        public UserPeriodStatistic(String period, UserEntity subject, Long count, Long length, Double score) {
+        public UserPeriodStatistic(LocalDateTime period, UserEntity subject, Long count, Long length, Double score) {
             super(subject, count, length, score);
             this.period = period;
         }
 
-        public UserPeriodStatistic(String period) {
+        public UserPeriodStatistic(LocalDateTime period) {
             super(null, null, null, null);
             this.period = period;
         }
@@ -24,14 +26,14 @@ public interface PeriodStatistic<T> extends Statistic<T> {
 
     @Getter
     class ChatPeriodStatistic extends Statistic.ChatStatistic implements PeriodStatistic<ChatEntity> {
-        private final String period;
+        private final LocalDateTime period;
 
-        public ChatPeriodStatistic(String period, ChatEntity subject, Long count, Long length, Double score) {
+        public ChatPeriodStatistic(LocalDateTime period, ChatEntity subject, Long count, Long length, Double score) {
             super(subject, count, length, score);
             this.period = period;
         }
 
-        public ChatPeriodStatistic(String period) {
+        public ChatPeriodStatistic(LocalDateTime period) {
             super(null, null, null, null);
             this.period = period;
         }
