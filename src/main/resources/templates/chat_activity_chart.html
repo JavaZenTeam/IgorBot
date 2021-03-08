@@ -15,7 +15,7 @@
             <div>
                 <label class="setting">
                     <span>Mode</span>
-                    <select name="activity-chart-mode" onchange="refresh()"
+                    <select name="activity-chart-mode" onchange="refreshChartView()"
                             class="custom-select custom-select-sm form-control form-control-sm">
                         <option value="DEFAULT">Default</option>
                         <option value="SUM">Sum</option>
@@ -28,7 +28,7 @@
             <div class="text-lg-center">
                 <label class="setting">
                     <span>Attribute</span>
-                    <select name="activity-chart-attribute" onchange="changeIntervalOrAttribute()"
+                    <select name="activity-chart-attribute" onchange="refreshChartData()"
                             class="custom-select custom-select-sm form-control form-control-sm">
                         <option value="SCORE">Score</option>
                         <option value="MESSAGES">Messages</option>
@@ -41,7 +41,7 @@
             <div class="text-lg-right">
                 <label class="setting">
                     <span>Interval</span>
-                    <select name="activity-chart-interval" onchange="changeIntervalOrAttribute()"
+                    <select name="activity-chart-interval" onchange="refreshChartData()"
                             class="custom-select custom-select-sm form-control form-control-sm"></select>
                 </label>
             </div>
@@ -52,14 +52,26 @@
     </div>
 </div>
 <script>
-    let from, to;
-    let chartControl, chartData;
-    let ids, selectedIds;
     let intervalOptions;
+    let chartControl;
+    let chartSvg;
+    let chartData;
+    let ids, selectedIds;
+    let labels;
+
+    function getMode() {
+        return $('select[name=activity-chart-mode]').val();
+    }
+
+    function getAttribute() {
+        return $('select[name=activity-chart-attribute]').val();
+    }
+
+    function getInterval() {
+        return  intervalOptions[$('select[name=activity-chart-interval]').val()];
+    }
 
     $(document).ready(function () {
-        from = $('#fromDate').val();
-        to = $('#toDate').val();
         selectedIds = $('.row-select[checked]').map((i, el) => el.id).toArray();
         $('.row-select')
             .change((e) => {
@@ -68,19 +80,19 @@
                 } else {
                     selectedIds.splice(selectedIds.indexOf(e.target.id), 1);
                 }
-                refresh();
+                refreshChartView();
             });
 
         intervalOptions = getAvailableIntervalOptions();
         renderIntervalOptions();
-        let interval = intervalOptions[0];
+        let interval = getInterval();
         let path = window.location.pathname + "/activity-chart";
         let param = $.param({
-            from: from,
-            to: to,
-            interval: interval[0],
-            interval_unit: interval[1],
-            type: $('#chat-type-holder > span').text(),
+            from: getFromDate(),
+            to: getToDate(),
+            intervalQuantity: interval.quantity,
+            intervalUnit: interval.unit,
+            chatType: getChatType(),
         });
         $.get(path + "?" + param)
             .done(function (response) {
@@ -98,14 +110,15 @@
     function buildChart(response) {
         chartData = response['data'];
         ids = response['ids'];
-        let sample = chartData[0][0];
-        let dateFormat = resolveDateFormat(sample);
+        labels = response['labels'];
+        let dateFormat = resolveDateFormat();
         chartControl = Morris.Area({
             element: 'activity-chart',
             data: chartData,
             xkey: 0,
             ykeys: filteredYKeys(),
-            labels: response['labels'],
+            labels: filteredLabels(),
+            xLabels: getInterval().unit.toLowerCase(),
             xLabelFormat: dateFormat,
             dateFormat: dateFormat,
             yLabelFormat: formatInteger,
@@ -115,17 +128,36 @@
             resize: true,
             smooth: false
         });
+        chartSvg = $('#activity-chart>svg');
+        chartSvg.height(chartSvg.height() + 10);
+    }
+
+    function filterSelectedIds(item, index) {
+        return selectedIds.indexOf("" + ids[index]) !== -1;
     }
 
     function filteredYKeys() {
         return Array.from(Array(ids.length).keys())
-            .filter((item, index) => selectedIds.indexOf("" + ids[index]) !== -1)
+            .filter(filterSelectedIds)
             .map(i => i + 1);
     }
 
-    function refresh() {
-        let mode = $('select[name=activity-chart-mode]').val();
-        switch (mode) {
+    function filteredLabels() {
+        return labels.filter(filterSelectedIds);
+    }
+
+    function refreshChartView() {
+        let dateFormat = resolveDateFormat();
+        if (dateFormat === formatDateTime) {
+            //to fit date time label into canvas. part 1
+            chartSvg.height(chartSvg.height() - 10);
+        }
+        chartControl.options.xLabelFormat = dateFormat;
+        chartControl.options.dateFormat = dateFormat;
+        chartControl.options.ykeys = filteredYKeys();
+        chartControl.options.labels = filteredLabels();
+        chartControl.options.xLabels = getInterval().unit.toLowerCase();
+        switch (getMode()) {
             case 'SUM':
                 sumMode();
                 break;
@@ -135,6 +167,10 @@
             default:
                 defaultMode();
         }
+        if (dateFormat === formatDateTime) {
+            //to fit date time label into canvas. part 2
+            chartSvg.height(chartSvg.height() + 10);
+        }
     }
 
     function defaultMode() {
@@ -143,7 +179,6 @@
         chartControl.options.fillOpacity = 0.0;
         chartControl.options.postUnits = '';
         chartControl.options.ymax = 'auto';
-        chartControl.options.ykeys = filteredYKeys();
         chartControl.setData(chartData);
     }
 
@@ -153,7 +188,6 @@
         chartControl.options.fillOpacity = 1.0;
         chartControl.options.postUnits = '';
         chartControl.options.ymax = 'auto';
-        chartControl.options.ykeys = filteredYKeys();
         chartControl.setData(chartData);
     }
 
@@ -163,15 +197,14 @@
         chartControl.options.fillOpacity = 1.0;
         chartControl.options.postUnits = '%';
         chartControl.options.ymax = 100.0;
-        chartControl.options.ykeys = filteredYKeys();
         let data = chartData.map(function (item) {
             let result = [item[0]];
-            let sum = item.slice(1).reduce(function (a, b) {
-                return a + b
-            });
+            let filteredData = item.slice(1)
+                .filter(filterSelectedIds);
+            let sum = filteredData.reduce((a, b) => a + b, 0);
             for (let i = 1; i < item.length; i++) {
                 let ratio = sum === 0
-                    ? 1.0 / (item.length - 1.0) * 100.0
+                    ? 1.0 / filteredData.length * 100.0
                     : item[i] / sum * 100.0;
                 result.push(ratio.toFixed(1));
             }
@@ -180,30 +213,20 @@
         chartControl.setData(data);
     }
 
-    function changeIntervalOrAttribute() {
-        let intervalIndex = $('select[name=activity-chart-interval]').val();
-        let attribute = $('select[name=activity-chart-attribute]').val();
-        refreshChartData(intervalOptions[intervalIndex], attribute);
-    }
-
-    function refreshChartData(interval, attribute) {
+    function refreshChartData() {
         let path = window.location.pathname + "/activity-chart";
         let param = $.param({
-            from: from,
-            to: to,
-            attribute: attribute,
-            interval: interval[0],
-            interval_unit: interval[1],
-            type: $('#chat-type-holder > span').text(),
+            from: getFromDate(),
+            to: getToDate(),
+            attribute: getAttribute(),
+            intervalQuantity: getInterval().quantity,
+            intervalUnit: getInterval().unit,
+            chatType: getChatType(),
         });
         $.get(path + "?" + param)
             .done(function (response) {
                 chartData = response['data'];
-                var sample = chartData[0][0];
-                var format = resolveDateFormat(sample);
-                chartControl.xLabelFormat = format;
-                chartControl.dateFormat = format;
-                refresh();
+                refreshChartView();
             });
     }
 
@@ -229,13 +252,39 @@
             [3, 'MONTH'],
             [6, 'MONTH'],
             [1, 'YEAR']
-        ];
-        let periodDuration = 24 + (getTime(to) - getTime(from)) / (1000 * 60 * 60);
-        return intervalOptions.filter(function (item) {
-            let intervalDuration = item[0] * hoursInUnit[item[1]];
-            return periodDuration >= 3 * intervalDuration &&
-                periodDuration <= 50 * intervalDuration;
+        ].map(item => {
+            return {
+                quantity: item[0],
+                unit: item[1],
+                hoursDuration: item[0] * hoursInUnit[item[1]]
+            }
         });
+        let periodDuration = getPeriodHoursDuration();
+        return intervalOptions.filter(function (item) {
+            return periodDuration >= 3 * item.hoursDuration &&
+                periodDuration <= 50 * item.hoursDuration;
+        });
+    }
+
+    function resolveDateFormat() {
+        let periodDuration = getPeriodHoursDuration();
+        switch (getInterval().unit) {
+            case 'HOUR':
+                if (periodDuration <= 24) {
+                    return formatTime;
+                } else {
+                    return formatDateTime;
+                }
+            case 'DAY': return formatDate;
+            case 'MONTH': return formatMonth;
+            case 'YEAR': return formatYear;
+            default:
+                return formatDateTime;
+        }
+    }
+
+    function getPeriodHoursDuration() {
+        return 24 + (getTime(getToDate()) - getTime(getFromDate())) / (1000 * 60 * 60)
     }
 
     function getTime(date) {
@@ -246,8 +295,9 @@
     function renderIntervalOptions() {
         let selectElement = $('select[name=activity-chart-interval]');
         intervalOptions.forEach(function (item, i) {
-            let text = item[0] + ' ' + item[1].toLowerCase() + (item[0] > 1 ? 's' : '');
+            let text = item.quantity + ' ' + item.unit.toLowerCase() + (item.quantity > 1 ? 's' : '');
             selectElement.append('<option value="' + i + '">' + text + '</option>');
         })
+        selectElement.val('1');
     }
 </script>
