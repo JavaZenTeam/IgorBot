@@ -6,14 +6,14 @@ import ru.javazen.telegram.bot.datasource.model.Statistic;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
 import ru.javazen.telegram.bot.util.DateRange;
 
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public interface StatisticDataSource<T> {
     List<? extends Statistic<? extends T>> topActivity(Long chatId, DateRange dateRange);
 
-    List<? extends PeriodStatistic<? extends T>> activityChart(Long chatId, DateRange dateRange, TimeInterval interval, TimeZone timeZone);
+    List<? extends PeriodStatistic<? extends T>> activityChart(Long chatId, DateRange dateRange, TimeInterval interval, ZoneId timeZone);
 
     List<CountStatistic> topStickers(Long chatId, DateRange dateRange, Integer maxResults);
 

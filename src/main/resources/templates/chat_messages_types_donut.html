@@ -1,10 +1,10 @@
 <div id="message-types-donut-container">
-    <div class="bg-white border px-3 mb-3">
+    <div class="bg-white border p-3 mb-3">
         <div id="message-types-donut"></div>
     </div>
 </div>
 <script>
-    var donutLabels = {
+    let donutLabels = {
         'FORWARD': 'Forward',
         'EVENT': 'Event',
         'TEXT': 'Text',
@@ -16,7 +16,7 @@
         'VIDEO_NOTE': 'Video note',
         'STICKER': 'Sticker'
     };
-    var colors = [
+    let colors = [
         '#007bff',
         '#28a745',
         '#ffc107',
@@ -37,12 +37,12 @@
     }
 
     $(document).ready(function () {
-        var param = $.param({
-            from: $('#fromDate').val(),
-            to: $('#toDate').val(),
-            type: $('#chat-type-holder > span').text()
+        let param = $.param({
+            from: getFromDate(),
+            to: getToDate(),
+            chatType: getChatType()
         });
-        var path = window.location.pathname + "/message-types";
+        let path = window.location.pathname + "/message-types";
         $.get(path + "?" + param)
             .done(function (response) {
                 if (response.length > 0) {
