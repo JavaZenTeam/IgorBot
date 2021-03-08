@@ -15,13 +15,12 @@ import javax.persistence.Query;
 import javax.persistence.criteria.*;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @Repository
@@ -78,32 +77,34 @@ public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> 
 
     @Override
     @Transactional(readOnly = true)
-    public List<PeriodStatistic.UserPeriodStatistic> activityChart(Long chatId, DateRange dateRange, TimeInterval interval, TimeZone timeZone) {
+    public List<PeriodStatistic.UserPeriodStatistic> activityChart(Long chatId, DateRange dateRange, TimeInterval interval, ZoneId timeZone) {
         Query nativeQuery = entityManager.createNativeQuery(ACTIVITY_CHART_SQL);
         nativeQuery.setParameter("chat_id", chatId);
         nativeQuery.setParameter("from", dateRange.getFrom());
         nativeQuery.setParameter("to", dateRange.getTo());
-        nativeQuery.setParameter("period", interval.getInterval() + " " + interval.getUnit());
+        nativeQuery.setParameter("period", interval.getQuantity() + " " + interval.getUnit());
         List<Object[]> resultList = nativeQuery.getResultList();
-        DateFormat format = new SimpleDateFormat(interval.getUnit().getDatetimeFormat());
-        format.setTimeZone(timeZone);
         var dataset = resultList.stream()
-                .map(obj -> mapToPeriodUserStatistic(obj, format))
+                .map(obj -> mapToPeriodUserStatistic(obj, timeZone))
                 .collect(Collectors.toList());
         dataset.forEach(item -> item.setDataset(dataset));
         return dataset;
     }
 
-    private static PeriodStatistic.UserPeriodStatistic mapToPeriodUserStatistic(Object[] arr, DateFormat format) {
-        String period = format.format((Timestamp) arr[0]);
+    private static PeriodStatistic.UserPeriodStatistic mapToPeriodUserStatistic(Object[] arr, ZoneId userZone) {
+        Timestamp periodTimestamp = (Timestamp) arr[0];
+        LocalDateTime periodDateTime = periodTimestamp.toLocalDateTime()
+                .atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(userZone)
+                .toLocalDateTime();
         if (arr[1] == null) {
-            return new PeriodStatistic.UserPeriodStatistic(period);
+            return new PeriodStatistic.UserPeriodStatistic(periodDateTime);
         } else {
             UserEntity user = new UserEntity((Integer) arr[1], (String) arr[2], (String) arr[3], (String) arr[4]);
             long count = ((BigInteger) arr[5]).longValue();
             long length = ((BigInteger) arr[6]).longValue();
             double score = (Double) arr[7];
-            return new PeriodStatistic.UserPeriodStatistic(period, user, count, length, score);
+            return new PeriodStatistic.UserPeriodStatistic(periodDateTime, user, count, length, score);
         }
     }
 
