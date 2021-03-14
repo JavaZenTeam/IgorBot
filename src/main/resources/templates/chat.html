@@ -17,26 +17,30 @@
 </head>
 <body>
 <div class="bg-white border-bottom p-3 ">
-    <div class="container clearfix">
-        <img th:if="${chat.photo}" th:src="${'/file/' + chat.photo.smallFileId}"
-             class="rounded float-left mr-3" style="height: 120px;">
-        <div th:replace="date_range_picker"></div>
-        <h1 class="display-4">
-            <span th:text="${chat.title}"></span>
-            <span th:text="${chat.firstName}"></span>
-            <span th:text="${chat.lastName}"></span>
-        </h1>
-        <p id="chat-type-holder" class="text-secondary font-weight-bold">
-            <span th:if="${chat.isChannelChat()}">channel</span>
-            <span th:if="${chat.isGroupChat()}">group</span>
-            <span th:if="${chat.isSuperGroupChat()}">super group</span>
-            <span th:if="${chat.isUserChat()}">user</span>
-        </p>
-        <script>
-            function getChatType() {
-                return $('#chat-type-holder > span').text()
-            }
-        </script>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-8 clearfix">
+                <img th:if="${chat.photo}" th:src="${'/file/' + chat.photo.smallFileId}"
+                     class="rounded float-left mr-3" style="height: 120px;">
+                <h1 th:class="${(chat.title?.length() ?: 0) + (chat.firstName?.length() ?: 0) + (chat.lastName?.length() ?: 0) > 10 ? 'font-weight-light' : 'display-4'}">
+                    <span th:if="${chat.title}" th:text="${chat.title}"></span>
+                    <span th:if="${chat.firstName}" th:text="${chat.firstName}"></span>
+                    <span th:if="${chat.lastName}" th:text="${chat.lastName}"></span>
+                </h1>
+                <p id="chat-type-holder" class="text-secondary font-weight-bold">
+                    <span th:if="${chat.isChannelChat()}">channel</span>
+                    <span th:if="${chat.isGroupChat()}">group</span>
+                    <span th:if="${chat.isSuperGroupChat()}">super group</span>
+                    <span th:if="${chat.isUserChat()}">user</span>
+                </p>
+                <script>
+                    function getChatType() {
+                        return $('#chat-type-holder > span').text()
+                    }
+                </script>
+            </div>
+            <div class="col-12 col-md-4" th:include="date_range_picker"></div>
+        </div>
     </div>
 </div>
 <div class="bg-light p-3 ">
