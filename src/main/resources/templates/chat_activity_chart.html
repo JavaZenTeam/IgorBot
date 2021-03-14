@@ -1,9 +1,9 @@
 <style>
-    .setting {
+    .chart-setting {
         font-size: 85%;
     }
 
-    .setting > select {
+    .chart-setting > select {
         width: 120px;
         font-size: 100% !important;
         padding-top: 4px !important;
@@ -11,40 +11,34 @@
 </style>
 <div class="activity-chart-container">
     <div class="row">
-        <div class="col-sm-12 col-md-4">
-            <div>
-                <label class="setting">
-                    <span>Mode</span>
-                    <select name="activity-chart-mode" onchange="refreshChartView()"
-                            class="custom-select custom-select-sm form-control form-control-sm">
-                        <option value="DEFAULT">Default</option>
-                        <option value="SUM">Sum</option>
-                        <option value="RATIO">Ratio</option>
-                    </select>
-                </label>
-            </div>
+        <div class="col-4">
+            <label class="chart-setting d-flex">
+                <span class="d-none d-md-inline p-1 flex-fill">Mode</span>
+                <select name="activity-chart-mode" onchange="refreshChartView()"
+                        class="custom-select custom-select-sm form-control form-control-sm flex-fill">
+                    <option value="DEFAULT">Default</option>
+                    <option value="SUM">Sum</option>
+                    <option value="RATIO">Ratio</option>
+                </select>
+            </label>
         </div>
-        <div class="col-sm-12 col-md-4">
-            <div class="text-lg-center">
-                <label class="setting">
-                    <span>Attribute</span>
-                    <select name="activity-chart-attribute" onchange="refreshChartData()"
-                            class="custom-select custom-select-sm form-control form-control-sm">
-                        <option value="SCORE">Score</option>
-                        <option value="MESSAGES">Messages</option>
-                        <option value="CHARACTERS">Characters</option>
-                    </select>
-                </label>
-            </div>
+        <div class="col-4">
+            <label class="chart-setting d-flex">
+                <span class="d-none d-md-inline p-1 flex-fill">Attribute</span>
+                <select name="activity-chart-attribute" onchange="refreshChartData()"
+                        class="custom-select custom-select-sm form-control form-control-sm flex-fill">
+                    <option value="SCORE">Score</option>
+                    <option value="MESSAGES">Messages</option>
+                    <option value="CHARACTERS">Characters</option>
+                </select>
+            </label>
         </div>
-        <div class="col-sm-12 col-md-4">
-            <div class="text-lg-right">
-                <label class="setting">
-                    <span>Interval</span>
-                    <select name="activity-chart-interval" onchange="refreshChartData()"
-                            class="custom-select custom-select-sm form-control form-control-sm"></select>
-                </label>
-            </div>
+        <div class="col-4">
+            <label class="chart-setting d-flex">
+                <span class="d-none d-md-inline p-1 flex-fill">Interval</span>
+                <select name="activity-chart-interval" onchange="refreshChartData()"
+                        class="custom-select custom-select-sm form-control form-control-sm flex-fill"></select>
+            </label>
         </div>
     </div>
     <div class="bg-white border p-2 mb-3">
@@ -68,7 +62,7 @@
     }
 
     function getInterval() {
-        return  intervalOptions[$('select[name=activity-chart-interval]').val()];
+        return intervalOptions[$('select[name=activity-chart-interval]').val()];
     }
 
     $(document).ready(function () {
@@ -275,9 +269,12 @@
                 } else {
                     return formatDateTime;
                 }
-            case 'DAY': return formatDate;
-            case 'MONTH': return formatMonth;
-            case 'YEAR': return formatYear;
+            case 'DAY':
+                return formatDate;
+            case 'MONTH':
+                return formatMonth;
+            case 'YEAR':
+                return formatYear;
             default:
                 return formatDateTime;
         }
