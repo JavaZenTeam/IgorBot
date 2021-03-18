@@ -36,7 +36,7 @@ public class UserEntity implements IdSupplier, LabelSupplier {
     }
 
     @Override
-    public long getId() {
-        return getUserId();
+    public String getId() {
+        return getClass().getSimpleName() + "/" + getUserId();
     }
 }

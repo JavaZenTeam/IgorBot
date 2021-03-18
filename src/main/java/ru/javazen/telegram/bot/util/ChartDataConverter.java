@@ -29,7 +29,7 @@ public class ChartDataConverter {
                 .sorted(Comparator.comparing(totalCounts::get).reversed())
                 .collect(Collectors.toList());
         ChartData target = new ChartData();
-        target.setIds(subjects.stream().mapToLong(this::extractId).toArray());
+        target.setIds(subjects.stream().map(this::extractId).toArray((String[]::new)));
         target.setLabels(subjects.stream().map(this::formatLabel).toArray(String[]::new));
         Object[][] data = source.stream()
                 .collect(Collectors.groupingBy(PeriodStatistic::getPeriod))
@@ -55,11 +55,11 @@ public class ChartDataConverter {
         return result;
     }
 
-    private long extractId(Object subject) {
+    private String extractId(Object subject) {
         if (subject instanceof IdSupplier idSupplier) {
             return idSupplier.getId();
         }
-        return 0;
+        return subject.toString();
     }
 
     private String formatLabel(Object subject) {

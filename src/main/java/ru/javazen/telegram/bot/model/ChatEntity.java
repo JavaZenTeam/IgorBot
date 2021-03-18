@@ -30,7 +30,7 @@ public class ChatEntity implements IdSupplier, LabelSupplier {
     }
 
     @Override
-    public long getId() {
-        return getChatId();
+    public String getId() {
+        return getClass().getSimpleName() + "/" + getChatId();
     }
 }

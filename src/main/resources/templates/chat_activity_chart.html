@@ -123,7 +123,9 @@
             smooth: false
         });
         chartSvg = $('#activity-chart>svg');
-        chartSvg.height(chartSvg.height() + 10);
+        if (dateFormat === formatDateTime) {
+            chartSvg.height(chartSvg.height() + 10);
+        }
     }
 
     function filterSelectedIds(item, index) {
