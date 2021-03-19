@@ -14,7 +14,12 @@ public interface MessageRepository extends Repository<MessageEntity, MessagePK> 
 
     MessageEntity findTop1ByChatChatIdOrderByDateAsc(Long chatId);
 
+    MessageEntity findTop1ByOrderByDateAsc();
+
     default Date startChatDate(Long chatId) {
         return findTop1ByChatChatIdOrderByDateAsc(chatId).getDate();
+    }
+    default Date startBotDate() {
+        return findTop1ByOrderByDateAsc().getDate();
     }
 }

@@ -20,7 +20,7 @@ public class TokenController {
         if (authenticationToken == null) {
             throw new TokenNotFoundException();
         }
-        return "redirect:/chat/" + authenticationToken.getChatId();
+        return "redirect:" + authenticationToken.getPath();
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)

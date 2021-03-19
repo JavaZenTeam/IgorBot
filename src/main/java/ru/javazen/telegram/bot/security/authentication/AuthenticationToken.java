@@ -8,5 +8,5 @@ import lombok.Data;
 public class AuthenticationToken {
 
     private String token;
-    private Long chatId;
+    private String path;
 }
