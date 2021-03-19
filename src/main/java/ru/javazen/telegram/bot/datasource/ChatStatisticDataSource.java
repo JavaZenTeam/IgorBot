@@ -59,9 +59,12 @@ public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> 
 
         Root<MessageEntity> messages = query.from(MessageEntity.class);
         Join<MessageEntity, UserEntity> userJoin = messages.join(MessageEntity_.user);
-        query.where(
-                builder.equal(messages.get(MessageEntity_.chat), chatId),
-                builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
+        Predicate datePredicate = builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo());
+        if (chatId == null) {
+            query.where(datePredicate);
+        } else {
+            query.where(builder.equal(messages.get(MessageEntity_.chat), chatId), datePredicate);
+        }
         query.groupBy(userJoin);
 
         Expression<Long> count = builder.count(messages);

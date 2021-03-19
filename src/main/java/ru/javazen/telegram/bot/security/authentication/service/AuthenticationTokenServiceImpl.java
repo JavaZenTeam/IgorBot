@@ -1,18 +1,18 @@
 package ru.javazen.telegram.bot.security.authentication.service;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import ru.javazen.telegram.bot.security.authentication.AuthenticationToken;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
+@Service
 public class AuthenticationTokenServiceImpl implements AuthenticationTokenService {
 
     private static final int RANDOM_LENGTH = 8;
 
-    private Map<String, AuthenticationToken> authenticationTokens = new HashMap<>();
+    private final Map<String, AuthenticationToken> authenticationTokens = new ConcurrentHashMap<>();
 
     @Override
     public AuthenticationToken findByToken(String token) {
@@ -30,9 +30,9 @@ public class AuthenticationTokenServiceImpl implements AuthenticationTokenServic
     }
 
     @Override
-    public AuthenticationToken generateToken(Long chatId) {
+    public AuthenticationToken generateToken(String path) {
         String token = RandomStringUtils.randomAlphanumeric(RANDOM_LENGTH);
-        AuthenticationToken authenticationToken = new AuthenticationToken(token, chatId);
+        AuthenticationToken authenticationToken = new AuthenticationToken(token, path);
         authenticationTokens.put(token, authenticationToken);
 
         return authenticationToken;

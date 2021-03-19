@@ -59,7 +59,7 @@ public class ChartDataConverter {
         if (subject instanceof IdSupplier idSupplier) {
             return idSupplier.getId();
         }
-        return 0;
+        return subject.hashCode();
     }
 
     private String formatLabel(Object subject) {

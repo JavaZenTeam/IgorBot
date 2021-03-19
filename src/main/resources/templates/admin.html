@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title th:text="${#strings.concat(chat.title, ' ', chat.firstName, ' ', chat.lastName).trim()}"></title>
+    <title th:text="${#strings.concat(bot.firstName, ' ', bot.lastName).trim()}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/morrisjs/0.5.1/morris.css">
@@ -20,24 +20,15 @@
     <div class="container">
         <div class="row">
             <div class="col-12 col-md-8 clearfix">
-                <img th:if="${chat.photo}" th:src="${'/file/' + chat.photo.smallFileId}"
+                <img th:if="${botPhoto}" th:src="${'/file/' + botPhoto.fileId}"
                      class="rounded float-left mr-3" style="height: 120px;">
-                <h1 th:class="${(chat.title?.length() ?: 0) + (chat.firstName?.length() ?: 0) + (chat.lastName?.length() ?: 0) > 10 ? 'font-weight-light' : 'display-4'}">
-                    <span th:if="${chat.title}" th:text="${chat.title}"></span>
-                    <span th:if="${chat.firstName}" th:text="${chat.firstName}"></span>
-                    <span th:if="${chat.lastName}" th:text="${chat.lastName}"></span>
+                <h1 class="display-4">
+                    <span th:if="${bot.firstName}" th:text="${bot.firstName}"></span>
+                    <span th:if="${bot.lastName}" th:text="${bot.lastName}"></span>
                 </h1>
                 <p id="chat-type-holder" class="text-secondary font-weight-bold">
-                    <span th:if="${chat.isChannelChat()}">channel</span>
-                    <span th:if="${chat.isGroupChat()}">group</span>
-                    <span th:if="${chat.isSuperGroupChat()}">super group</span>
-                    <span th:if="${chat.isUserChat()}">user</span>
+                    <span>bot</span>
                 </p>
-                <script>
-                    function getChatType() {
-                        return $('#chat-type-holder > span').text()
-                    }
-                </script>
             </div>
             <div class="col-12 col-md-4" th:include="date_range_picker"></div>
         </div>
@@ -46,19 +37,17 @@
 <div class="bg-light p-3 ">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8">
-                <h4>Top Activity</h4>
-                <div th:replace="chat_activity_table :: table ('activity-table', ${activityStatisticSummary})"></div>
-                <h4>Activity chart</h4>
-                <div th:replace="chat_activity_chart"></div>
+            <div class="col-lg-6">
+                <h4>Top Chat Activity</h4>
+                <div th:replace="chat_activity_table :: table ('chat-activity-table', ${chatActivityStatisticSummary})"></div>
+<!--                <h4>Chat Activity chart</h4>-->
+<!--                <div th:replace="chat_activity_chart"></div>-->
             </div>
-            <div class="col-lg-4">
-                <h4>Milestones</h4>
-                <div th:replace="chat_milestones"></div>
-                <h4>Top Used Stickers</h4>
-                <div th:replace="chat_stickers"></div>
-                <h4>Message Types Ratio</h4>
-                <div th:replace="chat_messages_types_donut"></div>
+            <div class="col-lg-6">
+                <h4>Top User Activity</h4>
+                <div th:replace="chat_activity_table :: table ('user-activity-table', ${userActivityStatisticSummary})"></div>
+<!--                <h4>User Activity chart</h4>-->
+<!--                <div th:replace="chat_activity_chart"></div>-->
             </div>
         </div>
     </div>

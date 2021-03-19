@@ -10,6 +10,6 @@ public interface AuthenticationTokenService {
 
     AuthenticationToken delete(String token);
 
-    AuthenticationToken generateToken(Long chatId);
+    AuthenticationToken generateToken(String path);
 
 }
