@@ -8,5 +8,5 @@ import lombok.Setter;
 public class ChartData {
     private Object[][] data;
     private String[] labels;
-    private String[] ids;
+    private long[] ids;
 }

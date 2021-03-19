@@ -66,13 +66,14 @@
     }
 
     $(document).ready(function () {
-        selectedIds = $('.row-select[checked]').map((i, el) => el.id).toArray();
+        selectedIds = $('.row-select[checked]').map((i, el) => el.id.split('/')[1]).toArray();
         $('.row-select')
             .change((e) => {
+                let objectId = e.target.id.split('/')[1];
                 if (e.target.checked) {
-                    selectedIds.push(e.target.id);
+                    selectedIds.push(objectId);
                 } else {
-                    selectedIds.splice(selectedIds.indexOf(e.target.id), 1);
+                    selectedIds.splice(selectedIds.indexOf(objectId), 1);
                 }
                 refreshChartView();
             });

@@ -1,6 +1,6 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <!--/*@thymesVar id="activityStatisticSummary" type="ru.javazen.telegram.bot.util.ActivityStatisticSummary"*/-->
-<div xmlns:th="http://www.thymeleaf.org" class="fix-height" th:fragment="table (id, activityStatisticSummary)">
+<div xmlns:th="http://www.thymeleaf.org" class="fix-height" th:fragment="table (tableId, activityStatisticSummary)">
     <script>
         function expandOverLimitStat(tableId) {
             $(`#${tableId} tr[hidden]`).removeAttr('hidden')
@@ -18,7 +18,7 @@
             left: auto;
         }
     </style>
-    <table th:id="${id}" class="table table-bordered table-sm bg-white" th:if="${!activityStatisticSummary.isEmpty()}">
+    <table th:id="${tableId}" class="table table-bordered table-sm bg-white" th:if="${!activityStatisticSummary.isEmpty()}">
         <thead class="thead-light text-center">
         <tr>
             <!--suppress HtmlDeprecatedAttribute-->
@@ -35,8 +35,8 @@
             th:hidden="${hidden}">
             <td class="custom-checkbox text-right">
                 <!--suppress HtmlFormInputWithoutLabel -->
-                <input class="custom-control-input row-select" type="checkbox" th:checked="${!hidden}" th:id="${item.subject.id}">
-                <label class="custom-control-label" th:for="${item.subject.id}" th:text="${iter.index + 1}"></label>
+                <input class="custom-control-input row-select" type="checkbox" th:checked="${!hidden}" th:id="${tableId + '/' + item.subject.id}">
+                <label class="custom-control-label" th:for="${tableId + '/' + item.subject.id}" th:text="${iter.index + 1}"></label>
             </td>
             <td th:text="${#strings.abbreviate(item.subject.label, 28)}">
             </td>
@@ -57,7 +57,7 @@
         </tr>
         <tr th:if="${activityStatisticSummary.isLimited()}" class="other-group">
             <td class="text-right">
-                <div class="btn btn-sm btn-link dropdown-toggle py-0" th:attr="onclick=|expandOverLimitStat('${id}')|" ></div>
+                <div class="btn btn-sm btn-link dropdown-toggle py-0" th:attr="onclick=|expandOverLimitStat('${tableId}')|" ></div>
             </td>
             <td th:text="${activityStatisticSummary.overLimitStatistic.subject}"></td>
             <td>
