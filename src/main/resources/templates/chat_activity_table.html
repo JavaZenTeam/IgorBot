@@ -1,13 +1,10 @@
 <!--suppress HtmlDeprecatedAttribute -->
-<div xmlns:th="http://www.thymeleaf.org" class="fix-height">
-    <!--/*@thymesVar id="activityStatistic" type="java.util.List"*/-->
-    <!--/*@thymesVar id="chat" type="org.telegram.telegrambots.meta.api.objects.Chat"*/-->
-    <!--/*@thymesVar id="scoreLimit" type="java.lang.Long"*/-->
-    <!--/*@thymesVar id="otherSum" type="ru.javazen.telegram.bot.datasource.model.Statistic"*/-->
+<!--/*@thymesVar id="activityStatisticSummary" type="ru.javazen.telegram.bot.util.ActivityStatisticSummary"*/-->
+<div xmlns:th="http://www.thymeleaf.org" class="fix-height" th:fragment="table (tableId, activityStatisticSummary)">
     <script>
-        function expandOtherGroup() {
-            $('tr[hidden]').removeAttr('hidden')
-            $('#other-group').hide();
+        function expandOverLimitStat(tableId) {
+            $(`#${tableId} tr[hidden]`).removeAttr('hidden')
+            $(`#${tableId} .other-group`).hide();
         }
     </script>
     <!--suppress HtmlUnknownTag -->
@@ -21,25 +18,25 @@
             left: auto;
         }
     </style>
-    <table class="table table-bordered table-sm bg-white" th:if="${!activityStatistic.isEmpty()}">
+    <table th:id="${tableId}" class="table table-bordered table-sm bg-white" th:if="${!activityStatisticSummary.isEmpty()}">
         <thead class="thead-light text-center">
         <tr>
             <!--suppress HtmlDeprecatedAttribute-->
             <th width="8%">#</th>
-            <th width="37%" th:text="${chat.isUserChat() ? 'Chat' : 'User'}"></th>
+            <th width="37%" th:text="${activityStatisticSummary.subjectClass.simpleName.replace('Entity', '')}"></th>
             <th width="25%">Activity</th>
             <th width="15%">Messages</th>
             <th width="15%">Characters</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="item, iter : ${activityStatistic}"
-            th:with="hidden = ${scoreLimit != null && item.scorePercentage <= scoreLimit}"
+        <tr th:each="item, iter : ${activityStatisticSummary.statisticItems}"
+            th:with="hidden = ${activityStatisticSummary.isLimited() && item.scorePercentage <= activityStatisticSummary.limitValue}"
             th:hidden="${hidden}">
             <td class="custom-checkbox text-right">
                 <!--suppress HtmlFormInputWithoutLabel -->
-                <input class="custom-control-input row-select" type="checkbox" th:checked="${!hidden}" th:id="${item.subject.id}">
-                <label class="custom-control-label" th:for="${item.subject.id}" th:text="${iter.index + 1}"></label>
+                <input class="custom-control-input row-select" type="checkbox" th:checked="${!hidden}" th:id="${tableId + '/' + item.subject.id}">
+                <label class="custom-control-label" th:for="${tableId + '/' + item.subject.id}" th:text="${iter.index + 1}"></label>
             </td>
             <td th:text="${#strings.abbreviate(item.subject.label, 28)}">
             </td>
@@ -58,27 +55,29 @@
             <td th:text="${#numbers.formatInteger(item.count, 1, 'WHITESPACE')}" class="text-right"></td>
             <td th:text="${#numbers.formatInteger(item.length, 1, 'WHITESPACE')}" class="text-right"></td>
         </tr>
-        <tr th:if="${otherSum != null}" id="other-group">
-            <td class="text-right"><div class="btn btn-sm btn-link dropdown-toggle py-0" onclick="expandOtherGroup()"></div></td>
-            <td th:text="${otherSum.subject}"></td>
+        <tr th:if="${activityStatisticSummary.isLimited()}" class="other-group">
+            <td class="text-right">
+                <div class="btn btn-sm btn-link dropdown-toggle py-0" th:attr="onclick=|expandOverLimitStat('${tableId}')|" ></div>
+            </td>
+            <td th:text="${activityStatisticSummary.overLimitStatistic.subject}"></td>
             <td>
                 <div class="progress" style="height: 1.5rem"
-                     th:title="${#numbers.formatInteger(otherSum.score, 0, 'WHITESPACE')} + ' points'">
+                     th:title="${#numbers.formatInteger(activityStatisticSummary.overLimitStatistic.score, 0, 'WHITESPACE')} + ' points'">
                     <div class="progress-bar" role="progressbar"
-                         th:style="'width: ' + ${otherSum.scorePercentage} + '%; min-width: 1%'">
-                        <div th:if="${otherSum.scorePercentage >= 45}"
-                             th:text="${otherSum.scorePercentage} + '%'"></div>
+                         th:style="'width: ' + ${activityStatisticSummary.overLimitStatistic.scorePercentage} + '%; min-width: 1%'">
+                        <div th:if="${activityStatisticSummary.overLimitStatistic.scorePercentage >= 45}"
+                             th:text="${activityStatisticSummary.overLimitStatistic.scorePercentage} + '%'"></div>
                     </div>
-                    <div th:if="${otherSum.scorePercentage} < 45" class="ml-2 d-flex flex-column justify-content-center"
-                         th:text="${otherSum.scorePercentage} + '%'"></div>
+                    <div th:if="${activityStatisticSummary.overLimitStatistic.scorePercentage} < 45" class="ml-2 d-flex flex-column justify-content-center"
+                         th:text="${activityStatisticSummary.overLimitStatistic.scorePercentage} + '%'"></div>
                 </div>
             </td>
-            <td th:text="${#numbers.formatInteger(otherSum.count, 1, 'WHITESPACE')}" class="text-right"></td>
-            <td th:text="${#numbers.formatInteger(otherSum.length, 1, 'WHITESPACE')}" class="text-right"></td>
+            <td th:text="${#numbers.formatInteger(activityStatisticSummary.overLimitStatistic.count, 1, 'WHITESPACE')}" class="text-right"></td>
+            <td th:text="${#numbers.formatInteger(activityStatisticSummary.overLimitStatistic.length, 1, 'WHITESPACE')}" class="text-right"></td>
         </tr>
         </tbody>
     </table>
-    <div class="alert-info p-3 mb-3" th:if="${activityStatistic.isEmpty()}">
+    <div class="alert-info p-3 mb-3" th:if="${activityStatisticSummary.isEmpty()}">
         No messages found for the selected period
     </div>
 </div>

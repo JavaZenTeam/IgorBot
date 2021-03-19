@@ -12,7 +12,7 @@ import ru.javazen.telegram.bot.security.authentication.service.AuthenticationTok
 import java.text.MessageFormat;
 
 @RequiredArgsConstructor
-public class LinkToChatPageHandler implements MessageHandler {
+public class LinkToAdminPageHandler implements MessageHandler {
     private final String linkTemplate;
 
     @Autowired
@@ -20,9 +20,7 @@ public class LinkToChatPageHandler implements MessageHandler {
 
     @Override
     public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
-        String path = "/chat/" + message.getChatId();
-        String token = authenticationTokenService.generateToken(path).getToken();
-
+        String token = authenticationTokenService.generateToken("/admin").getToken();
         String link = MessageFormat.format(linkTemplate, token);
         sender.execute(new SendMessage(message.getChatId(), link));
         return true;

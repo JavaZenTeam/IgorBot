@@ -31,7 +31,6 @@ import java.util.TimeZone;
 @RequestMapping("/chat/{chatId}")
 public class ChatController {
     private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT+04:00"); //TODO get actual tz from user
-    private static final int MAX_ACTIVITY_SIZE = 8;
 
     private final DefaultAbsSender bot;
     private final StatisticDataSource<UserEntity> chatDataSource;
@@ -40,9 +39,9 @@ public class ChatController {
     private final MessageRepository messageRepository;
     private final MilestoneHelper milestoneHelper;
 
-    @PreAuthorize("hasAuthority(#chatIdStr)")
+    @PreAuthorize("hasAuthority('/chat/' + #chatId)")
     @GetMapping
-    public String getChatView(@PathVariable("chatId") String chatIdStr, Model model,
+    public String getChatView(@PathVariable Long chatId, Model model,
                               TimeZone timeZone,
                               @RequestParam(defaultValue = "LAST_WEEK")
                                       DateRanges range,
@@ -52,7 +51,6 @@ public class ChatController {
                               @RequestParam(required = false)
                               @DateTimeFormat(pattern = "dd.MM.yyyy")
                                       LocalDate to) throws TelegramApiException {
-        Long chatId = Long.valueOf(chatIdStr);
         DateRange dateRange = range.apply(timeZone);
         if (range == DateRanges.CUSTOM) {
             dateRange = new DateRange(from, to, timeZone);
@@ -69,10 +67,7 @@ public class ChatController {
         StatisticDataSource<?> dataSource = isUserChat ? userDataSource : chatDataSource;
 
         var activityStatistic = dataSource.topActivity(chatId, dateRange);
-        model.addAttribute("activityStatistic", activityStatistic);
-        Long scoreLimit = calcScoreLimitToFitSize(activityStatistic);
-        model.addAttribute("scoreLimit", scoreLimit);
-        model.addAttribute("otherSum", sumOtherStats(activityStatistic, scoreLimit));
+        model.addAttribute("activityStatisticSummary", new ActivityStatisticSummary(activityStatistic, 8));
         model.addAttribute("topStickers", dataSource.topStickers(chatId, dateRange, 6));
 
         Integer prevMessageCount = dataSource.messageCountByDate(chatId, dateRange.getFrom());
@@ -82,45 +77,10 @@ public class ChatController {
         return "chat";
     }
 
-    private Long calcScoreLimitToFitSize(List<? extends Statistic<?>> data) {
-        if (data.size() > MAX_ACTIVITY_SIZE) {
-            long[] values = data.stream().mapToLong(Statistic::getScorePercentage).sorted().toArray();
-            long scoreLimit = values[data.size() - MAX_ACTIVITY_SIZE];
-            long filtered = data.stream()
-                    .filter(item -> item.getScorePercentage() <= scoreLimit)
-                    .count();
-            if (filtered < 3) {
-                return null;
-            } else {
-                return scoreLimit;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Statistic.AbstractStatistic<?> sumOtherStats(List<? extends Statistic<?>> activityStatistic, Long scoreLimit) {
-        if (scoreLimit == null) {
-            return null;
-        }
-        return activityStatistic.stream()
-                .filter(item -> item.getScorePercentage() <= scoreLimit)
-                .map(Statistic.AbstractStatistic.class::cast)
-                .reduce((t1, t2) -> new Statistic.StringStatistic(
-                        "Other",
-                        t1.getCount() + t2.getCount(),
-                        t1.getLength() + t2.getLength(),
-                        t1.getScore() + t2.getScore(),
-                        t1.getDataset())
-                )
-                .orElse(null);
-    }
-
-    @PreAuthorize("hasAuthority(#chatIdStr)")
+    @PreAuthorize("hasAuthority('/chat/' + #chatId)")
     @GetMapping("activity-chart")
     @ResponseBody
-    public ChartData getChatActivityChart(@PathVariable("chatId") String chatIdStr,
+    public ChartData getChatActivityChart(@PathVariable Long chatId,
                                           @RequestParam(defaultValue = "SCORE")
                                                   ChartDataConverter.Attribute attribute,
                                           @RequestParam(defaultValue = "1")
@@ -134,7 +94,6 @@ public class ChatController {
                                           @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                   LocalDate to,
                                           @RequestParam(required = false) String chatType) {
-        Long chatId = Long.valueOf(chatIdStr);
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         TimeInterval timeInterval = new TimeInterval(intervalQuantity, intervalUnit);
         var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
@@ -142,10 +101,10 @@ public class ChatController {
         return chartDataConverter.convert(statistic, attribute);
     }
 
-    @PreAuthorize("hasAuthority(#chatIdStr)")
+    @PreAuthorize("hasAuthority('/chat/' + #chatId)")
     @GetMapping("message-types")
     @ResponseBody
-    public List<CountStatistic> getMessageTypesChart(@PathVariable("chatId") String chatIdStr,
+    public List<CountStatistic> getMessageTypesChart(@PathVariable Long chatId,
                                                      @RequestParam
                                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                              LocalDate from,
@@ -153,7 +112,6 @@ public class ChatController {
                                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                              LocalDate to,
                                                      @RequestParam(required = false) String chatType) {
-        Long chatId = Long.valueOf(chatIdStr);
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
         return dataSource.messageTypesChart(chatId, dateRange);

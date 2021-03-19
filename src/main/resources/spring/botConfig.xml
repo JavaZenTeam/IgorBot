@@ -177,7 +177,7 @@
         </constructor-arg>
         <constructor-arg name="handler">
             <bean class="ru.javazen.telegram.bot.handler.UserTimezoneHandler">
-                <constructor-arg name="chatConfigService" ref="chatConfigServiceImpl" />
+                <constructor-arg name="chatConfigService" ref="chatConfigServiceImpl"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -389,7 +389,8 @@
         </constructor-arg>
     </bean>
 
-    <bean id="abstractToggle" class="ru.javazen.telegram.bot.handler.toggle.ToggleChatConfigMappedValuesHandler" abstract="true">
+    <bean id="abstractToggle" class="ru.javazen.telegram.bot.handler.toggle.ToggleChatConfigMappedValuesHandler"
+          abstract="true">
         <property name="value2response">
             <map>
                 <entry key="Y" value-ref="happyOkSupplier"/>
@@ -422,34 +423,21 @@
     </bean>
 
     <bean id="statisticReports" class="ru.javazen.telegram.bot.handler.FilterAdapter">
-        <constructor-arg name="filter">
-            <bean class="ru.javazen.telegram.bot.filter.AllowedChatFilter">
-                <property name="allowedChatId" value="${bot.supportChat}"/>
-            </bean>
-        </constructor-arg>
-        <constructor-arg name="handlers">
+        <constructor-arg name="filters">
             <list>
-                <bean id="activeChats" class="ru.javazen.telegram.bot.handler.FilterAdapter">
-                    <constructor-arg name="filter">
-                        <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                            <property name="pattern" value="/active_chats"/>
-                        </bean>
-                    </constructor-arg>
-                    <constructor-arg name="handler">
-                        <bean class="ru.javazen.telegram.bot.handler.stats.ActiveChatsHandler"/>
-                    </constructor-arg>
+                <bean class="ru.javazen.telegram.bot.filter.AllowedChatFilter">
+                    <property name="allowedChatId" value="${bot.supportChat}"/>
                 </bean>
-                <bean id="activeUsers" class="ru.javazen.telegram.bot.handler.FilterAdapter">
-                    <constructor-arg name="filter">
-                        <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
-                            <property name="pattern" value="/active_users"/>
-                        </bean>
-                    </constructor-arg>
-                    <constructor-arg name="handler">
-                        <bean class="ru.javazen.telegram.bot.handler.stats.ActiveUsersHandler"/>
-                    </constructor-arg>
+                <bean class="ru.javazen.telegram.bot.filter.CommandFilter">
+                    <constructor-arg name="command" value="/admin_stats"/>
+                    <constructor-arg name="botName" value="${bot.name}"/>
                 </bean>
             </list>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.stats.LinkToAdminPageHandler">
+                <constructor-arg name="linkTemplate" value="${bot.baseUrl}/stats/{0}"/>
+            </bean>
         </constructor-arg>
     </bean>
 

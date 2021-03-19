@@ -32,7 +32,7 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
 
         if (authenticationToken != null) {
             Collection<GrantedAuthority> grantedAuthorities =
-                    Lists.newArrayList(new SimpleGrantedAuthority(authenticationToken.getChatId().toString()));
+                    Lists.newArrayList(new SimpleGrantedAuthority(authenticationToken.getPath()));
 
             for (GrantedAuthority authority : authorities) {
                 if (grantedAuthorities.stream().noneMatch(a -> a.getAuthority().equals(authority.getAuthority()))) {
