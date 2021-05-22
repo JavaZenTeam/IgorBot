@@ -29,10 +29,10 @@
         '#bd2130',
     ];
 
-    function mapDonutData(item) {
+    function mapDonutData({subject, count}) {
         return {
-            label: donutLabels[item.key],
-            value: item.count
+            label: donutLabels[subject],
+            value: count
         }
     }
 
