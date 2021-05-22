@@ -67,7 +67,7 @@ public class ChatController {
         StatisticDataSource<?> dataSource = isUserChat ? userDataSource : chatDataSource;
 
         var activityStatistic = dataSource.topActivity(chatId, dateRange);
-        model.addAttribute("activityStatisticSummary", new ActivityStatisticSummary(activityStatistic, 8));
+        model.addAttribute("activityStatisticSummary", new ActivityStatisticSummary(activityStatistic, 10));
         model.addAttribute("topStickers", dataSource.topUsedStickers(chatId, dateRange, 6));
 
         Integer prevMessageCount = dataSource.messageCountAtDate(chatId, dateRange.getFrom());
