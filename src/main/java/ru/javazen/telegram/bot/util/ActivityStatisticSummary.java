@@ -11,7 +11,7 @@ public class ActivityStatisticSummary {
     private final Class<?> subjectClass;
     private final int preferredSize;
     private final Long limitValue;
-    private final Statistic.AbstractStatistic<?> overLimitStatistic;
+    private final Statistic<?> overLimitStatistic;
 
     public ActivityStatisticSummary(List<? extends Statistic<?>> statisticItems, int preferredSize) {
         this.statisticItems = statisticItems;
@@ -52,14 +52,14 @@ public class ActivityStatisticSummary {
     }
 
     @SuppressWarnings("unchecked")
-    private Statistic.AbstractStatistic<?> sumOverLimitStats() {
+    private Statistic<?> sumOverLimitStats() {
         if (getLimitValue() == null) {
             return null;
         }
         return getStatisticItems().stream()
                 .filter(item -> item.getScorePercentage() <= limitValue)
-                .map(Statistic.AbstractStatistic.class::cast)
-                .reduce((t1, t2) -> new Statistic.StringStatistic(
+                .map(Statistic.class::cast)
+                .reduce((t1, t2) -> new Statistic<String>(
                         "Other",
                         t1.getCount() + t2.getCount(),
                         t1.getLength() + t2.getLength(),
