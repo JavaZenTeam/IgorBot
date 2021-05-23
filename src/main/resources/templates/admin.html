@@ -38,16 +38,16 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-6">
-                <h4>Top Chat Activity</h4>
-                <div th:replace="chat_activity_table :: table ('chat-activity-table', ${chatActivityStatisticSummary})"></div>
-<!--                <h4>Chat Activity chart</h4>-->
-<!--                <div th:replace="chat_activity_chart"></div>-->
+                <h4>Chat Activity Levels</h4>
+                <div th:replace="admin_activity_table :: table ('chat-activity-table', ${chatActivity})"></div>
+                <h4>Chat Activity Chart</h4>
+                <div th:replace="admin_activity_chart :: chart ('chat-activity-chart', 'chat-activity-chart')"></div>
             </div>
             <div class="col-lg-6">
-                <h4>Top User Activity</h4>
-                <div th:replace="chat_activity_table :: table ('user-activity-table', ${userActivityStatisticSummary})"></div>
-<!--                <h4>User Activity chart</h4>-->
-<!--                <div th:replace="chat_activity_chart"></div>-->
+                <h4>User Activity Levels</h4>
+                <div th:replace="admin_activity_table :: table ('user-activity-table', ${userActivity})"></div>
+                <h4>User Activity Chart</h4>
+                <div th:replace="admin_activity_chart :: chart ('user-activity-chart', 'user-activity-chart')"></div>
             </div>
         </div>
     </div>
