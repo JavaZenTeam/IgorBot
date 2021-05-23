@@ -2,36 +2,26 @@ package ru.javazen.telegram.bot.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.annotation.Nullable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
-@Entity
 @Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class ActivityLevel implements LabelSupplier, IdSupplier, Comparable<ActivityLevel> {
-    @Id
-    private Long id;
+public enum ActivityLevel implements LabelSupplier, IdSupplier, Comparable<ActivityLevel> {
+    LOW("Low activity", 0, 10),
+    MID("Middle activity", 10, 100),
+    HIGH("High activity", 100, null),
+    ;
 
-    private String name;
+    private final String label;
 
-    private Integer lowerThreshold;
+    private final Integer lowerThreshold;
 
     @Nullable
-    private Integer upperThreshold;
+    private final Integer upperThreshold;
 
     @Override
-    public String getLabel() {
-        return name;
-    }
-
-    @Override
-    public int compareTo(ActivityLevel o) {
-        return this.getLowerThreshold().compareTo(o.getLowerThreshold());
+    public Long getId() {
+        return 1L + ordinal();
     }
 }
