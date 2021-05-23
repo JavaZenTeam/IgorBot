@@ -1,0 +1,44 @@
+<div xmlns:th="http://www.thymeleaf.org" class="fix-height" th:fragment="chart (elementId, url)">
+    <style>
+        .chart-setting {
+            font-size: 85%;
+        }
+
+        .chart-setting > select {
+            width: 120px;
+            font-size: 100% !important;
+            padding-top: 4px !important;
+        }
+    </style>
+    <div th:id="${elementId + '-container'}">
+        <div class="row">
+            <div class="col-6">
+                <label class="chart-setting d-flex">
+                    <span class="d-none d-md-inline p-1 flex-fill">Mode</span>
+                    <select name="activity-chart-mode"
+                            class="custom-select custom-select-sm form-control form-control-sm flex-fill">
+                        <option value="DEFAULT">Default</option>
+                        <option value="SUM">Sum</option>
+                        <option value="RATIO">Ratio</option>
+                    </select>
+                </label>
+            </div>
+            <div class="col-6">
+                <label class="chart-setting d-flex">
+                    <span class="d-none d-md-inline p-1 flex-fill">Interval</span>
+                    <select name="activity-chart-interval"
+                            class="custom-select custom-select-sm form-control form-control-sm flex-fill"></select>
+                </label>
+            </div>
+        </div>
+        <div class="bg-white border p-2 mb-3">
+            <div th:id="${elementId + '-chart'}"></div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            let containerId = '[[${elementId + "-container"}]]';
+            new ActivityLevelsChart(containerId, '[[${elementId + "-chart"}]]', '[[${url}]]');
+            });
+    </script>
+</div>

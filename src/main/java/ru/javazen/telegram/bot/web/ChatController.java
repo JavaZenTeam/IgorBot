@@ -67,11 +67,11 @@ public class ChatController {
         StatisticDataSource<?> dataSource = isUserChat ? userDataSource : chatDataSource;
 
         var activityStatistic = dataSource.topActivity(chatId, dateRange);
-        model.addAttribute("activityStatisticSummary", new ActivityStatisticSummary(activityStatistic, 8));
-        model.addAttribute("topStickers", dataSource.topStickers(chatId, dateRange, 6));
+        model.addAttribute("activityStatisticSummary", new ActivityStatisticSummary(activityStatistic, 10));
+        model.addAttribute("topStickers", dataSource.topUsedStickers(chatId, dateRange, 6));
 
-        Integer prevMessageCount = dataSource.messageCountByDate(chatId, dateRange.getFrom());
-        Integer currMessageCount = dataSource.messageCountByDate(chatId, dateRange.getTo());
+        Integer prevMessageCount = dataSource.messageCountAtDate(chatId, dateRange.getFrom());
+        Integer currMessageCount = dataSource.messageCountAtDate(chatId, dateRange.getTo());
         model.addAttribute("milestoneSummary", milestoneHelper.getMilestoneSummary(prevMessageCount, currMessageCount));
 
         return "chat";
@@ -97,14 +97,14 @@ public class ChatController {
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         TimeInterval timeInterval = new TimeInterval(intervalQuantity, intervalUnit);
         var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
-        var statistic = dataSource.activityChart(chatId, dateRange, timeInterval, DEFAULT_TIME_ZONE.toZoneId());
-        return chartDataConverter.convert(statistic, attribute);
+        var statistic = dataSource.activityChart(chatId, dateRange, timeInterval);
+        return chartDataConverter.convert(statistic, attribute, DEFAULT_TIME_ZONE.toZoneId());
     }
 
     @PreAuthorize("hasAuthority('/chat/' + #chatId)")
     @GetMapping("message-types")
     @ResponseBody
-    public List<CountStatistic> getMessageTypesChart(@PathVariable Long chatId,
+    public List<Statistic<String>> getMessageTypesChart(@PathVariable Long chatId,
                                                      @RequestParam
                                                      @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                              LocalDate from,
@@ -114,7 +114,7 @@ public class ChatController {
                                                      @RequestParam(required = false) String chatType) {
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
-        return dataSource.messageTypesChart(chatId, dateRange);
+        return dataSource.messageTypesUsage(chatId, dateRange);
     }
 
     public Chat getChat(Long chatId) throws TelegramApiException {

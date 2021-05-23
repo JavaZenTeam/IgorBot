@@ -2,26 +2,15 @@ package ru.javazen.telegram.bot.datasource;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-import ru.javazen.telegram.bot.datasource.model.CountStatistic;
 import ru.javazen.telegram.bot.datasource.model.PeriodStatistic;
 import ru.javazen.telegram.bot.datasource.model.Statistic;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
-import ru.javazen.telegram.bot.model.*;
+import ru.javazen.telegram.bot.datasource.query.*;
+import ru.javazen.telegram.bot.model.ChatEntity;
 import ru.javazen.telegram.bot.util.DateRange;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.persistence.criteria.*;
-import java.math.BigInteger;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 @AllArgsConstructor
@@ -48,121 +37,34 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
             "  and date between cast(:from as TIMESTAMP) and cast(:to as TIMESTAMP) " +
             "group by type";
 
-    private final EntityManager entityManager;
+    private final MemberActivityTableQuery activityTableQuery;
+    private final MemberActivityChartQuery activityChartQuery;
+    private final TopUsedStickerQuery topUsedStickersQuery;
+    private final MessageTypesQuery messageTypesQuery;
+    private final MessageCountQuery messageCountQuery;
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Statistic.ChatStatistic> topActivity(Long userId, DateRange dateRange) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Statistic.ChatStatistic> query = builder.createQuery(Statistic.ChatStatistic.class);
-
-        Root<MessageEntity> messages = query.from(MessageEntity.class);
-        Join<MessageEntity, ChatEntity> chatJoin = messages.join(MessageEntity_.chat);
-        Predicate datePredicate = builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo());
-        if (userId == null) {
-            query.where(datePredicate);
-        } else {
-            query.where(builder.equal(messages.get(MessageEntity_.user), userId), datePredicate);
-        }
-        query.groupBy(chatJoin);
-
-        Expression<Long> count = builder.count(messages);
-        Expression<Long> length = builder.sumAsLong(messages.get(MessageEntity_.textLength));
-        Expression<Double> score = builder.sum(messages.get(MessageEntity_.score));
-        query.select(builder.construct(Statistic.ChatStatistic.class, chatJoin, count, length, score));
-        query.orderBy(builder.desc(score));
-
-        List<Statistic.ChatStatistic> dataset = entityManager.createQuery(query).getResultList();
-        dataset.forEach(item -> item.setDataset(dataset));
-        return dataset;
+    public List<Statistic<ChatEntity>> topActivity(Long userId, DateRange dateRange) {
+        return activityTableQuery.getUserActivity(userId, dateRange);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<PeriodStatistic.ChatPeriodStatistic> activityChart(Long userId, DateRange dateRange, TimeInterval interval, ZoneId timeZone) {
-        Query nativeQuery = entityManager.createNativeQuery(ACTIVITY_CHART_SQL);
-        nativeQuery.setParameter("user_id", userId);
-        nativeQuery.setParameter("from", dateRange.getFrom());
-        nativeQuery.setParameter("to", dateRange.getTo());
-        nativeQuery.setParameter("period", interval.getQuantity() + " " + interval.getUnit());
-        List<Object[]> resultList = nativeQuery.getResultList();
-        var dataset = resultList.stream()
-                .map(obj -> mapToPeriodChatStatistic(obj, timeZone))
-                .collect(Collectors.toList());
-        dataset.forEach(item -> item.setDataset(dataset));
-        return dataset;
-    }
-
-    private static PeriodStatistic.ChatPeriodStatistic mapToPeriodChatStatistic(Object[] arr, ZoneId userZone) {
-        Timestamp periodTimestamp = (Timestamp) arr[0];
-        LocalDateTime periodDateTime = periodTimestamp.toLocalDateTime()
-                .atZone(ZoneId.systemDefault())
-                .withZoneSameInstant(userZone)
-                .toLocalDateTime();
-        if (arr[1] == null) {
-            return new PeriodStatistic.ChatPeriodStatistic(periodDateTime);
-        } else {
-            long chatId = ((BigInteger) arr[1]).longValue();
-            String chatUsername = (String) arr[2];
-            String chatTitle = (String) arr[3];
-            ChatEntity chat = new ChatEntity(chatId, chatUsername, chatTitle);
-            long count = ((BigInteger) arr[4]).longValue();
-            long length = ((BigInteger) arr[5]).longValue();
-            double score = (Double) arr[6];
-            return new PeriodStatistic.ChatPeriodStatistic(periodDateTime, chat, count, length, score);
-        }
+    public List<PeriodStatistic<ChatEntity>> activityChart(Long userId, DateRange dateRange, TimeInterval interval) {
+        return activityChartQuery.getUserActivity(userId, dateRange, interval);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<CountStatistic> topStickers(Long userId, DateRange dateRange, Integer maxResults) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CountStatistic> query = builder.createQuery(CountStatistic.class);
-
-        Root<MessageEntity> messages = query.from(MessageEntity.class);
-        query.where(
-                builder.equal(messages.get(MessageEntity_.fileType), FileType.STICKER),
-                builder.equal(messages.get(MessageEntity_.user), userId),
-                builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo()));
-        Path<String> fileUniqueId = messages.get(MessageEntity_.fileUniqueId);
-        query.groupBy(fileUniqueId);
-
-        Expression<String> fileId = builder.greatest(messages.get(MessageEntity_.fileId));
-        Expression<Long> count = builder.count(messages);
-        query.select(builder.construct(CountStatistic.class, fileId, count));
-        query.orderBy(builder.desc(count));
-
-        return entityManager.createQuery(query)
-                .setMaxResults(Optional.ofNullable(maxResults).orElse(5))
-                .getResultList();
+    public List<Statistic<String>> topUsedStickers(Long userId, DateRange dateRange, Integer maxResults) {
+        return topUsedStickersQuery.getTopUsedUserStickers(userId, dateRange, maxResults);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<CountStatistic> messageTypesChart(Long userId, DateRange dateRange) {
-        List<Object[]> resultList = entityManager.createNativeQuery(MESSAGE_TYPES_SQL)
-                .setParameter("user_id", userId)
-                .setParameter("from", dateRange.getFrom())
-                .setParameter("to", dateRange.getTo())
-                .getResultList();
-
-        return resultList.stream()
-                .map(arr -> new CountStatistic((String) arr[0], ((BigInteger) arr[1]).longValue()))
-                .sorted(Comparator.comparing(CountStatistic::getKey))
-                .collect(Collectors.toList());
+    public List<Statistic<String>> messageTypesUsage(Long userId, DateRange dateRange) {
+        return messageTypesQuery.getChatMessagesByTypes(userId, dateRange);
     }
 
     @Override
-    public Integer messageCountByDate(Long chatId, Date date) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> query = builder.createQuery(Long.class);
-        Root<MessageEntity> messages = query.from(MessageEntity.class);
-        query.where(
-                builder.equal(messages.get(MessageEntity_.user), chatId),
-                builder.lessThanOrEqualTo(messages.get(MessageEntity_.date), date)
-        );
-        query.select(builder.count(messages.get(MessageEntity_.messagePK).get(MessagePK_.messageId)));
-        return Optional.ofNullable(entityManager.createQuery(query).getSingleResult())
-                .map(Long::intValue).orElse(0);
+    public Integer messageCountAtDate(Long userId, Date date) {
+        return messageCountQuery.getUserMessageCount(userId, date);
     }
 }
