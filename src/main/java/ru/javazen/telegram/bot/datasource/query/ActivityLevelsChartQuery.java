@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,8 +40,7 @@ public class ActivityLevelsChartQuery {
     }
 
     private List<PeriodStatistic<ActivityLevel>> activityChartByLevels(DateRange dateRange, TimeInterval interval, String groupEntity) {
-        List<ActivityLevel> activityLevels = entityManager.createQuery("SELECT al FROM ActivityLevel al", ActivityLevel.class)
-                .getResultList();
+
         Query nativeQuery = entityManager.createNativeQuery(MessageFormat.format(SQL_TEMPLATE, groupEntity))
                 .setParameter("from", dateRange.getFrom())
                 .setParameter("to", dateRange.getTo())
@@ -51,7 +51,7 @@ public class ActivityLevelsChartQuery {
                         Collectors.mapping(arr -> arr[0] == null ? null : (Double) arr[2],
                                 Collectors.toList())));
 
-        return activityLevels.stream()
+        return Arrays.stream(ActivityLevel.values())
                 .flatMap(activityLevel -> dailyCounts.entrySet().stream()
                         .map(dailyCountEntry -> {
                             var count = dailyCountEntry.getValue().stream()
