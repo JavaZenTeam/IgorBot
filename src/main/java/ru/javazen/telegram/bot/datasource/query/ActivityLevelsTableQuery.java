@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,8 +36,6 @@ public class ActivityLevelsTableQuery {
     }
 
     private List<Statistic<ActivityLevel>> getActivityByLevels(DateRange dateRange, String groupEntity) {
-        List<ActivityLevel> activityLevels = entityManager.createQuery("SELECT al FROM ActivityLevel al", ActivityLevel.class)
-                .getResultList();
         Query nativeQuery = entityManager.createNativeQuery(MessageFormat.format(SQL_TEMPLATE, groupEntity))
                 .setParameter("from", dateRange.getFrom())
                 .setParameter("to", dateRange.getTo());
@@ -47,7 +46,7 @@ public class ActivityLevelsTableQuery {
                         .map(BigDecimal::doubleValue)
                         .orElse(0d)));
 
-        return activityLevels.stream()
+        return Arrays.stream(ActivityLevel.values())
                 .sorted()
                 .map(activityLevel -> {
                     var count = dailyCounts.stream()
