@@ -24,7 +24,7 @@ public class ActivityLevelsChartQuery {
 
     private static final String SQL_TEMPLATE = "SELECT {0}, " +
             "generate_series, " +
-            "1.0 * count(message_id) / (extract(epoch from cast(:period as INTERVAL)) / 3600) " +
+            "1.0 * count(message_id) / (extract(epoch from cast(:period as INTERVAL)) / 86400) " +
             "FROM generate_series(cast(:from as TIMESTAMP), cast(:to as TIMESTAMP), cast(:period as INTERVAL)) " +
             "LEFT JOIN message_entity " +
             " ON date >= generate_series " +
