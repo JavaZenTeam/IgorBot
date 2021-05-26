@@ -3,7 +3,8 @@
         position: relative;
         padding-bottom: 100%;
     }
-    .square img,tgs-player {
+
+    .square img, tgs-player {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -19,12 +20,13 @@
     <div th:if=" ${!topStickers.isEmpty()}" class="bg-white border px-3">
         <div class="row">
             <div th:each="sticker, iter : ${topStickers}" class="p-2 col-4 col-lg-6">
-                <span class="position-absolute badge badge-secondary" style="z-index: 1" th:text="${sticker.count}"></span>
+                <span class="position-absolute badge badge-secondary" style="z-index: 1"
+                      th:text="${sticker.count}"></span>
                 <div class="square">
-                    <img th:src="${'/file/' + sticker.key}" onerror="this.style.display = 'None'"/>
-                    <tgs-player autoplay loop mode="normal" th:src="${'/file/' + sticker.key}"></tgs-player>
+                    <img th:src="${'/file/' + sticker.subject}" onerror="this.style.display = 'None'"/>
+                    <tgs-player autoplay loop mode="normal" th:src="${'/file/' + sticker.subject}"></tgs-player>
                 </div>
-        </div>
+            </div>
         </div>
     </div>
     <div class="alert-info p-3" th:if=" ${topStickers.isEmpty()}">
