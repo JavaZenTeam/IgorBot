@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 @AllArgsConstructor
 public enum ActivityLevel implements LabelSupplier, IdSupplier, Comparable<ActivityLevel> {
     LOW("Low activity", 0, 10),
-    MID("Middle activity", 10, 100),
+    MEDIUM("Medium activity", 10, 100),
     HIGH("High activity", 100, null),
     ;
 
