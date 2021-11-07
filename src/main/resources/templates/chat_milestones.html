@@ -1,22 +1,22 @@
 <div xmlns:th="http://www.thymeleaf.org" th:with="
-    progressFull = ${milestoneSummary.nextMilestone() - milestoneSummary.prevMilestone()},
-    progressPrev = ${milestoneSummary.prevPosition() - milestoneSummary.prevMilestone()},
-    progressCurr = ${milestoneSummary.currPosition() - milestoneSummary.prevPosition()}">
+    progressFull = ${milestoneSummary.nextMilestone - milestoneSummary.prevMilestone},
+    progressPrev = ${milestoneSummary.prevPosition - milestoneSummary.prevMilestone},
+    progressCurr = ${milestoneSummary.currPosition - milestoneSummary.prevPosition}">
     <!--/*@thymesVar id="milestoneSummary" type="ru.javazen.telegram.bot.util.MilestoneHelper.MilestoneSummary"*/-->
     <!--/*@thymesVar id="dateRange" type="ru.javazen.telegram.bot.util.DateRange"*/-->
     <div class="clearfix">
-        <div class="small float-left" th:text="${#numbers.formatInteger(milestoneSummary.prevMilestone(), 1, 'WHITESPACE')}"></div>
-        <div class="small float-right" th:text="${#numbers.formatInteger(milestoneSummary.nextMilestone(), 1, 'WHITESPACE')}"></div>
+        <div class="small float-left" th:text="${#numbers.formatInteger(milestoneSummary.prevMilestone, 1, 'WHITESPACE')}"></div>
+        <div class="small float-right" th:text="${#numbers.formatInteger(milestoneSummary.nextMilestone, 1, 'WHITESPACE')}"></div>
     </div>
-    <div class="progress mb-2" th:title="${#numbers.formatInteger(milestoneSummary.currPosition(), 1, 'WHITESPACE')} + ' at the end of the period. ' +
-                                         ${#numbers.formatInteger(milestoneSummary.nextMilestone() - milestoneSummary.currPosition(), 1, 'WHITESPACE')} + ' to the next stage.'">
+    <div class="progress mb-2" th:title="${#numbers.formatInteger(milestoneSummary.currPosition, 1, 'WHITESPACE')} + ' at the end of the period. ' +
+                                         ${#numbers.formatInteger(milestoneSummary.nextMilestone - milestoneSummary.currPosition, 1, 'WHITESPACE')} + ' to the next stage.'">
         <div class="progress-bar"
-             th:title="${#numbers.formatInteger(milestoneSummary.prevPosition(), 1, 'WHITESPACE')} + ' at the start of the period. ' +
+             th:title="${#numbers.formatInteger(milestoneSummary.prevPosition, 1, 'WHITESPACE')} + ' at the start of the period. ' +
                        ${#numbers.formatInteger(progressPrev, 1, 'WHITESPACE')} + ' from the previous stage.'"
              th:style="'width: ' + ${#numbers.formatDecimal(100.0 * progressPrev / progressFull, 1, 0)} + '%; min-width: 1%; max-width: 98%'"></div>
         <div class="progress-bar bg-success"
              th:title="${#numbers.formatInteger(progressCurr, 1, 'WHITESPACE')} + ' for the period. ' +
-                       ${#numbers.formatInteger(milestoneSummary.currPosition() - milestoneSummary.prevMilestone(), 1, 'WHITESPACE')} + ' from the previous stage.'"
+                       ${#numbers.formatInteger(milestoneSummary.currPosition - milestoneSummary.prevMilestone, 1, 'WHITESPACE')} + ' from the previous stage.'"
              th:style="'width: ' + ${#numbers.formatDecimal(100.0 * progressCurr / progressFull, 1, 0)} + '%; min-width: 1%; max-width: 98%'"></div>
     </div>
     <div class="bg-white border mb-3 px-3 py-2 d-flex flex-wrap">
@@ -24,7 +24,7 @@
             <span>Total messages</span>
         </div>
         <div class="col-4 p-1 text-right font-weight-bold text-primary">
-            <span th:text="${#numbers.formatInteger(milestoneSummary.currPosition(), 1, 'WHITESPACE')}"></span>
+            <span th:text="${#numbers.formatInteger(milestoneSummary.currPosition, 1, 'WHITESPACE')}"></span>
         </div>
         <div class="col-8 p-1">
             <span>Selected period</span>
