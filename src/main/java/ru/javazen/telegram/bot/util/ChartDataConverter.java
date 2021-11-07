@@ -80,15 +80,15 @@ public class ChartDataConverter {
     }
 
     private long extractId(Object subject) {
-        if (subject instanceof IdSupplier idSupplier) {
-            return idSupplier.getId();
+        if (subject instanceof IdSupplier) {
+            return ((IdSupplier) subject).getId();
         }
         return subject.hashCode();
     }
 
     private String formatLabel(Object subject) {
-        if (subject instanceof LabelSupplier labelSupplier) {
-            return labelSupplier.getLabel();
+        if (subject instanceof LabelSupplier) {
+            return  ((LabelSupplier) subject).getLabel();
         }
         return subject.toString();
     }
