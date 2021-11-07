@@ -79,11 +79,10 @@ function getTime(date) {
     return new Date(a[2], a[1] - 1, a[0]).getTime();
 }
 
-function resolveDateFormat(unit) {
-    let periodDuration = getPeriodHoursDuration();
-    switch (unit) {
+function resolveDateFormat() {
+    switch (getInterval().unit) {
         case 'HOUR':
-            if (periodDuration <= 24) {
+            if (getPeriodHoursDuration() <= 24) {
                 return formatTime;
             } else {
                 return formatDateTime;
