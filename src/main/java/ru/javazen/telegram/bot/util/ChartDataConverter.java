@@ -10,6 +10,7 @@ import ru.javazen.telegram.bot.model.LabelSupplier;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
@@ -69,7 +70,8 @@ public class ChartDataConverter {
                                    List<Object> subjects, Attribute attribute, ZoneId zoneId) {
         Object[] result = new Object[subjects.size() + 1];
         Arrays.fill(result, 0);
-        result[0] = period.toLocalDateTime().atZone(zoneId).toLocalDateTime().toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(zoneId);
+        result[0] = formatter.format(period.toInstant());
         for (PeriodStatistic<?> item : statistic) {
             if (item.getSubject() != null) {
                 int index = subjects.indexOf(item.getSubject());
@@ -88,7 +90,7 @@ public class ChartDataConverter {
 
     private String formatLabel(Object subject) {
         if (subject instanceof LabelSupplier) {
-            return  ((LabelSupplier) subject).getLabel();
+            return ((LabelSupplier) subject).getLabel();
         }
         return subject.toString();
     }
