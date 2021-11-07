@@ -5,14 +5,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javazen.telegram.bot.datasource.model.Statistic;
 import ru.javazen.telegram.bot.model.ChatEntity;
-import ru.javazen.telegram.bot.model.MessageEntity;
-import ru.javazen.telegram.bot.model.MessageEntity_;
+import ru.javazen.telegram.bot.model.DailyUserChatPK_;
+import ru.javazen.telegram.bot.model.DailyUserChatStatistic;
+import ru.javazen.telegram.bot.model.DailyUserChatStatistic_;
 import ru.javazen.telegram.bot.model.UserEntity;
 import ru.javazen.telegram.bot.util.DateRange;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.SingularAttribute;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -22,33 +24,34 @@ public class MemberActivityTableQuery {
 
     @Transactional(readOnly = true)
     public List<Statistic<UserEntity>> getChatActivity(Long chatId, DateRange dateRange) {
-        return getActivity(MessageEntity_.user, MessageEntity_.chat, chatId, dateRange);
+        return getActivity(DailyUserChatStatistic_.user, DailyUserChatStatistic_.chat, chatId, dateRange);
     }
 
     @Transactional(readOnly = true)
     public List<Statistic<ChatEntity>> getUserActivity(Long userId, DateRange dateRange) {
-        return getActivity(MessageEntity_.chat, MessageEntity_.user, userId, dateRange);
+        return getActivity(DailyUserChatStatistic_.chat, DailyUserChatStatistic_.user, userId, dateRange);
     }
 
-    private <T> List<Statistic<T>> getActivity(SingularAttribute<MessageEntity, T> subjectAttr,
-                                                                       SingularAttribute<MessageEntity, ?> objectAttr,
-                                                                       Long objectId,
-                                                                       DateRange dateRange) {
+    private <T> List<Statistic<T>> getActivity(SingularAttribute<DailyUserChatStatistic, T> subjectAttr,
+                                               SingularAttribute<DailyUserChatStatistic, ?> objectAttr,
+                                               Long objectId,
+                                               DateRange dateRange) {
         Class<Statistic<T>> statisticClass = QueryUtils.statisticClassFor(subjectAttr.getBindableJavaType());
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Statistic<T>> query = builder.createQuery(statisticClass);
 
-        Root<MessageEntity> messages = query.from(MessageEntity.class);
-        Predicate datePredicate = builder.between(messages.get(MessageEntity_.date), dateRange.getFrom(), dateRange.getTo());
-        query.where(builder.equal(messages.get(objectAttr), objectId), datePredicate);
+        Root<DailyUserChatStatistic> stats = query.from(DailyUserChatStatistic.class);
+        Path<LocalDate> datePath = stats.get(DailyUserChatStatistic_.pk).get(DailyUserChatPK_.date);
+        Predicate datePredicate = builder.between(datePath, dateRange.getFromDate(), dateRange.getToDate());
+        query.where(builder.equal(stats.get(objectAttr), objectId), datePredicate);
 
-        Join<MessageEntity, ?> subjectJoin = messages.join(subjectAttr);
+        Join<DailyUserChatStatistic, ?> subjectJoin = stats.join(subjectAttr);
         query.groupBy(subjectJoin);
 
-        Expression<Long> count = builder.count(messages);
-        Expression<Long> length = builder.sumAsLong(messages.get(MessageEntity_.textLength));
-        Expression<Double> score = builder.sum(messages.get(MessageEntity_.score));
+        Expression<Long> count = builder.sum(stats.get(DailyUserChatStatistic_.count));
+        Expression<Long> length = builder.sum(stats.get(DailyUserChatStatistic_.textLength));
+        Expression<Double> score = builder.sum(stats.get(DailyUserChatStatistic_.score));
         query.select(builder.construct(statisticClass, subjectJoin, count, length, score));
         query.orderBy(builder.desc(score));
 

@@ -22,8 +22,8 @@ public class ActivityLevelsTableQuery {
     private final EntityManager entityManager;
 
     private static final String SQL_TEMPLATE = "SELECT {0}, " +
-            "1.0 * count(message_id) / (cast(:to as DATE) - cast(:from as DATE)) " +
-            "FROM message_entity " +
+            "1.0 * sum(count) / (cast(:to as DATE) - cast(:from as DATE)) " +
+            "FROM daily_user_chat_statistic " +
             "WHERE date >= :from and date < :to " +
             "GROUP BY {0}";
 
