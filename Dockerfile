@@ -8,4 +8,4 @@ RUN mvn -f /home/app/pom.xml clean install
 FROM openjdk:14-jdk-slim
 COPY --from=build /home/app/target/IgorBot.jar /usr/local/lib/IgorBot.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "--enable-preview","-jar","/usr/local/lib/IgorBot.jar"]
+ENTRYPOINT ["java", "-jar", "/usr/local/lib/IgorBot.jar"]

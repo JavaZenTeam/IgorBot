@@ -33,13 +33,14 @@ public class MessageCountQuery {
 
     public Integer getUserMessageCount(Long userId, Date date) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Integer> query = builder.createQuery(Integer.class);
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
         Root<MessageEntity> messages = query.from(MessageEntity.class);
         query.where(
                 builder.equal(messages.get(MessageEntity_.user), userId),
                 builder.lessThanOrEqualTo(messages.get(MessageEntity_.date), date)
         );
-        query.select(builder.max(messages.get(MessageEntity_.messagePK).get(MessagePK_.messageId)));
-        return Optional.ofNullable(entityManager.createQuery(query).getSingleResult()).orElse(0);
+        query.select(builder.count(messages.get(MessageEntity_.messagePK).get(MessagePK_.messageId)));
+        return Optional.ofNullable(entityManager.createQuery(query).getSingleResult())
+                .map(Long::intValue).orElse(0);
     }
 }

@@ -6,7 +6,6 @@ import ru.javazen.telegram.bot.datasource.model.Statistic;
 
 import javax.persistence.Query;
 import java.lang.reflect.Constructor;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
@@ -43,9 +42,9 @@ public class QueryUtils {
         if (arr[4] == null) {
             return new PeriodStatistic<>(period);
         } else {
-            long count = ((BigInteger) arr[1]).longValue();
-            long length = ((BigInteger) arr[2]).longValue();
-            double score = (Double) arr[3];
+            long count = castLong(arr[1]);
+            long length = castLong(arr[2]);
+            double score = castDouble(arr[3]);
 
             T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 4, arr.length), subjectClass);
             return new PeriodStatistic<>(period, subject, count, length, score);
@@ -57,22 +56,22 @@ public class QueryUtils {
         if (arr[2] == null) {
             return new PeriodStatistic<>(period);
         } else {
-            long count = ((BigInteger) arr[1]).longValue();
+            long count = castLong(arr[1]);
             T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 2, arr.length), subjectClass);
             return new PeriodStatistic<>(period, subject, count);
         }
     }
 
     public <T> Statistic<T> mapFullStatistic(Object[] arr, Class<T> subjectClass) {
-        long count = ((BigInteger) arr[0]).longValue();
-        long length = ((BigInteger) arr[1]).longValue();
-        double score = (Double) arr[2];
+        long count = castLong(arr[0]);
+        long length = castLong(arr[1]);
+        double score = castDouble(arr[2]);
         T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 3, arr.length), subjectClass);
         return new Statistic<>(subject, count, length, score);
     }
 
     public <T> Statistic<T> mapCountStatistic(Object[] arr, Class<T> subjectClass) {
-        long count = ((BigInteger) arr[0]).longValue();
+        long count = castLong(arr[0]);
         T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 1, arr.length), subjectClass);
         return new Statistic<>(subject, count);
     }
@@ -98,5 +97,13 @@ public class QueryUtils {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private double castDouble(Object object) {
+        return ((Number) object).doubleValue();
+    }
+
+    private long castLong(Object object) {
+        return ((Number) object).longValue();
     }
 }

@@ -55,6 +55,11 @@ public class MilestoneHelper {
         );
     }
 
-    public static record MilestoneSummary(int prevMilestone, int prevPosition, int currPosition, int nextMilestone) {
+    @AllArgsConstructor
+    public static class MilestoneSummary {
+        public final int prevMilestone;
+        public final int prevPosition;
+        public final int currPosition;
+        public final int nextMilestone;
     }
 }
