@@ -21,15 +21,17 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class MemberActivityChartQuery {
     /**
-     * {0} = object_field
-     * {1} = subject_table
-     * {2} = subject_id_field
-     * {3} = subject_fields
+     * {0} = object_field (chat_id or user_id)
+     * {1} = subject_table (chat_entity or user_entity)
+     * {2} = subject_id_field (user_id or chat_id)
+     * {3} = subject_fields (all subject_table fields)
+     * {4} = source_table (message_entity or daily_user_chat_statistic)
+     * {5} = count_formula (count(message_id) or sum(count))
      */
     private static final String SQL_TEMPLATE = "select generate_series, " +
-            "count(message_id) as count, sum(text_length) as length, sum(score) as score, {3} " +
+            "{5} as count, sum(text_length) as length, sum(score) as score, {3} " +
             "from generate_series(cast(:from as TIMESTAMP), cast(:to as TIMESTAMP), cast(:period as INTERVAL)) " +
-            "left join message_entity m on {0} = :object_id " +
+            "left join {4} m on {0} = :object_id " +
             "and date >= generate_series and date < generate_series + cast(:period as INTERVAL) " +
             "left join {1} o on m.{2} = o.{2} " +
             "group by generate_series, {3}";
@@ -56,7 +58,8 @@ public class MemberActivityChartQuery {
             Function<Object[], T> mappingFunction,
             String objectField, String subjectTable, String... subjectFields
     ) {
-        Query nativeQuery = entityManager.createNativeQuery(generateSqlString(objectField, subjectTable, subjectFields))
+        String sqlString = generateSqlString(objectField, subjectTable, interval.getUnit(), subjectFields);
+        Query nativeQuery = entityManager.createNativeQuery(sqlString)
                 .setParameter("object_id", userId)
                 .setParameter("from", dateRange.getFrom())
                 .setParameter("to", dateRange.getTo())
@@ -69,12 +72,15 @@ public class MemberActivityChartQuery {
 
     private String generateSqlString(String objectField,
                                      String subjectTable,
+                                     TimeInterval.Unit unit,
                                      String... subjectFields) {
         return MessageFormat.format(SQL_TEMPLATE,
                 objectField,
                 subjectTable,
                 subjectFields[0],
-                Stream.of(subjectFields).map(s -> "o." + s).collect(Collectors.joining(", "))
+                Stream.of(subjectFields).map(s -> "o." + s).collect(Collectors.joining(", ")),
+                unit == TimeInterval.Unit.HOUR ? "message_entity" : "daily_user_chat_statistic",
+                unit == TimeInterval.Unit.HOUR ? "count(message_id)" : "sum(count)"
         );
     }
 }
