@@ -82,7 +82,7 @@ function getTime(date) {
 function resolveDateFormat() {
     switch (getInterval().unit) {
         case 'HOUR':
-            if (getPeriodHoursDuration() <= 24) {
+            if (getPeriodHoursDuration() === 24) {
                 return formatTime;
             } else {
                 return formatDateTime;
