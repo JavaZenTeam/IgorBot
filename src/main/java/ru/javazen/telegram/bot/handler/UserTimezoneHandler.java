@@ -1,5 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -53,6 +54,10 @@ public class UserTimezoneHandler implements TextMessageHandler {
                         message.getFrom().getId(),
                         TIMEZONE_OFFSET_CONFIG_KEY,
                         zoneOffset.getId());
+
+
+                String responseMessage = "Ваша личная таймзона изменена на " + zoneOffset.getId();
+                sender.execute(new SendMessage(message.getChatId(), responseMessage));
 
                 return true;
             }
