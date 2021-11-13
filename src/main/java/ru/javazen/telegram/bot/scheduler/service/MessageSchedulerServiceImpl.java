@@ -159,19 +159,29 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
                 String formattedDate = format.format(new Date(task.getTimeOfCompletion()));
 
-                if (e.getApiResponse().contains("reply message not found")) {
+                if (e.getApiResponse().contains("replied message not found")) {
                     sendMessage.setReplyToMessageId(null);
                     String username = findUsernameById(task.getUserId().intValue());
                     username = username == null ? "Незнакомец под номером '" + task.getUserId() + "'" : "@" + username;
 
-                    sendMessage.setText(username +  ", как-то давно (" + formattedDate + ") ты просил меня напомнить: " + sendMessage.getText());
+                    sendMessage.setText(username +  ", как-то давно (" + formattedDate + ") ты просил меня напомнить: " +
+                            sendMessage.getText());
                 } else if (e.getApiResponse().contains("group chat was upgraded to a supergroup chat")) {
                     sendMessage.setChatId(e.getParameters().getMigrateToChatId());
-                    sendMessage.setText("Когда-то (" + formattedDate + ") вы просили напомнить. Но я не мог с вами связаться. В общем, вот: " + sendMessage.getText());
+                    sendMessage.setText("Когда-то (" + formattedDate + ") вы просили напомнить. Но я не мог с вами " +
+                            "связаться. В общем, вот: " + sendMessage.getText());
                 } else if (e.getApiResponse().contains("chat not found")) {
                     sendMessage.setChatId(task.getUserId());
                     sendMessage.setReplyToMessageId(null);
-                    sendMessage.setText("Когда-то (" + formattedDate + ") ты завел напоминание. Но чата больше нет. В общем, вот: " + sendMessage.getText());
+                    sendMessage.setText("Когда-то (" + formattedDate + ") ты завел напоминание. Но чата больше нет. " +
+                            "В общем, вот: " + sendMessage.getText());
+                } else if (e.getApiResponse().contains("bot was kicked from the group chat")) {
+                    String newMessageToSend = "Когда-то (" + formattedDate + ") ты завел напоминание: https://t.me/c/" +
+                            sendMessage.getChatId() + "/" + sendMessage.getReplyToMessageId() + ". Но меня удалили " +
+                            "из чата. В общем, вот: " + sendMessage.getText();
+                    sendMessage.setChatId(task.getUserId());
+                    sendMessage.setReplyToMessageId(null);
+                    sendMessage.setText(newMessageToSend);
                 } else {
                     log.error("Can't send message", e);
                     tgLogger.log(e);
