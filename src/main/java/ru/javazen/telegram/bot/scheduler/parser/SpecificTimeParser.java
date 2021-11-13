@@ -72,7 +72,7 @@ public class SpecificTimeParser extends ScheduledWithRepetitionParser {
                 Date date = null;
                 String dateStr = matcher.group(1);
                 if (dateStr != null) {
-                    date = findExplicitDate(dateStr);
+                    date = findExplicitDate(dateStr, timeZone);
                 }
                 LocalTime time = null;
 
@@ -141,9 +141,10 @@ public class SpecificTimeParser extends ScheduledWithRepetitionParser {
         return null;
     }
 
-    private Date findExplicitDate(String dateStr) {
+    private Date findExplicitDate(String dateStr, TimeZone timeZone) {
         dateStr = dateStr.replace(".", "-");
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yy");
+        dateFormat.setTimeZone(timeZone);
         try {
             return dateFormat.parse(dateStr);
         } catch (ParseException e) {
