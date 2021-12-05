@@ -23,7 +23,7 @@ public class RepeaterAdvanced implements TextMessageHandler {
         String answer = solveAnswer(text);
         if (answer == null) return false;
 
-        sender.execute(new SendMessage(message.getChatId(), answer));
+        sender.execute(new SendMessage(message.getChatId().toString(), answer));
         return true;
     }
 

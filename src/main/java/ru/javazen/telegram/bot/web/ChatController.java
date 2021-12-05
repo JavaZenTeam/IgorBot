@@ -118,7 +118,7 @@ public class ChatController {
     }
 
     public Chat getChat(Long chatId) throws TelegramApiException {
-        return bot.execute(new GetChat(chatId));
+        return bot.execute(new GetChat(chatId.toString()));
     }
 
     @ModelAttribute("bot")

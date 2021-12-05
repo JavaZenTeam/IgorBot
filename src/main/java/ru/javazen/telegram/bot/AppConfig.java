@@ -26,13 +26,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.facilities.TelegramHttpClientBuilder;
-import org.telegram.telegrambots.meta.ApiContext;
 import ru.javazen.telegram.bot.client.FileServiceClient;
-import ru.javazen.telegram.bot.util.comparator.RandomComparator;
 import ru.javazen.telegram.bot.handler.SayTextHandler;
 import ru.javazen.telegram.bot.handler.base.InlineQueryHandler;
 import ru.javazen.telegram.bot.service.VoiceService;
 import ru.javazen.telegram.bot.service.impl.VoiceServiceImpl;
+import ru.javazen.telegram.bot.util.comparator.RandomComparator;
 
 import java.net.MalformedURLException;
 import java.util.Random;
@@ -96,7 +95,7 @@ public class AppConfig {
     @Bean
     public DefaultBotOptions proxyBotOptions(
             @Value("${http.proxy.url}") String proxyUrl) throws MalformedURLException {
-        DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
+        DefaultBotOptions botOptions = new DefaultBotOptions();
 
         /*if (!StringUtils.isEmpty(proxyUrl)) {
             URL url = new URL(proxyUrl);
