@@ -1,6 +1,7 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -19,8 +20,8 @@ public class GetStickerById implements TextMessageHandler {
         if (!matcher.matches() || matcher.groupCount() < 1) return false;
 
         SendSticker sendSticker = new SendSticker();
-        sendSticker.setChatId(message.getChatId());
-        sendSticker.setSticker(matcher.group(1));
+        sendSticker.setChatId(message.getChatId().toString());
+        sendSticker.setSticker(new InputFile(matcher.group(1)));
 
         sender.execute(sendSticker);
 

@@ -17,12 +17,12 @@ public class ChatBridge implements MessageHandler {
     public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
         if (message.getChatId() != firstChat && message.getChatId() != secondChat) return false;
 
-        long chatTo = message.getChatId() == firstChat ? secondChat : firstChat;
+        Long chatTo = message.getChatId() == firstChat ? secondChat : firstChat;
 
         ForwardMessage forwardMessage = new ForwardMessage();
-        forwardMessage.setFromChatId(message.getChatId());
+        forwardMessage.setFromChatId(message.getChatId().toString());
         forwardMessage.setMessageId(message.getMessageId());
-        forwardMessage.setChatId(chatTo);
+        forwardMessage.setChatId(chatTo.toString());
         sender.execute(forwardMessage);
 
         return false;

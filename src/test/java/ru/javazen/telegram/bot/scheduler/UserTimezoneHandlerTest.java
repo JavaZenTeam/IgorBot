@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class UserTimezoneHandlerTest {
 
-    private static final int USER_ID = 111;
+    private static final Long USER_ID = 111L;
     private static final String TIMEZONE_OFFSET_CONFIG_KEY = "TIMEZONE_OFFSET";
 
     private UserTimezoneHandler userTimezoneHandler;

@@ -49,14 +49,14 @@ public class SchedulerExtendNotifyHandler implements TextMessageHandler {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
         if (result.getDate().compareTo(calendar.getTime()) > 0) {
-            sender.execute(new SendMessage(message.getChatId(), "Так долго я помнить не смогу, сорри"));
+            sender.execute(new SendMessage(message.getChatId().toString(), "Так долго я помнить не смогу, сорри"));
             return true;
         }
 
         long additionalTime = result.getDate().getTime() - new Date().getTime();
         if (message.getReplyToMessage() != null && messageSchedulerService.extendTaskByChatAndMessage(
                 message.getChatId(), message.getReplyToMessage().getMessageId(), additionalTime)) {
-            sender.execute(new SendMessage(message.getChatId(), successResponseSupplier.get()));
+            sender.execute(new SendMessage(message.getChatId().toString(), successResponseSupplier.get()));
             log.debug("Task extended");
             return true;
         }

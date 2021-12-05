@@ -21,7 +21,11 @@ public class ReplyLayoutSwitcher implements MessageHandler {
         if (targetText == null) return false;
 
         String result = switchLayout(targetText);
-        sender.execute(new SendMessage(message.getChatId(), result).setReplyToMessageId(replyMessage.getMessageId()));
+        sender.execute(SendMessage.builder()
+                .chatId(message.getChatId().toString())
+                .text( result)
+                .replyToMessageId(replyMessage.getMessageId())
+                .build());
         return true;
     }
 

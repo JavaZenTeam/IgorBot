@@ -25,7 +25,10 @@ public class MilestoneCongratulations implements MessageHandler {
         }
         if (milestoneHelper.isMilestone(message.getMessageId())) {
             String text = MessageFormat.format(templateSupplier.get(), message.getMessageId());
-            sender.execute(new SendMessage(message.getChatId(), text).setReplyToMessageId(message.getMessageId()));
+
+            SendMessage sendMessage = new SendMessage(message.getChatId().toString(), text);
+            sendMessage.setReplyToMessageId(message.getMessageId());
+            sender.execute(sendMessage);
         }
         return false;
     }

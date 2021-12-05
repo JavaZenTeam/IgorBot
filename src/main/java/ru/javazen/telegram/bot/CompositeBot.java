@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.BotSession;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.javazen.telegram.bot.handler.base.UpdateHandler;
 import ru.javazen.telegram.bot.logging.TelegramLogger;
 import ru.javazen.telegram.bot.service.MessageCollectorService;
@@ -104,7 +105,7 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     @PostConstruct
     public void onStart() throws TelegramApiException {
-        TelegramBotsApi botsApi = new TelegramBotsApi();
+        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         session = botsApi.registerBot(this);
 
         log.info(String.format("'%s' bot started.", name));

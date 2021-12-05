@@ -6,6 +6,7 @@ import ru.javazen.telegram.bot.datasource.model.Statistic;
 
 import javax.persistence.Query;
 import java.lang.reflect.Constructor;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
@@ -78,6 +79,7 @@ public class QueryUtils {
 
     @SuppressWarnings("unchecked")
     public <T> T constructObject(Object[] rawResult, Class<T> objectClass) {
+        fixBigIntegerToLong(rawResult);
         Class<?>[] paramTypes = Arrays.stream(rawResult)
                 .map(object -> object == null ? null : object.getClass())
                 .toArray(Class[]::new);
@@ -89,6 +91,19 @@ public class QueryUtils {
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("Suitable constructor is not found"));
+    }
+
+    /**
+     * In the DB we have stored the long values as bigint type. But JPA loads it as BigInteger.
+     * The class used to fix BigInteger values to the Long values.
+     * @param array a list with values from DB
+     */
+    private void fixBigIntegerToLong(Object[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] instanceof BigInteger) {
+                array[0] = ((BigInteger) array[0]).longValue();
+            }
+        }
     }
 
     private <T> T newInstance(Constructor<T> constructor, Object[] params) {

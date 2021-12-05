@@ -55,7 +55,7 @@ public class ChoiceMaker implements TextMessageHandler {
 
         if (choice == null) return false;
 
-        sender.execute(new SendMessage(message.getChatId(), choice));
+        sender.execute(new SendMessage(message.getChatId().toString(), choice));
         return true;
     }
 

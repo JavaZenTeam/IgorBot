@@ -30,12 +30,12 @@ public class GetSubscriptionsByKeyHandler implements TextMessageHandler {
         List<Subscription> subscriptions = subscriptionService.catchSubscriptions(chatId, message.getFrom().getId(), trigger);
 
         if (subscriptions.isEmpty()){
-            sender.execute(new SendMessage(message.getChatId(), onEmptyResponseSupplier.get()));
+            sender.execute(new SendMessage(message.getChatId().toString(), onEmptyResponseSupplier.get()));
         }
 
         for (Subscription s : subscriptions) {
             SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(chatId);
+            sendMessage.setChatId(chatId.toString());
             sendMessage.setReplyToMessageId(s.getSubscriptionPK().getMessageId());
             sendMessage.setText(s.getResponse());
 

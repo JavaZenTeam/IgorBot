@@ -167,11 +167,11 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                     sendMessage.setText(username +  ", как-то давно (" + formattedDate + ") ты просил меня напомнить: " +
                             sendMessage.getText());
                 } else if (e.getApiResponse().contains("group chat was upgraded to a supergroup chat")) {
-                    sendMessage.setChatId(e.getParameters().getMigrateToChatId());
+                    sendMessage.setChatId(e.getParameters().getMigrateToChatId().toString());
                     sendMessage.setText("Когда-то (" + formattedDate + ") вы просили напомнить. Но я не мог с вами " +
                             "связаться. В общем, вот: " + sendMessage.getText());
                 } else if (e.getApiResponse().contains("chat not found")) {
-                    sendMessage.setChatId(task.getUserId());
+                    sendMessage.setChatId(task.getUserId().toString());
                     sendMessage.setReplyToMessageId(null);
                     sendMessage.setText("Когда-то (" + formattedDate + ") ты завел напоминание. Но чата больше нет. " +
                             "В общем, вот: " + sendMessage.getText());
@@ -179,7 +179,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                     String newMessageToSend = "Когда-то (" + formattedDate + ") ты завел напоминание: https://t.me/c/" +
                             sendMessage.getChatId() + "/" + sendMessage.getReplyToMessageId() + ". Но меня удалили " +
                             "из чата. В общем, вот: " + sendMessage.getText();
-                    sendMessage.setChatId(task.getUserId());
+                    sendMessage.setChatId(task.getUserId().toString());
                     sendMessage.setReplyToMessageId(null);
                     sendMessage.setText(newMessageToSend);
                 } else {

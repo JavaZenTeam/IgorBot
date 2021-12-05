@@ -57,7 +57,7 @@ public class UserTimezoneHandler implements TextMessageHandler {
 
 
                 String responseMessage = "Ваша личная таймзона изменена на " + zoneOffset.getId();
-                sender.execute(new SendMessage(message.getChatId(), responseMessage));
+                sender.execute(new SendMessage(message.getChatId().toString(), responseMessage));
 
                 return true;
             }

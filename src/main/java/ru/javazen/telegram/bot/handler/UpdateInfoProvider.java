@@ -3,6 +3,7 @@ package ru.javazen.telegram.bot.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -30,10 +31,13 @@ public class UpdateInfoProvider implements TextMessageHandler {
             if (args.length > 1) requestedEntity = resolveEntity(requestedEntity, args[1]);
 
             String answer = mapper.writeValueAsString(requestedEntity);
-            sender.execute(new SendMessage(message.getChatId(), "```\n" + answer + "```").setParseMode("MARKDOWN"));
+            sender.execute(SendMessage.builder()
+                    .chatId(message.getChatId().toString())
+                    .text("```\n" + answer + "```")
+                    .parseMode(ParseMode.MARKDOWN).build());
             return true;
         } catch (IllegalArgumentException e) {
-            sender.execute(new SendMessage(message.getChatId(), invalidPathMessageSupplier.get()));
+            sender.execute(new SendMessage(message.getChatId().toString(), invalidPathMessageSupplier.get()));
             return true;
         } catch (IOException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
