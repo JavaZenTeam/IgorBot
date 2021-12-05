@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.updateshandlers.SentCallback;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class AbsSenderStub extends AbsSender {
     private BotApiMethod apiMethod;
@@ -117,7 +118,85 @@ public class AbsSenderStub extends AbsSender {
         return null;
     }
 
+    @Override
+    public CompletableFuture<Message> executeAsync(SendDocument sendDocument) {
+        return null;
+    }
 
+    @Override
+    public CompletableFuture<Message> executeAsync(SendPhoto sendPhoto) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendVideo sendVideo) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendVideoNote sendVideoNote) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendSticker sendSticker) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendAudio sendAudio) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendVoice sendVoice) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<List<Message>> executeAsync(SendMediaGroup sendMediaGroup) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> executeAsync(SetChatPhoto setChatPhoto) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> executeAsync(AddStickerToSet addStickerToSet) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> executeAsync(SetStickerSetThumb setStickerSetThumb) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> executeAsync(CreateNewStickerSet createNewStickerSet) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<File> executeAsync(UploadStickerFile uploadStickerFile) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Serializable> executeAsync(EditMessageMedia editMessageMedia) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendAnimation sendAnimation) {
+        return null;
+    }
+
+    @Override
+    protected <T extends Serializable, Method extends BotApiMethod<T>> CompletableFuture<T> sendApiMethodAsync(Method method) {
+        return null;
+    }
 
     public BotApiMethod getApiMethod() {
         return apiMethod;

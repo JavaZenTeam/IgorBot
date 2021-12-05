@@ -26,7 +26,7 @@ public class PinnedForwarder implements MessageHandler {
         if (targetChatId == null) return false;
 
         ForwardMessage forwardMessage = new ForwardMessage();
-        forwardMessage.setFromChatId(message.getChatId());
+        forwardMessage.setFromChatId(message.getChatId().toString());
         forwardMessage.setMessageId(message.getPinnedMessage().getMessageId());
         forwardMessage.setChatId(targetChatId);
         sender.execute(forwardMessage);

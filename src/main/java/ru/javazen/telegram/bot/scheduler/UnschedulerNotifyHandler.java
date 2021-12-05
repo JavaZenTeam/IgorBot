@@ -30,7 +30,7 @@ public class UnschedulerNotifyHandler implements TextMessageHandler {
                     message.getReplyToMessage().getMessageId());
 
         if (canceled) {
-            sender.execute(new SendMessage(message.getChatId(),
+            sender.execute(new SendMessage(message.getChatId().toString(),
                     successResponseSupplier.get()));
         }
 

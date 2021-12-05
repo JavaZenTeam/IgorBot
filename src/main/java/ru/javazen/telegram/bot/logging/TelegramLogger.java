@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -45,10 +46,11 @@ public class TelegramLogger {
             log.warn(String.format("Logging to support chat is disabled. Message: %s", message));
             return;
         }
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(supportChatId);
-        sendMessage.setText(message);
-        sendMessage.setParseMode("MARKDOWN");
+        SendMessage sendMessage = SendMessage.builder()
+                .chatId(supportChatId)
+                .text(message)
+                .parseMode(ParseMode.MARKDOWN)
+                .build();
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException te) {

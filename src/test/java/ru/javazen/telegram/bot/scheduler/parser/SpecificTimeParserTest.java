@@ -35,7 +35,7 @@ public class SpecificTimeParserTest {
 
         message = Mockito.mock(Message.class);
         User user = Mockito.mock(User.class);
-        Mockito.when(user.getId()).thenReturn(111);
+        Mockito.when(user.getId()).thenReturn(111L);
 
         Mockito.when(message.getReplyToMessage()).thenReturn(null);
         Mockito.when(message.getFrom()).thenReturn(user);

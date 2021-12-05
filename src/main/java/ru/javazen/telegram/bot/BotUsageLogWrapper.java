@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.updateshandlers.SentCallback;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class BotUsageLogWrapper extends AbsSender {
     private AbsSender sender;
@@ -133,6 +134,86 @@ public class BotUsageLogWrapper extends AbsSender {
     @Override
     protected <T extends Serializable, Method extends BotApiMethod<T>> T sendApiMethod(Method method) {
         throw new UnsupportedOperationException("BotUsageLogWrapper does't support sendApiMethod");
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendDocument sendDocument) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendPhoto sendPhoto) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendVideo sendVideo) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendVideoNote sendVideoNote) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendSticker sendSticker) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendAudio sendAudio) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendVoice sendVoice) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<List<Message>> executeAsync(SendMediaGroup sendMediaGroup) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> executeAsync(SetChatPhoto setChatPhoto) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> executeAsync(AddStickerToSet addStickerToSet) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> executeAsync(SetStickerSetThumb setStickerSetThumb) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> executeAsync(CreateNewStickerSet createNewStickerSet) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<File> executeAsync(UploadStickerFile uploadStickerFile) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Serializable> executeAsync(EditMessageMedia editMessageMedia) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    public CompletableFuture<Message> executeAsync(SendAnimation sendAnimation) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
+    }
+
+    @Override
+    protected <T extends Serializable, Method extends BotApiMethod<T>> CompletableFuture<T> sendApiMethodAsync(Method method) {
+        throw new UnsupportedOperationException("BotUsageLogWrapper does't support executeAsync");
     }
 
     public Message getSentMessage() {

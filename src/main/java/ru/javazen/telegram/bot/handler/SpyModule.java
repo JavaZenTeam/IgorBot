@@ -17,7 +17,7 @@ public class SpyModule implements MessageHandler {
         if (message.getChatId() != spyOnChatId) return false;
 
         ForwardMessage forwardMessage = new ForwardMessage();
-        forwardMessage.setFromChatId(message.getChatId());
+        forwardMessage.setFromChatId(message.getChatId().toString());
         forwardMessage.setMessageId(message.getMessageId());
 
         forwardMessage.setChatId(Long.toString(forwardToChatId));

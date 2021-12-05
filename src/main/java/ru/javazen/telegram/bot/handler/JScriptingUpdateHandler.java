@@ -61,7 +61,7 @@ public class JScriptingUpdateHandler implements TextMessageHandler {
                 }
             } catch (ScriptException | NoSuchMethodException e) {
                 LOGGER.error("JS HAS FALLEN", e);
-                sender.execute(new SendMessage(message.getChatId(), e.getMessage()));
+                sender.execute(new SendMessage(message.getChatId().toString(), e.getMessage()));
             }
         }
         return false;
