@@ -2,6 +2,7 @@ package ru.javazen.telegram.bot.help;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -20,12 +21,13 @@ public class HelpMainPostQueryHandler implements CallbackQueryHandler {
 
         MessageData helpMessage = helpInfoProvider.getHelpMessage();
 
-        EditMessageText editedMessage = new EditMessageText()
-                .setParseMode("MARKDOWN")
-                .setChatId(callbackQuery.getMessage().getChatId())
-                .setMessageId(callbackQuery.getMessage().getMessageId())
-                .setText(helpMessage.getMessageText())
-                .setReplyMarkup(helpMessage.getInlineKeyboardMarkup());
+        EditMessageText editedMessage = EditMessageText.builder()
+                .parseMode(ParseMode.MARKDOWN   )
+                .chatId(callbackQuery.getMessage().getChatId().toString())
+                .messageId(callbackQuery.getMessage().getMessageId())
+                .text(helpMessage.getMessageText())
+                .replyMarkup(helpMessage.getInlineKeyboardMarkup())
+                .build();
 
         sender.execute(editedMessage);
         return true;

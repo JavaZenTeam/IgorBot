@@ -29,13 +29,13 @@ public class Counter implements TextMessageHandler {
         Integer to = getParam(matcher, "to", 0);
 
         if (from == null || to == null) {
-            sender.execute(new SendMessage(message.getChatId(), errorMessage));
+            sender.execute(new SendMessage(message.getChatId().toString(), errorMessage));
             return false;
         }
 
         IntStream.range(Math.min(from, to), Math.max(from, to) + 1)
                 .forEach(i -> {
-                    SendMessage send = new SendMessage(message.getChatId(), String.valueOf(i));
+                    SendMessage send = new SendMessage(message.getChatId().toString(), String.valueOf(i));
                     Date time = new Date(Math.abs(i - from) * 1000 + System.currentTimeMillis());
                     taskScheduler.schedule(() -> {
                         try {

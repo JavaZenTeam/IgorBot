@@ -15,7 +15,7 @@ import java.util.Optional;
 @NoArgsConstructor
 public class UserEntity implements IdSupplier, LabelSupplier {
     @Id
-    private Integer userId;
+    private Long userId;
 
     @Column
     private String firstName;

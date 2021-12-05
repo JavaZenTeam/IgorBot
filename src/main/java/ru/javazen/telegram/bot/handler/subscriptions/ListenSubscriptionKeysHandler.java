@@ -21,7 +21,7 @@ public class ListenSubscriptionKeysHandler implements TextMessageHandler {
 
         for (Subscription s : subscriptions) {
             SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(chatId);
+            sendMessage.setChatId(chatId.toString());
             sendMessage.setText(s.getResponse());
 
             Message m = sender.execute(sendMessage);

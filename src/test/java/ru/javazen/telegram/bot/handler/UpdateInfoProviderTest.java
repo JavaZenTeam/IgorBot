@@ -39,7 +39,7 @@ public class UpdateInfoProviderTest {
         Message message = mock(Message.class);
         when(message.getMessageId()).thenReturn(777777);
         User from = mock(User.class);
-        when(from.getId()).thenReturn(909090909);
+        when(from.getId()).thenReturn(909090909L);
         when(from.getFirstName()).thenReturn("Mr. User");
         when(message.getFrom()).thenReturn(from);
         when(message.getDate()).thenReturn(1511723066);

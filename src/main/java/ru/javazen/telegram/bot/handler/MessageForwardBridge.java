@@ -22,7 +22,7 @@ public class MessageForwardBridge implements TextMessageHandler {
         if (!matcher.matches() || matcher.groupCount() < 1) return false;
 
         ForwardMessage forwardMessage = new ForwardMessage();
-        forwardMessage.setFromChatId(message.getChatId());
+        forwardMessage.setFromChatId(message.getChatId().toString());
         forwardMessage.setMessageId(message.getReplyToMessage().getMessageId());
         forwardMessage.setChatId(matcher.group(1));
         sender.execute(forwardMessage);
