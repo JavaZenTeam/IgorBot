@@ -63,7 +63,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public List<Subscription> catchSubscriptions(Long chatId, Integer userId, String text) {
+    public List<Subscription> catchSubscriptions(Long chatId, Long userId, String text) {
         List<String> words = WordSplitter.getInstance().apply(text);
         List<Subscription> subscriptions = getSubscriptions().getUnchecked(chatId);
         return subscriptions.stream()

@@ -65,7 +65,8 @@ public class AdminController {
 
         User botUser = bot.getMe();
         model.addAttribute("bot", botUser);
-        UserProfilePhotos photos = bot.execute(new GetUserProfilePhotos().setUserId(botUser.getId()).setLimit(1));
+        UserProfilePhotos photos = bot.execute(GetUserProfilePhotos.builder()
+                .userId(botUser.getId()).limit(1).build());
         PhotoSize botPhoto = photos.getPhotos().stream().flatMap(List::stream).findAny().orElse(null);
         model.addAttribute("botPhoto", botPhoto);
 

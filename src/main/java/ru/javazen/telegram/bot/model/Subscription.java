@@ -20,7 +20,7 @@ public class Subscription {
     @EmbeddedId
     private MessagePK subscriptionPK;
 
-    private Integer userId;
+    private Long userId;
 
     private String trigger;
 

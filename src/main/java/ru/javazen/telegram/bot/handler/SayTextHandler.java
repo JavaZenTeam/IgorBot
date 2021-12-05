@@ -14,6 +14,7 @@ import ru.javazen.telegram.bot.handler.base.InlineQueryHandler;
 import ru.javazen.telegram.bot.service.VoiceService;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 
 @Slf4j
@@ -24,7 +25,7 @@ public class SayTextHandler implements InlineQueryHandler {
 
     private final VoiceService voiceService;
     private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
-    private HashMap<Integer, String> queries = new HashMap<>();
+    private HashMap<Long, String> queries = new HashMap<>();
 
     public SayTextHandler(VoiceService voiceService) {
         this.voiceService = voiceService;
@@ -45,7 +46,7 @@ public class SayTextHandler implements InlineQueryHandler {
         date.add(Calendar.SECOND, VOICE_GENERATION_PAUSE);
 
         String text = inlineQuery.getQuery();
-        Integer userId = inlineQuery.getFrom().getId();
+        Long userId = inlineQuery.getFrom().getId();
 
         taskScheduler.schedule(() -> {
             if (text.equals(queries.get(userId))) {
@@ -53,10 +54,14 @@ public class SayTextHandler implements InlineQueryHandler {
                 String randomId = RandomStringUtils.randomAlphanumeric(RANDOM_LENGTH);
 
                 InlineQueryResultVoice audio = new InlineQueryResultVoice();
-                audio.setTitle(text).setVoiceUrl(fileUrl).setId(randomId);
+                audio.setTitle(text);
+                audio.setVoiceUrl(fileUrl);
+                audio.setId(randomId);
 
                 AnswerInlineQuery answerInlineQuery = new AnswerInlineQuery();
-                answerInlineQuery.setResults(audio).setInlineQueryId(inlineQuery.getId());
+                answerInlineQuery.setResults(Collections.singletonList(audio));
+                answerInlineQuery.setInlineQueryId(inlineQuery.getId());
+
                 try {
                     sender.execute(answerInlineQuery);
                 } catch (TelegramApiException e) {

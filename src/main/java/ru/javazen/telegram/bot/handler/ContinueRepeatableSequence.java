@@ -3,6 +3,7 @@ package ru.javazen.telegram.bot.handler;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -40,7 +41,7 @@ public class ContinueRepeatableSequence implements MessageHandler {
         }
         if (allTextsEquals(messages)) {
             SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(message.getChatId());
+            sendMessage.setChatId(message.getChatId().toString());
             sendMessage.setText(message.getText());
             sender.execute(sendMessage);
             messageQueue.clear();
@@ -48,8 +49,8 @@ public class ContinueRepeatableSequence implements MessageHandler {
         }
         if (allStickersEquals(messages)) {
             SendSticker sendSticker = new SendSticker();
-            sendSticker.setChatId(message.getChatId());
-            sendSticker.setSticker(message.getSticker().getFileId());
+            sendSticker.setChatId(message.getChatId().toString());
+            sendSticker.setSticker(new InputFile(message.getSticker().getFileId()));
             sender.execute(sendSticker);
             messageQueue.clear();
             return true;
