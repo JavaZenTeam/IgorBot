@@ -37,6 +37,6 @@ public class UserEntity implements IdSupplier, LabelSupplier {
 
     @Override
     public Long getId() {
-        return getUserId().longValue();
+        return getUserId();
     }
 }

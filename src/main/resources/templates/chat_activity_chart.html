@@ -106,7 +106,7 @@
         chartData = response['data'];
         ids = response['ids'];
         labels = response['labels'];
-        let dateFormat = resolveDateFormat();
+        let dateFormat = resolveDateFormat(this.getInterval().unit);
         chartControl = Morris.Area({
             element: 'activity-chart',
             data: chartData,
@@ -144,7 +144,7 @@
     }
 
     function refreshChartView() {
-        let dateFormat = resolveDateFormat();
+        let dateFormat = resolveDateFormat(this.getInterval().unit);
         if (dateFormat === formatDateTime) {
             //to fit date time label into canvas. part 1
             chartSvg.height(chartSvg.height() - 10);
