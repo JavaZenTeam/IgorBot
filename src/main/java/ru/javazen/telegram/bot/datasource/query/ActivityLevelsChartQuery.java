@@ -48,7 +48,7 @@ public class ActivityLevelsChartQuery {
 
         Map<Timestamp, List<Double>> dailyCounts = QueryUtils.getResultStream(nativeQuery)
                 .collect(Collectors.groupingBy((arr -> (Timestamp) arr[1]),
-                        Collectors.mapping(arr -> arr[0] == null ? null : (Double) arr[2],
+                        Collectors.mapping(arr -> arr[0] == null ? null : ((Number) arr[2]).doubleValue(),
                                 Collectors.toList())));
 
         return Arrays.stream(ActivityLevel.values())
