@@ -34,6 +34,7 @@
         <entry key="ок" value="4"/>
         <entry key="лан" value="2"/>
         <entry key="будет сделано!" value="1"/>
+        <entry key="понял принял" value="1"/>
     </util:map>
     <bean id="okSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="ok"/>
@@ -43,6 +44,7 @@
         <entry key="еееее!" value="4"/>
         <entry key="наканецта" value="2"/>
         <entry key="о да, детка" value="1"/>
+        <entry key=":)" value="1"/>
     </util:map>
     <bean id="happyOkSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="happyOk"/>
@@ -52,6 +54,7 @@
         <entry key="ок(" value="4"/>
         <entry key="ой всё" value="2"/>
         <entry key=":(" value="1"/>
+        <entry key="эх" value="1"/>
     </util:map>
     <bean id="sadOkSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="sadOk"/>
@@ -73,6 +76,14 @@
     </util:map>
     <bean id="emptySupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
         <property name="optionRatios" ref="empty"/>
+    </bean>
+
+    <util:map id="failed">
+        <entry key="не получилось(" value="2"/>
+        <entry key="что-то пошло не так..." value="1"/>
+    </util:map>
+    <bean id="failedSupplier" class="ru.javazen.telegram.bot.util.RandomItemSupplier">
+        <property name="optionRatios" ref="failed"/>
     </bean>
 
 

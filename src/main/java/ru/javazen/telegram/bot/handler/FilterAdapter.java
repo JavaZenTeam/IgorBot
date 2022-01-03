@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class FilterAdapter implements UpdateHandler, BeanNameAware {
-    private List<Filter> filters;
-    private List<UpdateHandler> handlers;
+    private final List<Filter> filters;
+    private final List<UpdateHandler> handlers;
     private String beanName;
 
     public FilterAdapter(Filter filter, UpdateHandler handler) {
@@ -34,14 +34,17 @@ public class FilterAdapter implements UpdateHandler, BeanNameAware {
 
     @Override
     public boolean handle(Update update, AbsSender sender) throws TelegramApiException {
-        return filters.stream().allMatch(f -> f != null && f.check(update)) &&
-                handlers.stream().anyMatch(h -> {
-                    try {
-                        return h.handle(update, sender);
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        for (Filter filter : filters) {
+            if (!filter.check(update)) {
+                return false;
+            }
+        }
+        for (UpdateHandler handler : handlers) {
+            if (handler.handle(update, sender)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

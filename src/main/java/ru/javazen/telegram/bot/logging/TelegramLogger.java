@@ -9,9 +9,12 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.BotUsageLogWrapper;
 import ru.javazen.telegram.bot.IgorBotApplication;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +42,7 @@ public class TelegramLogger {
     /**
      * Log exception to support chat in the following format:
      * -- message
+     *
      * @param message - message to log
      */
     public void log(String message) {
@@ -60,19 +64,34 @@ public class TelegramLogger {
 
     /**
      * Log exception to support chat in the following format:
-     * -- message
+     * -- Error!
      * -- exception with message
      * -- stacktrace
-     * @param message - message to log
-     * @param e - exception to log
+     * -- context variables
+     *
+     * @param context - context to log
+     * @param e       - exception to log
      */
-    public void log(String message, Exception e) {
-        String stackTraceString = Arrays.stream(e.getStackTrace())
-                .filter(el -> el.getClassName().startsWith(ROOT_PACKAGE_NAME))
-                .map(StackTraceElement::toString)
+    public void log(Map<String, Object> context, Exception e) {
+        String contextString = context.entrySet().stream()
+                .map(entry -> String.format("*%s:* %s", entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("\n"));
 
-        String text = String.format("%s\n%s\n```\n%s```", message, e, stackTraceString);
+        String stackTraceString = Arrays.stream(e.getStackTrace())
+                .filter(el -> el.getClassName().startsWith(ROOT_PACKAGE_NAME))
+                .filter(el -> !el.getClassName().equals(BotUsageLogWrapper.class.getName()))
+                .map(StackTraceElement::toString)
+                .map(str -> str.replace(ROOT_PACKAGE_NAME, "~"))
+                .collect(Collectors.joining("\n"));
+
+        String text = String.join("\n",
+                "*Error!*",
+                e.toString(),
+                "```",
+                stackTraceString,
+                "```",
+                contextString
+        );
 
         this.log(text);
     }
@@ -85,6 +104,6 @@ public class TelegramLogger {
      * @param e - exception to log.
      */
     public void log(Exception e) {
-        this.log("*Error!*", e);
+        this.log(Collections.emptyMap(), e);
     }
 }
