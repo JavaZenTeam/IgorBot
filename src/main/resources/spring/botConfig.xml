@@ -195,6 +195,7 @@
 
     <bean id="getStickerByIdModule" class="ru.javazen.telegram.bot.handler.GetStickerById">
         <property name="pattern" value="/sticker (.+)"/>
+        <property name="failedResponseSupplier" ref="failedSupplier"/>
     </bean>
 
     <bean id="randomFacePalmModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
