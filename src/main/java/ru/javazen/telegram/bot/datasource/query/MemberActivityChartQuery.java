@@ -3,7 +3,7 @@ package ru.javazen.telegram.bot.datasource.query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.javazen.telegram.bot.datasource.model.PeriodStatistic;
+import ru.javazen.telegram.bot.datasource.model.PeriodMessageStatistic;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
 import ru.javazen.telegram.bot.model.ChatEntity;
 import ru.javazen.telegram.bot.model.UserEntity;
@@ -37,21 +37,21 @@ public class MemberActivityChartQuery {
     private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
-    public List<PeriodStatistic<UserEntity>> getChatActivity(Long chatId, DateRange dateRange, TimeInterval interval) {
+    public List<PeriodMessageStatistic<UserEntity>> getChatActivity(Long chatId, DateRange dateRange, TimeInterval interval) {
         return getActivity(chatId, dateRange, interval,
-                (arr -> QueryUtils.mapFullPeriodStatistic(arr, UserEntity.class)),
+                (arr -> QueryUtils.mapMessagePeriodStatistic(arr, UserEntity.class)),
                 "chat_id", "user_entity", "user_id", "first_name", "last_name", "username");
     }
 
     @Transactional(readOnly = true)
-    public List<PeriodStatistic<ChatEntity>> getUserActivity(Long userId, DateRange dateRange, TimeInterval interval) {
+    public List<PeriodMessageStatistic<ChatEntity>> getUserActivity(Long userId, DateRange dateRange, TimeInterval interval) {
         return getActivity(userId, dateRange, interval,
-                (arr -> QueryUtils.mapFullPeriodStatistic(arr, ChatEntity.class)),
+                (arr -> QueryUtils.mapMessagePeriodStatistic(arr, ChatEntity.class)),
                 "user_id", "chat_entity", "chat_id", "username", "title");
 
     }
 
-    private <S, T extends PeriodStatistic<S>> List<T> getActivity(
+    private <S, T extends PeriodMessageStatistic<S>> List<T> getActivity(
             Long userId, DateRange dateRange, TimeInterval interval,
             Function<Object[], T> mappingFunction,
             String objectField, String subjectTable, String... subjectFields

@@ -2,8 +2,9 @@ package ru.javazen.telegram.bot.datasource;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.javazen.telegram.bot.datasource.model.PeriodStatistic;
-import ru.javazen.telegram.bot.datasource.model.Statistic;
+import ru.javazen.telegram.bot.datasource.model.MessageStatistic;
+import ru.javazen.telegram.bot.datasource.model.PeriodMessageStatistic;
+import ru.javazen.telegram.bot.datasource.model.BaseCount;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
 import ru.javazen.telegram.bot.datasource.query.*;
 import ru.javazen.telegram.bot.model.ChatEntity;
@@ -44,22 +45,22 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
     private final MessageCountQuery messageCountQuery;
 
     @Override
-    public List<Statistic<ChatEntity>> topActivity(Long userId, DateRange dateRange) {
+    public List<MessageStatistic<ChatEntity>> topActivity(Long userId, DateRange dateRange) {
         return activityTableQuery.getUserActivity(userId, dateRange);
     }
 
     @Override
-    public List<PeriodStatistic<ChatEntity>> activityChart(Long userId, DateRange dateRange, TimeInterval interval) {
+    public List<PeriodMessageStatistic<ChatEntity>> activityChart(Long userId, DateRange dateRange, TimeInterval interval) {
         return activityChartQuery.getUserActivity(userId, dateRange, interval);
     }
 
     @Override
-    public List<Statistic<String>> topUsedStickers(Long userId, DateRange dateRange, Integer maxResults) {
+    public List<MessageStatistic<String>> topUsedStickers(Long userId, DateRange dateRange, Integer maxResults) {
         return topUsedStickersQuery.getTopUsedUserStickers(userId, dateRange, maxResults);
     }
 
     @Override
-    public List<Statistic<String>> messageTypesUsage(Long userId, DateRange dateRange) {
+    public List<BaseCount<String>> messageTypesUsage(Long userId, DateRange dateRange) {
         return messageTypesQuery.getChatMessagesByTypes(userId, dateRange);
     }
 

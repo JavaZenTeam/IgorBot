@@ -16,18 +16,18 @@ import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.UserProfilePhotos;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.datasource.AdminStatisticDataSource;
 import ru.javazen.telegram.bot.datasource.model.ChartData;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
+import ru.javazen.telegram.bot.datasource.query.ActiveEntitiesChartQuery;
+import ru.javazen.telegram.bot.datasource.query.CountEntitiesQuery;
+import ru.javazen.telegram.bot.datasource.query.IncomeOutcomeEntitiesQuery;
 import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.util.ChartDataConverter;
 import ru.javazen.telegram.bot.util.DateRange;
 import ru.javazen.telegram.bot.util.DateRanges;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -39,7 +39,9 @@ public class AdminController {
 
     private final DefaultAbsSender bot;
     private final MessageRepository messageRepository;
-    private final AdminStatisticDataSource adminStatisticDataSource;
+    private final CountEntitiesQuery countEntitiesQuery;
+    private final IncomeOutcomeEntitiesQuery incomeOutcomeEntitiesQuery;
+    private final ActiveEntitiesChartQuery activeEntitiesChartQuery;
     private final ChartDataConverter chartDataConverter;
 
     @GetMapping
@@ -70,48 +72,31 @@ public class AdminController {
         PhotoSize botPhoto = photos.getPhotos().stream().flatMap(List::stream).findAny().orElse(null);
         model.addAttribute("botPhoto", botPhoto);
 
-        var userActivity = adminStatisticDataSource.userActivityByLevels(dateRange);
-        model.addAttribute("userActivity", userActivity);
-        var chatActivity = adminStatisticDataSource.chatActivityByLevels(dateRange);
-        model.addAttribute("chatActivity", chatActivity);
+        model.addAttribute("activityStatistics", List.of(
+                Map.entry("Total", countEntitiesQuery.totalCount(dateRange)),
+                Map.entry("Active", countEntitiesQuery.activeCount(dateRange)),
+                Map.entry("Income", incomeOutcomeEntitiesQuery.incomeCount(dateRange)),
+                Map.entry("Outcome", incomeOutcomeEntitiesQuery.outcomeCount(dateRange))
+        ));
 
         return "admin";
     }
 
-    @GetMapping("chat-activity-chart")
+    @GetMapping("activity-per-entity-chart")
     @ResponseBody
-    public ChartData getChatActivityChart(@RequestParam(defaultValue = "1")
-                                                  int intervalQuantity,
-                                          @RequestParam(defaultValue = "DAY")
-                                                  TimeInterval.Unit intervalUnit,
-                                          @RequestParam
-                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                  LocalDate from,
-                                          @RequestParam
-                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                  LocalDate to) {
+    public ChartData getActivityPerEntityChart(@RequestParam(defaultValue = "1")
+                                                       int intervalQuantity,
+                                               @RequestParam(defaultValue = "DAY")
+                                                       TimeInterval.Unit intervalUnit,
+                                               @RequestParam
+                                               @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                       LocalDate from,
+                                               @RequestParam
+                                               @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                       LocalDate to) {
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         TimeInterval timeInterval = new TimeInterval(intervalQuantity, intervalUnit);
-        var statistics = adminStatisticDataSource.chatActivityChartByLevels(dateRange, timeInterval);
+        var statistics = activeEntitiesChartQuery.getActiveEntitiesChart(dateRange, timeInterval);
         return chartDataConverter.convert(statistics, DEFAULT_TIME_ZONE.toZoneId());
-    }
-
-    @GetMapping("user-activity-chart")
-    @ResponseBody
-    public ChartData getUserActivityChart(@RequestParam(defaultValue = "1")
-                                                  int intervalQuantity,
-                                          @RequestParam(defaultValue = "DAY")
-                                                  TimeInterval.Unit intervalUnit,
-                                          @RequestParam
-                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                  LocalDate from,
-                                          @RequestParam
-                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                  LocalDate to) {
-        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
-        TimeInterval timeInterval = new TimeInterval(intervalQuantity, intervalUnit);
-        var statistics = adminStatisticDataSource.userActivityChartByLevels(dateRange, timeInterval);
-        return chartDataConverter.convert(statistics, DEFAULT_TIME_ZONE.toZoneId());
-
     }
 }

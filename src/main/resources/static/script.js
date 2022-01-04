@@ -108,10 +108,6 @@ class ActivityLevelsChart {
         this.chartData = null;
         this.intervalOptions = getAvailableIntervalOptions();
 
-        this.getMode = function () {
-            return $(`#${this.containerElementId} select[name=activity-chart-mode]`).val();
-        }
-
         this.getInterval = function () {
             return this.intervalOptions[$(`#${this.containerElementId} select[name=activity-chart-interval]`).val()];
         }
@@ -150,16 +146,7 @@ class ActivityLevelsChart {
             this.chartControl.options.xLabelFormat = dateFormat;
             this.chartControl.options.dateFormat = dateFormat;
             this.chartControl.options.xLabels = this.getInterval().unit.toLowerCase();
-            switch (this.getMode()) {
-                case 'SUM':
-                    this.sumMode();
-                    break;
-                case 'RATIO':
-                    this.ratioMode();
-                    break;
-                default:
-                    this.defaultMode();
-            }
+            this.defaultMode();
             if (dateFormat === formatDateTime) {
                 //to fit date time label into canvas. part 2
                 this.chartSvg.height(this.chartSvg.height() + 10);
@@ -173,36 +160,6 @@ class ActivityLevelsChart {
             this.chartControl.options.postUnits = '';
             this.chartControl.options.ymax = 'auto';
             this.chartControl.setData(this.chartData);
-        }
-
-        this.sumMode = function () {
-            this.chartControl.cumulative = true;
-            this.chartControl.options.behaveLikeLine = false;
-            this.chartControl.options.fillOpacity = 1.0;
-            this.chartControl.options.postUnits = '';
-            this.chartControl.options.ymax = 'auto';
-            this.chartControl.setData(this.chartData);
-        }
-
-        this.ratioMode = function () {
-            this.chartControl.cumulative = true;
-            this.chartControl.options.behaveLikeLine = false;
-            this.chartControl.options.fillOpacity = 1.0;
-            this.chartControl.options.postUnits = '%';
-            this.chartControl.options.ymax = 100.0;
-            let data = this.chartData.map(function (item) {
-                let result = [item[0]];
-                let data = item.slice(1);
-                let sum = data.reduce((a, b) => a + b, 0);
-                for (let i = 1; i < item.length; i++) {
-                    let ratio = sum === 0
-                        ? 1.0 / data.length * 100.0
-                        : item[i] / sum * 100.0;
-                    result.push(ratio.toFixed(1));
-                }
-                return result;
-            });
-            this.chartControl.setData(data);
         }
 
         this.refreshChartData = function () {

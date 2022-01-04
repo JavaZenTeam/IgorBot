@@ -12,7 +12,6 @@
     <script type="text/javascript" src="/webjars/raphaeljs/2.1.2/raphael-min.js"></script>
     <script type="text/javascript" src="/webjars/morrisjs/0.5.1/morris.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-    <script type="text/javascript" src="https://unpkg.com/@lottiefiles/lottie-player@0.4.0/dist/tgs-player.js"></script>
     <script type="text/javascript" src="/script.js"></script>
 </head>
 <body>
@@ -37,17 +36,13 @@
 <div class="bg-light p-3 ">
     <div class="container">
         <div class="row">
-            <div class="col-lg-6">
-                <h4>Chat Activity Levels</h4>
-                <div th:replace="admin_activity_table :: table ('chat-activity-table', ${chatActivity})"></div>
-                <h4>Chat Activity Chart</h4>
-                <div th:replace="admin_activity_chart :: chart ('chat-activity-chart', 'chat-activity-chart')"></div>
+            <div class="col-lg-4">
+                <h4>Usage Stats</h4>
+                <div th:replace="admin_activity_table :: table ('activity-per-entity-table')"></div>
             </div>
-            <div class="col-lg-6">
-                <h4>User Activity Levels</h4>
-                <div th:replace="admin_activity_table :: table ('user-activity-table', ${userActivity})"></div>
-                <h4>User Activity Chart</h4>
-                <div th:replace="admin_activity_chart :: chart ('user-activity-chart', 'user-activity-chart')"></div>
+            <div class="col-lg-8">
+                <h4>Activity Chart</h4>
+                <div th:replace="admin_activity_chart :: chart ('activity-per-entity-chart', 'activity-per-entity-chart')"></div>
             </div>
         </div>
     </div>

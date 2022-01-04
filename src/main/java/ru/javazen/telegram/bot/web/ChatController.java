@@ -104,14 +104,14 @@ public class ChatController {
     @PreAuthorize("hasAuthority('/chat/' + #chatId)")
     @GetMapping("message-types")
     @ResponseBody
-    public List<Statistic<String>> getMessageTypesChart(@PathVariable Long chatId,
-                                                     @RequestParam
-                                                     @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                             LocalDate from,
-                                                     @RequestParam
-                                                     @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                             LocalDate to,
-                                                     @RequestParam(required = false) String chatType) {
+    public List<BaseCount<String>> getMessageTypesChart(@PathVariable Long chatId,
+                                                        @RequestParam
+                                                              @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                      LocalDate from,
+                                                        @RequestParam
+                                                              @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                      LocalDate to,
+                                                        @RequestParam(required = false) String chatType) {
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
         return dataSource.messageTypesUsage(chatId, dateRange);
