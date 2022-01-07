@@ -1,0 +1,53 @@
+<div id="chat-types-donut-container">
+    <div class="bg-white border p-2 mb-2">
+        <div id="chat-types-donut"></div>
+    </div>
+</div>
+<script>
+    let donutLabels = {
+        'PRIVATE': 'Private',
+        'GROUP': 'Group',
+        'SUPERGROUP': 'Supergroup',
+        'CHANNEL': 'Channel',
+        'UNKNOWN': 'Unknown'
+    };
+    let colors = [
+        '#007bff',
+        '#28a745',
+        '#ffc107',
+        '#dc3545',
+        '#17a2b8'
+    ];
+
+    function mapDonutData({subject, count}) {
+        return {
+            label: donutLabels[subject],
+            value: count
+        }
+    }
+
+    $(document).ready(function () {
+        let param = $.param({
+            from: getFromDate(),
+            to: getToDate()
+        });
+        let path = window.location.pathname + "/chat-types";
+        $.get(path + "?" + param)
+            .done(function (response) {
+                if (response.length > 0) {
+                    Morris.Donut({
+                        element: 'chat-types-donut',
+                        data: response.map(mapDonutData),
+                        formatter: formatInteger,
+                        colors: colors,
+                        resize: true
+                    })
+                } else {
+                    $('#chat-types-donut-container').parent().replaceWith(
+                        '<div class="alert-info p-3 mb-3">' +
+                        'No data found for the selected period' +
+                        '</div>');
+                }
+            });
+    });
+</script>

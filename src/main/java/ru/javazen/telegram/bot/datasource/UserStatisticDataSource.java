@@ -55,7 +55,7 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
     }
 
     @Override
-    public List<MessageStatistic<String>> topUsedStickers(Long userId, DateRange dateRange, Integer maxResults) {
+    public List<BaseCount<String>> topUsedStickers(Long userId, DateRange dateRange, Integer maxResults) {
         return topUsedStickersQuery.getTopUsedUserStickers(userId, dateRange, maxResults);
     }
 
@@ -65,7 +65,7 @@ public class UserStatisticDataSource implements StatisticDataSource<ChatEntity> 
     }
 
     @Override
-    public Integer messageCountAtDate(Long userId, Date date) {
+    public Long messageCountAtDate(Long userId, Date date) {
         return messageCountQuery.getUserMessageCount(userId, date);
     }
 }

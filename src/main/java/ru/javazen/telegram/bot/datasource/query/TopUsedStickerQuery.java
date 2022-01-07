@@ -3,7 +3,7 @@ package ru.javazen.telegram.bot.datasource.query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.javazen.telegram.bot.datasource.model.MessageStatistic;
+import ru.javazen.telegram.bot.datasource.model.BaseCount;
 import ru.javazen.telegram.bot.model.FileType;
 import ru.javazen.telegram.bot.model.MessageEntity;
 import ru.javazen.telegram.bot.model.MessageEntity_;
@@ -21,21 +21,21 @@ public class TopUsedStickerQuery {
     private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
-    public List<MessageStatistic<String>> getTopUsedChatStickers(Long chatId, DateRange dateRange, Integer maxResults) {
+    public List<BaseCount<String>> getTopUsedChatStickers(Long chatId, DateRange dateRange, Integer maxResults) {
         return getTopUsedStickers(chatId, dateRange, maxResults, MessageEntity_.chat);
     }
 
     @Transactional(readOnly = true)
-    public List<MessageStatistic<String>> getTopUsedUserStickers(Long chatId, DateRange dateRange, Integer maxResults) {
+    public List<BaseCount<String>> getTopUsedUserStickers(Long chatId, DateRange dateRange, Integer maxResults) {
         return getTopUsedStickers(chatId, dateRange, maxResults, MessageEntity_.user);
     }
 
-    private List<MessageStatistic<String>> getTopUsedStickers(Long objectId, DateRange dateRange, Integer maxResults,
-                                                              SingularAttribute<MessageEntity, ?> objectAttr) {
-        Class<MessageStatistic<String>> statisticClass = QueryUtils.messageCountFor(String.class);
+    private List<BaseCount<String>> getTopUsedStickers(Long objectId, DateRange dateRange, Integer maxResults,
+                                                       SingularAttribute<MessageEntity, ?> objectAttr) {
+        Class<BaseCount<String>> statisticClass = QueryUtils.countFor(String.class);
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<MessageStatistic<String>> query = builder.createQuery(statisticClass);
+        CriteriaQuery<BaseCount<String>> query = builder.createQuery(statisticClass);
 
         Root<MessageEntity> messages = query.from(MessageEntity.class);
 

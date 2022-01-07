@@ -6,21 +6,21 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.GetUserProfilePhotos;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.UserProfilePhotos;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.javazen.telegram.bot.datasource.model.BaseCount;
 import ru.javazen.telegram.bot.datasource.model.ChartData;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
 import ru.javazen.telegram.bot.datasource.query.ActiveEntitiesChartQuery;
+import ru.javazen.telegram.bot.datasource.query.ChatTypesQuery;
 import ru.javazen.telegram.bot.datasource.query.CountEntitiesQuery;
 import ru.javazen.telegram.bot.datasource.query.IncomeOutcomeEntitiesQuery;
+import ru.javazen.telegram.bot.model.ChatType;
 import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.util.ChartDataConverter;
 import ru.javazen.telegram.bot.util.DateRange;
@@ -42,6 +42,7 @@ public class AdminController {
     private final CountEntitiesQuery countEntitiesQuery;
     private final IncomeOutcomeEntitiesQuery incomeOutcomeEntitiesQuery;
     private final ActiveEntitiesChartQuery activeEntitiesChartQuery;
+    private final ChatTypesQuery chatTypesQuery;
     private final ChartDataConverter chartDataConverter;
 
     @GetMapping
@@ -98,5 +99,17 @@ public class AdminController {
         TimeInterval timeInterval = new TimeInterval(intervalQuantity, intervalUnit);
         var statistics = activeEntitiesChartQuery.getActiveEntitiesChart(dateRange, timeInterval);
         return chartDataConverter.convert(statistics, DEFAULT_TIME_ZONE.toZoneId());
+    }
+
+    @GetMapping("chat-types")
+    @ResponseBody
+    public List<BaseCount<ChatType>> getMessageTypesChart(@RequestParam
+                                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                  LocalDate from,
+                                                          @RequestParam
+                                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                  LocalDate to) {
+        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
+        return chatTypesQuery.getChatTypes(dateRange);
     }
 }

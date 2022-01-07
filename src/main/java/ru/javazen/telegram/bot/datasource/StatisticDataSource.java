@@ -14,9 +14,9 @@ public interface StatisticDataSource<T> {
 
     List<PeriodMessageStatistic<T>> activityChart(Long chatId, DateRange dateRange, TimeInterval interval);
 
-    List<MessageStatistic<String>> topUsedStickers(Long chatId, DateRange dateRange, Integer maxResults);
+    List<BaseCount<String>> topUsedStickers(Long chatId, DateRange dateRange, Integer maxResults);
 
     List<BaseCount<String>> messageTypesUsage(Long chatId, DateRange dateRange);
 
-    Integer messageCountAtDate(Long chatId, Date date);
+    Long messageCountAtDate(Long chatId, Date date);
 }

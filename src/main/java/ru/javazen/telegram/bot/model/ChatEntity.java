@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.Optional;
 
 @Entity
@@ -23,6 +22,9 @@ public class ChatEntity implements IdSupplier, LabelSupplier {
     @Column(length = 512)
     private String title;
 
+    @Enumerated(EnumType.STRING)
+    private ChatType type;
+
     @Override
     public String getLabel() {
         return Optional.ofNullable(getTitle())
@@ -32,5 +34,9 @@ public class ChatEntity implements IdSupplier, LabelSupplier {
     @Override
     public Long getId() {
         return getChatId();
+    }
+
+    public ChatEntity(BigInteger chatId, String username, String title) {
+        this(chatId.longValue(), username, title, ChatType.UNKNOWN);
     }
 }

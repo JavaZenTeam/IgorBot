@@ -1,5 +1,6 @@
 package ru.javazen.telegram.bot.config;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.modelmapper.Conditions;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -17,6 +18,7 @@ import ru.javazen.telegram.bot.util.MessageHelper;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
@@ -56,6 +58,7 @@ public class ModelMapperConfig {
                 map().setChatId(source.getId());
                 map().setTitle(source.getTitle());
                 map().setUsername(source.getUserName());
+                using(chatTypeConverter).map(source.getType(), destination.getType());
             }
         };
     }
@@ -115,6 +118,7 @@ public class ModelMapperConfig {
         if (message.getVoice() != null) return FileType.VOICE;
         if (message.getVideoNote() != null) return FileType.VIDEO_NOTE;
         if (message.getSticker() != null) return FileType.STICKER;
+        if (message.getAnimation() != null) return FileType.ANIMATION;
 
         return null;
     }
@@ -135,6 +139,7 @@ public class ModelMapperConfig {
         if (message.getVoice() != null) return message.getVoice().getFileId();
         if (message.getVideoNote() != null) return message.getVideoNote().getFileId();
         if (message.getSticker() != null) return message.getSticker().getFileId();
+        if (message.getAnimation() != null) return message.getAnimation().getFileId();
 
         return null;
     }
@@ -155,6 +160,7 @@ public class ModelMapperConfig {
         if (message.getVoice() != null) return message.getVoice().getFileUniqueId();
         if (message.getVideoNote() != null) return message.getVideoNote().getFileUniqueId();
         if (message.getSticker() != null) return message.getSticker().getFileUniqueId();
+        if (message.getAnimation() != null) return message.getAnimation().getFileUniqueId();
 
         return null;
     }
@@ -169,6 +175,10 @@ public class ModelMapperConfig {
         if (message.getLeftChatMember() != null) return EventType.LEFT_MEMBER;
         return null;
     };
+
+    private final Converter<String, ChatType> chatTypeConverter = ctx -> Optional
+            .ofNullable(EnumUtils.getEnumIgnoreCase(ChatType.class, ctx.getSource()))
+            .orElse(ChatType.UNKNOWN);
 
     @Bean
     public ModelMapper modelMapper(List<PropertyMap<?, ?>> propertyMaps) {

@@ -70,8 +70,8 @@ public class ChatController {
         model.addAttribute("activityStatisticSummary", new ActivityStatisticSummary(activityStatistic, 10));
         model.addAttribute("topStickers", dataSource.topUsedStickers(chatId, dateRange, 6));
 
-        Integer prevMessageCount = dataSource.messageCountAtDate(chatId, dateRange.getFrom());
-        Integer currMessageCount = dataSource.messageCountAtDate(chatId, dateRange.getTo());
+        Long prevMessageCount = dataSource.messageCountAtDate(chatId, dateRange.getFrom());
+        Long currMessageCount = dataSource.messageCountAtDate(chatId, dateRange.getTo());
         model.addAttribute("milestoneSummary", milestoneHelper.getMilestoneSummary(prevMessageCount, currMessageCount));
 
         return "chat";
@@ -106,11 +106,11 @@ public class ChatController {
     @ResponseBody
     public List<BaseCount<String>> getMessageTypesChart(@PathVariable Long chatId,
                                                         @RequestParam
-                                                              @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                                      LocalDate from,
+                                                        @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                LocalDate from,
                                                         @RequestParam
-                                                              @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                                      LocalDate to,
+                                                        @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                LocalDate to,
                                                         @RequestParam(required = false) String chatType) {
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;

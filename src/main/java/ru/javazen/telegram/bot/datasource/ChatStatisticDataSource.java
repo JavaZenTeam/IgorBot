@@ -33,7 +33,7 @@ public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> 
     }
 
     @Override
-    public List<MessageStatistic<String>> topUsedStickers(Long chatId, DateRange dateRange, Integer maxResults) {
+    public List<BaseCount<String>> topUsedStickers(Long chatId, DateRange dateRange, Integer maxResults) {
         return topUsedStickersQuery.getTopUsedChatStickers(chatId, dateRange, maxResults);
     }
 
@@ -43,7 +43,7 @@ public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> 
     }
 
     @Override
-    public Integer messageCountAtDate(Long chatId, Date date) {
+    public Long messageCountAtDate(Long chatId, Date date) {
         return messageCountQuery.getChatMessageCount(chatId, date);
     }
 }

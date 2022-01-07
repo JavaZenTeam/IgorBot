@@ -1,10 +1,7 @@
 package ru.javazen.telegram.bot.datasource.query;
 
 import lombok.experimental.UtilityClass;
-import ru.javazen.telegram.bot.datasource.model.EntityTypesCount;
-import ru.javazen.telegram.bot.datasource.model.MessageStatistic;
-import ru.javazen.telegram.bot.datasource.model.PeriodEntityTypesCount;
-import ru.javazen.telegram.bot.datasource.model.PeriodMessageStatistic;
+import ru.javazen.telegram.bot.datasource.model.*;
 
 import javax.persistence.Query;
 import java.lang.reflect.Constructor;
@@ -32,6 +29,11 @@ public class QueryUtils {
     @SuppressWarnings("unchecked")
     public <T> Class<MessageStatistic<T>> messageCountFor(Class<T> target) {
         return (Class<MessageStatistic<T>>) ((Class<?>) MessageStatistic.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Class<BaseCount<T>> countFor(Class<T> target) {
+        return (Class<BaseCount<T>>) ((Class<?>) BaseCount.class);
     }
 
     public EntityTypesCount mapEntityTypesCount(Object object) {
@@ -70,7 +72,10 @@ public class QueryUtils {
                 .map(constructor -> newInstance((Constructor<T>) constructor, rawResult))
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Suitable constructor is not found"));
+                .orElseThrow(() -> {
+                    String msg = objectClass.getSimpleName() + " class doesn't have a constructor with following types of arguments: " + Arrays.toString(paramTypes);
+                    return new NoSuchElementException(msg);
+                });
     }
 
     private <T> T newInstance(Constructor<T> constructor, Object[] params) {
