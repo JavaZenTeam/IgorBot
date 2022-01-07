@@ -98,7 +98,7 @@ function resolveDateFormat(unit) {
     }
 }
 
-class ActivityLevelsChart {
+class AdminActivityChart {
     constructor(containerElementId, chartElementId, url) {
         this.containerElementId = containerElementId;
         this.chartElementId = chartElementId;
