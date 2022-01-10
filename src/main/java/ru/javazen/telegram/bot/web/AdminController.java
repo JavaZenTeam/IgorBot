@@ -13,13 +13,10 @@ import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.UserProfilePhotos;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.javazen.telegram.bot.datasource.model.BaseCount;
+import ru.javazen.telegram.bot.datasource.model.SubjectCount;
 import ru.javazen.telegram.bot.datasource.model.ChartData;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
-import ru.javazen.telegram.bot.datasource.query.ActiveEntitiesChartQuery;
-import ru.javazen.telegram.bot.datasource.query.ChatTypesQuery;
-import ru.javazen.telegram.bot.datasource.query.CountEntitiesQuery;
-import ru.javazen.telegram.bot.datasource.query.IncomeOutcomeEntitiesQuery;
+import ru.javazen.telegram.bot.datasource.query.*;
 import ru.javazen.telegram.bot.model.ChatType;
 import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.util.ChartDataConverter;
@@ -40,9 +37,11 @@ public class AdminController {
     private final DefaultAbsSender bot;
     private final MessageRepository messageRepository;
     private final CountEntitiesQuery countEntitiesQuery;
+    private final TopEntitiesQuery topEntitiesQuery;
     private final IncomeOutcomeEntitiesQuery incomeOutcomeEntitiesQuery;
     private final ActiveEntitiesChartQuery activeEntitiesChartQuery;
     private final ChatTypesQuery chatTypesQuery;
+    private final UserLanguagesQuery userLanguagesQuery;
     private final ChartDataConverter chartDataConverter;
 
     @GetMapping
@@ -80,6 +79,9 @@ public class AdminController {
                 Map.entry("Outcome", incomeOutcomeEntitiesQuery.outcomeCount(dateRange))
         ));
 
+        model.addAttribute("topChats", topEntitiesQuery.topChats(dateRange, 20));
+        model.addAttribute("topUsers", topEntitiesQuery.topUsers(dateRange, 20));
+
         return "admin";
     }
 
@@ -103,13 +105,25 @@ public class AdminController {
 
     @GetMapping("chat-types")
     @ResponseBody
-    public List<BaseCount<ChatType>> getMessageTypesChart(@RequestParam
-                                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                                  LocalDate from,
+    public List<SubjectCount<ChatType>> getChatTypesChart(@RequestParam
+                                                       @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                               LocalDate from,
                                                           @RequestParam
-                                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                                  LocalDate to) {
+                                                       @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                               LocalDate to) {
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         return chatTypesQuery.getChatTypes(dateRange);
+    }
+
+    @GetMapping("user-languages")
+    @ResponseBody
+    public List<SubjectCount<String>> getUserLanguagesChart(@RequestParam
+                                                         @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                 LocalDate from,
+                                                            @RequestParam
+                                                         @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                 LocalDate to) {
+        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
+        return userLanguagesQuery.getLanguages(dateRange);
     }
 }

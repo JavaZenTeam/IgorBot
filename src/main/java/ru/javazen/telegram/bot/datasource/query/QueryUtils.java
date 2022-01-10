@@ -32,8 +32,8 @@ public class QueryUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Class<BaseCount<T>> countFor(Class<T> target) {
-        return (Class<BaseCount<T>>) ((Class<?>) BaseCount.class);
+    public <T> Class<SubjectCount<T>> countFor(Class<T> target) {
+        return (Class<SubjectCount<T>>) ((Class<?>) SubjectCount.class);
     }
 
     public EntityTypesCount mapEntityTypesCount(Object object) {

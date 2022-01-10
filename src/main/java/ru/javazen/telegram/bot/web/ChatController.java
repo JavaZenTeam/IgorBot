@@ -74,6 +74,9 @@ public class ChatController {
         Long currMessageCount = dataSource.messageCountAtDate(chatId, dateRange.getTo());
         model.addAttribute("milestoneSummary", milestoneHelper.getMilestoneSummary(prevMessageCount, currMessageCount));
 
+        if (!chat.isUserChat()) {
+            model.addAttribute("events", messageRepository.findEventsByChatId(chatId, dateRange.getFrom(), dateRange.getTo()));
+        }
         return "chat";
     }
 
@@ -104,14 +107,14 @@ public class ChatController {
     @PreAuthorize("hasAuthority('/chat/' + #chatId)")
     @GetMapping("message-types")
     @ResponseBody
-    public List<BaseCount<String>> getMessageTypesChart(@PathVariable Long chatId,
-                                                        @RequestParam
+    public List<SubjectCount<String>> getMessageTypesChart(@PathVariable Long chatId,
+                                                           @RequestParam
                                                         @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                                 LocalDate from,
-                                                        @RequestParam
+                                                           @RequestParam
                                                         @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                                 LocalDate to,
-                                                        @RequestParam(required = false) String chatType) {
+                                                           @RequestParam(required = false) String chatType) {
         DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
         var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
         return dataSource.messageTypesUsage(chatId, dateRange);

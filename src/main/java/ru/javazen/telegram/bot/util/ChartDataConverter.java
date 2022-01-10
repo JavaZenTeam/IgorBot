@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import ru.javazen.telegram.bot.datasource.model.ChartData;
 import ru.javazen.telegram.bot.datasource.model.PeriodEntityTypesCount;
 import ru.javazen.telegram.bot.datasource.model.PeriodMessageStatistic;
-import ru.javazen.telegram.bot.datasource.model.BaseCount;
+import ru.javazen.telegram.bot.datasource.model.SubjectCount;
 import ru.javazen.telegram.bot.model.IdSupplier;
 import ru.javazen.telegram.bot.model.LabelSupplier;
 
@@ -62,9 +62,9 @@ public class ChartDataConverter {
                 .build();
     }
 
-    private List<Object> getSubjects(List<? extends BaseCount<?>> source) {
+    private List<Object> getSubjects(List<? extends SubjectCount<?>> source) {
         return source.stream()
-                .map(BaseCount::getSubject)
+                .map(SubjectCount::getSubject)
                 .filter(Objects::nonNull)
                 .distinct()
                 .sorted()

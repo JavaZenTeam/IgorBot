@@ -47,18 +47,36 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
-                <h4>Top Activity</h4>
-                <div th:replace="chat_activity_table :: table ('activity-table', ${activityStatisticSummary})"></div>
-                <h4>Activity chart</h4>
-                <div th:replace="chat_activity_chart"></div>
+                <div>
+                    <h4>Top Activity</h4>
+                    <div th:replace="chat_activity_table :: table ('activity-table', ${activityStatisticSummary})"></div>
+                </div>
+                <div>
+                    <h4>Activity chart</h4>
+                    <div th:replace="chat_activity_chart"></div>
+                </div>
+                <div>
+                    <h4>Periods bar chart</h4>
+                    <div th:replace="chat_periods_bar_chart"></div>
+                </div>
             </div>
             <div class="col-lg-4">
-                <h4>Milestones</h4>
-                <div th:replace="chat_milestones"></div>
-                <h4>Top Used Stickers</h4>
-                <div th:replace="chat_stickers"></div>
-                <h4>Message Types Ratio</h4>
-                <div th:replace="chat_messages_types_donut"></div>
+                <div>
+                    <h4>Milestones</h4>
+                    <div th:replace="chat_milestones"></div>
+                </div>
+                <div>
+                    <h4>Top Used Stickers</h4>
+                    <div th:replace="chat_stickers"></div>
+                </div>
+                <div>
+                    <h4>Message Types Ratio</h4>
+                    <div th:replace="chat_messages_types_donut"></div>
+                </div>
+                <div th:if="${events}">
+                    <h4>Events</h4>
+                    <div th:replace="chat_events"></div>
+                </div>
             </div>
         </div>
     </div>

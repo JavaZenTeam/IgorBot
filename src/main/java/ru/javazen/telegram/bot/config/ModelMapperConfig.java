@@ -72,6 +72,7 @@ public class ModelMapperConfig {
                 map().setUsername(source.getUserName());
                 map().setFirstName(source.getFirstName());
                 map().setLastName(source.getLastName());
+                map().setLanguageCode(source.getLanguageCode());
             }
         };
     }
@@ -125,6 +126,9 @@ public class ModelMapperConfig {
 
     private final Converter<Message, String> fileIdConverter = ctx ->
             ofNullable(resolveFileId(ctx.getSource()))
+                    .or(() -> ofNullable(ctx.getSource().getNewChatPhoto()).map(photos -> photos.stream()
+                            .map(PhotoSize::getFileId)
+                            .collect(Collectors.joining(","))))
                     .or(() -> ofNullable(ctx.getSource().getPinnedMessage()).map(this::resolveFileId))
                     .orElse(null);
 
@@ -146,6 +150,9 @@ public class ModelMapperConfig {
 
     private final Converter<Message, String> fileUniqueIdConverter = ctx ->
             ofNullable(resolveFileUniqueId(ctx.getSource()))
+                    .or(() -> ofNullable(ctx.getSource().getNewChatPhoto()).map(photos -> photos.stream()
+                            .map(PhotoSize::getFileUniqueId)
+                            .collect(Collectors.joining(","))))
                     .or(() -> ofNullable(ctx.getSource().getPinnedMessage()).map(this::resolveFileUniqueId))
                     .orElse(null);
 

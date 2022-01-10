@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BaseCount<T> {
+public class SubjectCount<T> {
     private final T subject;
     private final long count;
 }

@@ -27,6 +27,8 @@ public class UserEntity implements IdSupplier, LabelSupplier {
     @Column(length = 32)
     private String username;
 
+    private String languageCode;
+
     @Override
     public String getLabel() {
         return Optional.ofNullable(getFirstName())
@@ -42,6 +44,6 @@ public class UserEntity implements IdSupplier, LabelSupplier {
     }
 
     public UserEntity(BigInteger userId, String firstName, String lastName, String username) {
-        this(userId.longValue(), firstName, lastName, username);
+        this(userId.longValue(), firstName, lastName, username, null);
     }
 }

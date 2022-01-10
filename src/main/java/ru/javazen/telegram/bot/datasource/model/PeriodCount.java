@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.sql.Timestamp;
 
 @Getter
-public class PeriodCount<T> extends BaseCount<T> {
+public class PeriodCount<T> extends SubjectCount<T> {
     private final Timestamp period;
 
     public PeriodCount(Timestamp period, T subject, Long count) {

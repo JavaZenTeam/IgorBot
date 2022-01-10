@@ -2,7 +2,7 @@ package ru.javazen.telegram.bot.datasource.query;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.javazen.telegram.bot.datasource.model.BaseCount;
+import ru.javazen.telegram.bot.datasource.model.SubjectCount;
 import ru.javazen.telegram.bot.model.*;
 import ru.javazen.telegram.bot.util.DateRange;
 
@@ -16,11 +16,11 @@ public class ChatTypesQuery {
 
     private final EntityManager entityManager;
 
-    public List<BaseCount<ChatType>> getChatTypes(DateRange dateRange) {
-        Class<BaseCount<ChatType>> statisticClass = QueryUtils.countFor(ChatType.class);
+    public List<SubjectCount<ChatType>> getChatTypes(DateRange dateRange) {
+        Class<SubjectCount<ChatType>> statisticClass = QueryUtils.countFor(ChatType.class);
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<BaseCount<ChatType>> query = builder.createQuery(statisticClass);
+        CriteriaQuery<SubjectCount<ChatType>> query = builder.createQuery(statisticClass);
 
         Root<MessageEntity> messages = query.from(MessageEntity.class);
         Join<MessageEntity, ChatEntity> chatJoin = messages.join(MessageEntity_.chat);

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.javazen.telegram.bot.datasource.model.MessageStatistic;
 import ru.javazen.telegram.bot.datasource.model.PeriodMessageStatistic;
-import ru.javazen.telegram.bot.datasource.model.BaseCount;
+import ru.javazen.telegram.bot.datasource.model.SubjectCount;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
 import ru.javazen.telegram.bot.datasource.query.*;
 import ru.javazen.telegram.bot.model.UserEntity;
@@ -33,12 +33,12 @@ public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> 
     }
 
     @Override
-    public List<BaseCount<String>> topUsedStickers(Long chatId, DateRange dateRange, Integer maxResults) {
+    public List<SubjectCount<String>> topUsedStickers(Long chatId, DateRange dateRange, Integer maxResults) {
         return topUsedStickersQuery.getTopUsedChatStickers(chatId, dateRange, maxResults);
     }
 
     @Override
-    public List<BaseCount<String>> messageTypesUsage(Long chatId, DateRange dateRange) {
+    public List<SubjectCount<String>> messageTypesUsage(Long chatId, DateRange dateRange) {
         return messageTypesQuery.getChatMessagesByTypes(chatId, dateRange);
     }
 

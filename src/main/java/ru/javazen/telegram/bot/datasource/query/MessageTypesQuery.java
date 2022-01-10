@@ -2,7 +2,7 @@ package ru.javazen.telegram.bot.datasource.query;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.javazen.telegram.bot.datasource.model.BaseCount;
+import ru.javazen.telegram.bot.datasource.model.SubjectCount;
 import ru.javazen.telegram.bot.util.DateRange;
 
 import javax.persistence.EntityManager;
@@ -32,15 +32,15 @@ public class MessageTypesQuery {
 
     private final EntityManager entityManager;
 
-    public List<BaseCount<String>> getChatMessagesByTypes(Long userId, DateRange dateRange) {
+    public List<SubjectCount<String>> getChatMessagesByTypes(Long userId, DateRange dateRange) {
         return queryTemplate(userId, dateRange, "chat_id");
     }
 
-    public List<BaseCount<String>> getUserMessagesByTypes(Long userId, DateRange dateRange) {
+    public List<SubjectCount<String>> getUserMessagesByTypes(Long userId, DateRange dateRange) {
         return queryTemplate(userId, dateRange, "user_id");
     }
 
-    public List<BaseCount<String>> queryTemplate(Long userId, DateRange dateRange, String objectField) {
+    public List<SubjectCount<String>> queryTemplate(Long userId, DateRange dateRange, String objectField) {
         String sqlString = String.format(MESSAGE_TYPES_SQL, objectField);
         Query query = entityManager.createNativeQuery(sqlString)
                 .setParameter("object_id", userId)
@@ -48,8 +48,8 @@ public class MessageTypesQuery {
                 .setParameter("to", dateRange.getTo());
 
         return QueryUtils.getResultStream(query)
-                .map(arr -> new BaseCount<>((String) arr[0], ((Number) arr[1]).longValue()))
-                .sorted(Comparator.comparing(BaseCount::getSubject))
+                .map(arr -> new SubjectCount<>((String) arr[0], ((Number) arr[1]).longValue()))
+                .sorted(Comparator.comparing(SubjectCount::getSubject))
                 .collect(Collectors.toList());
     }
 }

@@ -1,0 +1,68 @@
+<style>
+    .img-micro {
+        height: 30px;
+        margin-top: -5px;
+        margin-bottom: -5px;
+        border-radius: 0.25rem;
+    }
+</style>
+<div xmlns:th="http://www.thymeleaf.org">
+    <ul class="list-group" style="height: 250px; overflow-y: scroll">
+        <li class="list-group-item flex-column align-items-start"
+            th:each="event : ${events}">
+            <div class="d-flex w-100 justify-content-between">
+                <th:block th:switch="${event.eventType}">
+                    <div th:case="${T(ru.javazen.telegram.bot.model.EventType).PINNED_MESSAGE}">
+                        <span>Pinned</span>
+                        <span th:with="isPhoto = ${event.fileType?.name() == 'PHOTO'}">
+                            <img class="img-micro" th:if="${isPhoto && event.getSmallFileId() != null}"
+                                 th:src="${'/file/' + event.getSmallFileId()}"
+                                 th:attr="data-content=${'<img src=&quot/file/' + event.getSmallFileId() + '&quot></img>'}"/>
+                            <span th:if="${event.fileType != null && (!isPhoto || event.getSmallFileId() == null)}">
+                                <span>some</span>
+                                <span class="text-lowercase" th:text="${event.fileType.name()}"></span>
+                            </span>
+                            <i th:text="${event.text}"></i>
+                            <span th:if="${event.text == null && event.getSmallFileId() == null}">some message</span>
+                        </span>
+                    </div>
+                    <div th:case="${T(ru.javazen.telegram.bot.model.EventType).NEW_TITLE}">
+                        <span>New title</span>
+                        <b th:text="${event.text}"></b>
+                    </div>
+                    <div th:case="${T(ru.javazen.telegram.bot.model.EventType).NEW_PHOTO}">
+                        <span>New photo</span>
+                        <img class="img-micro" th:if="${event.getSmallFileId()}"
+                                       th:src="${'/file/' + event.getSmallFileId()}"
+                                       th:attr="data-content=${'<img src=&quot/file/' + event.getSmallFileId() + '&quot></img>'}"/>
+                    </div>
+                    <div th:case="${T(ru.javazen.telegram.bot.model.EventType).DELETED_PHOTO}">
+                        <span>Deleted photo</span>
+                    </div>
+                    <div th:case="${T(ru.javazen.telegram.bot.model.EventType).NEW_MEMBERS}">
+                        <b th:each="member : ${event.members}">
+                            <span th:if="${member.firstName}" th:text="${member.firstName}"></span>
+                            <span th:if="${member.lastName}" th:text="${member.lastName}"></span>
+                        </b>
+                        <span>joined group</span>
+                    </div>
+                    <div th:case="${T(ru.javazen.telegram.bot.model.EventType).LEFT_MEMBER}">
+                        <b th:each="member : ${event.members}">
+                            <span th:if="${member.firstName}" th:text="${member.firstName}"></span>
+                            <span th:if="${member.lastName}" th:text="${member.lastName}"></span>
+                        </b>
+                        <span>left group</span>
+                    </div>
+                </th:block>
+                <small class="text-muted" th:text="${#dates.format(event.date, 'dd.MM.yyyy')}"></small>
+            </div>
+        </li>
+    </ul>
+    <script>
+        $('img.img-micro').popover({
+          html: true,
+          trigger: 'hover',
+          placement: 'right'
+        });
+    </script>
+</div>

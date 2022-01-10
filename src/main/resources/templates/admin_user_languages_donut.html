@@ -1,27 +1,25 @@
-<div id="chat-types-donut-container">
+<div id="user-languages-donut-container">
     <div class="bg-white border p-2 mb-2">
-        <div id="chat-types-donut"></div>
+        <div id="user-languages-donut"></div>
     </div>
 </div>
 <script>
-    let chatTypesLabels = {
-        'PRIVATE': 'Private',
-        'GROUP': 'Group',
-        'SUPERGROUP': 'Supergroup',
-        'CHANNEL': 'Channel',
-        'UNKNOWN': 'Unknown'
-    };
-    let chatTypesColors = [
+    let userLanguagesColors = [
         '#007bff',
         '#28a745',
         '#ffc107',
         '#dc3545',
-        '#17a2b8'
+        '#17a2b8',
+        '#6c757d',
+        '#1e7e34',
+        '#ff8107',
+        '#0062cc',
+        '#bd2130',
     ];
 
-    function mapChatTypesData({subject, count}) {
+    function mapUserLanguagesData({subject, count}) {
         return {
-            label: chatTypesLabels[subject],
+            label: subject || '???',
             value: count
         }
     }
@@ -31,19 +29,19 @@
             from: getFromDate(),
             to: getToDate()
         });
-        let path = window.location.pathname + "/chat-types";
+        let path = window.location.pathname + "/user-languages";
         $.get(path + "?" + param)
             .done(function (response) {
                 if (response.length > 0) {
                     Morris.Donut({
-                        element: 'chat-types-donut',
-                        data: response.map(mapChatTypesData),
+                        element: 'user-languages-donut',
+                        data: response.map(mapUserLanguagesData),
                         formatter: formatInteger,
-                        colors: chatTypesColors,
+                        colors: userLanguagesColors,
                         resize: true
                     })
                 } else {
-                    $('#chat-types-donut-container').parent().replaceWith(
+                    $('#user-languages-donut-container').parent().replaceWith(
                         '<div class="alert-info p-3 mb-3">' +
                         'No data found for the selected period' +
                         '</div>');

@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Getter
-public class MessageStatistic<T> extends BaseCount<T> {
+public class MessageStatistic<T> extends SubjectCount<T> {
     private final long length;
     private final double score;
 
