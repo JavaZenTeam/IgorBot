@@ -1,13 +1,13 @@
-<style>
+<div xmlns:th="http://www.thymeleaf.org">
+    <style>
     .img-micro {
         height: 30px;
         margin-top: -5px;
         margin-bottom: -5px;
         border-radius: 0.25rem;
     }
-</style>
-<div xmlns:th="http://www.thymeleaf.org">
-    <ul class="list-group" style="height: 250px; overflow-y: scroll">
+    </style>
+    <ul th:if="${!events.isEmpty()}" class="list-group" style="max-height: 250px; overflow-y: scroll">
         <li class="list-group-item flex-column align-items-start"
             th:each="event : ${events}">
             <div class="d-flex w-100 justify-content-between">
@@ -58,6 +58,9 @@
             </div>
         </li>
     </ul>
+    <div class="alert-info p-3" th:if="${events.isEmpty()}">
+        No events found for the selected period
+    </div>
     <script>
         $('img.img-micro').popover({
           html: true,
