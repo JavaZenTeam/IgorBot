@@ -8,4 +8,5 @@ public enum FileType {
     VOICE,
     VIDEO_NOTE,
     STICKER,
+    ANIMATION,
 }

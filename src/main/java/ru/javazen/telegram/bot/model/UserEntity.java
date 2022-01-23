@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.math.BigInteger;
 import java.util.Optional;
 
 @Entity
@@ -26,6 +27,8 @@ public class UserEntity implements IdSupplier, LabelSupplier {
     @Column(length = 32)
     private String username;
 
+    private String languageCode;
+
     @Override
     public String getLabel() {
         return Optional.ofNullable(getFirstName())
@@ -38,5 +41,9 @@ public class UserEntity implements IdSupplier, LabelSupplier {
     @Override
     public Long getId() {
         return getUserId();
+    }
+
+    public UserEntity(BigInteger userId, String firstName, String lastName, String username) {
+        this(userId.longValue(), firstName, lastName, username, null);
     }
 }

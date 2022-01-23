@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class MilestoneHelper {
-    public static final int MIN_MILESTONE = 1000;
-    public static final int STEP = 10;
+    public static final long MIN_MILESTONE = 1000;
+    public static final long STEP = 10;
 
-    public boolean isMilestone(int number) {
+    public boolean isMilestone(long number) {
         if (number < MIN_MILESTONE) {
             return false;
         }
@@ -23,7 +23,7 @@ public class MilestoneHelper {
         }
     }
 
-    public int prevMilestone(int number) {
+    public long prevMilestone(long number) {
         if (number <= MIN_MILESTONE) {
             return 0;
         }
@@ -36,7 +36,7 @@ public class MilestoneHelper {
         return STEP * prevMilestone(number / STEP);
     }
 
-    public int nextMilestone(int number) {
+    public long nextMilestone(long number) {
         if (number < MIN_MILESTONE) {
             return MIN_MILESTONE;
         }
@@ -46,7 +46,7 @@ public class MilestoneHelper {
         return STEP * nextMilestone(number / STEP);
     }
 
-    public MilestoneSummary getMilestoneSummary(int prevPosition, int currentPosition) {
+    public MilestoneSummary getMilestoneSummary(Long prevPosition, Long currentPosition) {
         return new MilestoneSummary(
                 prevMilestone(prevPosition),
                 prevPosition,
@@ -57,9 +57,9 @@ public class MilestoneHelper {
 
     @AllArgsConstructor
     public static class MilestoneSummary {
-        public final int prevMilestone;
-        public final int prevPosition;
-        public final int currPosition;
-        public final int nextMilestone;
+        public final long prevMilestone;
+        public final long prevPosition;
+        public final long currPosition;
+        public final long nextMilestone;
     }
 }
