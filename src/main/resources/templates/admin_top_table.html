@@ -5,16 +5,19 @@
         <thead class="thead-light text-center">
         <tr>
             <!--suppress HtmlDeprecatedAttribute-->
-            <th width="10%">#</th>
-            <th width="60%" th:text="${entity}"></th>
-            <th width="30%">Messages</th>
+            <th width="8%">#</th>
+            <th width="70%" th:text="${entity}"></th>
+            <th width="22%">Messages</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="item, iter : ${data}">
             <td class="text-right" th:text="${iter.index + 1}">
             </td>
-            <td th:text="${#strings.abbreviate(item.subject.label, 28)}">
+            <td th:if="${item.subject.username != null}">
+                <a th:href="@{${'https://t.me/' + item.subject.username}}" th:text="${#strings.abbreviate(item.subject.label, 26)}"></a>
+            </td>
+            <td th:if="${item.subject.username == null}" th:text="${#strings.abbreviate(item.subject.label, 26)}">
             </td>
             <td th:text="${#numbers.formatInteger(item.count, 1, 'WHITESPACE')}" class="text-right"></td>
         </tr>

@@ -38,8 +38,10 @@
                 <input class="custom-control-input row-select" type="checkbox" th:checked="${!hidden}" th:id="${tableId + '/' + item.subject.id}">
                 <label class="custom-control-label" th:for="${tableId + '/' + item.subject.id}" th:text="${iter.index + 1}"></label>
             </td>
-            <td th:text="${#strings.abbreviate(item.subject.label, 28)}">
+            <td th:if="${item.subject.username != null}">
+                <a th:href="@{${'https://t.me/' + item.subject.username}}" th:text="${#strings.abbreviate(item.subject.label, 28)}"></a>
             </td>
+            <td th:if="${item.subject.username == null}" th:text="${#strings.abbreviate(item.subject.label, 28)}">
             <td>
                 <div class="progress" style="height: 1.5rem"
                      th:title="${#numbers.formatInteger(item.score, 0, 'WHITESPACE')} + ' points'">

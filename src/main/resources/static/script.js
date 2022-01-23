@@ -201,20 +201,26 @@ class ChatActivityBarChart {
         }
 
         this.defaultMode = function() {
+            this.chartControl.cumulative = false;
             this.chartControl.options.stacked = false;
             this.chartControl.options.ymax = 'auto';
+            this.chartControl.options.postUnits = '';
             this.chartControl.setData(this.chartData);
         }
 
         this.sumMode = function() {
+            this.chartControl.cumulative = true;
             this.chartControl.options.stacked = true;
             this.chartControl.options.ymax = 'auto';
+            this.chartControl.options.postUnits = '';
             this.chartControl.setData(this.chartData);
         }
 
         this.ratioMode = function() {
+            this.chartControl.cumulative = true;
             this.chartControl.options.stacked = true;
-            this.chartControl.options.ymax = 100;
+            this.chartControl.options.ymax = 100.0;
+            this.chartControl.options.postUnits = '%';
             let filterSelectedIds = this.filterSelectedIds();
 
             let data = this.chartData.map(function (item) {
