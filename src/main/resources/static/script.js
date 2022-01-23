@@ -202,16 +202,19 @@ class ChatActivityBarChart {
 
         this.defaultMode = function() {
             this.chartControl.options.stacked = false;
+            this.chartControl.options.ymax = 'auto';
             this.chartControl.setData(this.chartData);
         }
 
         this.sumMode = function() {
             this.chartControl.options.stacked = true;
+            this.chartControl.options.ymax = 'auto';
             this.chartControl.setData(this.chartData);
         }
 
         this.ratioMode = function() {
             this.chartControl.options.stacked = true;
+            this.chartControl.options.ymax = 100;
             let filterSelectedIds = this.filterSelectedIds();
 
             let data = this.chartData.map(function (item) {

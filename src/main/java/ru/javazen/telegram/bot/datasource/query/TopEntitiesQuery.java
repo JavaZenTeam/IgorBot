@@ -30,7 +30,7 @@ public class TopEntitiesQuery {
 
 
     private <T> List<SubjectCount<T>> getTop(SingularAttribute<MessageEntity, T> subjectAttr,
-                                                      DateRange dateRange, Integer maxResults) {
+                                             DateRange dateRange, Integer maxResults) {
         Class<SubjectCount<T>> statisticClass = QueryUtils.countFor(subjectAttr.getBindableJavaType());
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -46,6 +46,6 @@ public class TopEntitiesQuery {
         query.select(builder.construct(statisticClass, subjectJoin, count));
         query.orderBy(builder.desc(count));
 
-        return entityManager.createQuery(query).getResultList();
+        return entityManager.createQuery(query).setMaxResults(maxResults).getResultList();
     }
 }

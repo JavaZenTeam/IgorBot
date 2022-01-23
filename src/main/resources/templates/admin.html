@@ -45,6 +45,8 @@
                 <div th:replace="admin_user_languages_donut"></div>
             </div>
             <div class="col-lg-8">
+                <h4>Activity Chart</h4>
+                <div th:replace="admin_activity_chart :: chart ('activity-per-entity-chart', 'activity-per-entity-chart')"></div>
                 <div class="row">
                     <div class="col-lg-6">
                         <h4>Top Chats</h4>
@@ -55,8 +57,6 @@
                         <div th:replace="admin_top_table :: table ('top-users', ${topUsers}, 'User')"></div>
                     </div>
                 </div>
-                <h4>Activity Chart</h4>
-                <div th:replace="admin_activity_chart :: chart ('activity-per-entity-chart', 'activity-per-entity-chart')"></div>
             </div>
         </div>
     </div>
