@@ -118,6 +118,7 @@ public class CompositeBot extends TelegramLongPollingBot {
         if (session != null) {
             session.stop();
         }
+        onClosing();
         log.info(String.format("'%s' bot stopped.", name));
     }
 }

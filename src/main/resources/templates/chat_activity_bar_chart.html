@@ -9,7 +9,7 @@
         padding-top: 4px !important;
     }
 </style>
-<div id="activity-chart-container">
+<div id="periods-bar-chart-container">
     <div class="row">
         <div class="col-4">
             <label class="chart-setting d-flex">
@@ -42,11 +42,11 @@
         </div>
     </div>
     <div class="bg-white border p-2 mb-3">
-        <div id="activity-chart"></div>
+        <div id="periods-bar-chart"></div>
     </div>
 </div>
 <script>
     $(document).ready(function () {
-        new ChatActivityChart('activity-chart-container', 'activity-chart');
+        chatActivityBarChart = new ChatActivityBarChart('periods-bar-chart-container', 'periods-bar-chart');
     });
 </script>

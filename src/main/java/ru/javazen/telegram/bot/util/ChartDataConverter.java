@@ -3,10 +3,7 @@ package ru.javazen.telegram.bot.util;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
-import ru.javazen.telegram.bot.datasource.model.ChartData;
-import ru.javazen.telegram.bot.datasource.model.PeriodEntityTypesCount;
-import ru.javazen.telegram.bot.datasource.model.PeriodMessageStatistic;
-import ru.javazen.telegram.bot.datasource.model.SubjectCount;
+import ru.javazen.telegram.bot.datasource.model.*;
 import ru.javazen.telegram.bot.model.IdSupplier;
 import ru.javazen.telegram.bot.model.LabelSupplier;
 
@@ -14,6 +11,7 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
@@ -22,11 +20,39 @@ import static java.util.stream.Collectors.toList;
 
 @Component
 public class ChartDataConverter {
-    public ChartData convert(List<? extends PeriodMessageStatistic<?>> source, Attribute attribute, ZoneId zoneId) {
-        return convert(source, attribute, true, zoneId);
+    public ChartData convert(List<? extends TimestampMessageStatistic<?>> source, Attribute attribute, ZoneId zoneId) {
+        var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(zoneId);
+
+        var subjects = getSortedByTotalSubjects(source, attribute);
+
+        return ChartData.builder()
+                .ids(subjects.stream().map(this::extractId).collect(toList()))
+                .labels(subjects.stream().map(this::formatLabel).collect(toList()))
+                .data(source.stream()
+                        .collect(Collectors.groupingBy(TimestampMessageStatistic::getTimestamp))
+                        .entrySet().stream()
+                        .sorted(Map.Entry.comparingByKey())
+                        .map(entry -> formatDataRow(entry.getKey(), entry.getValue(), subjects, attribute, formatter))
+                        .toArray(Object[][]::new))
+                .build();
     }
 
-    public ChartData convert(List<? extends PeriodEntityTypesCount> source, ZoneId zoneId) {
+    public ChartData convert(List<? extends PeriodIdMessageStatistic<?>> source, Attribute attribute, Function<Integer, String> periodNameFunc) {
+        var subjects = getSortedByTotalSubjects(source, attribute);
+
+        return ChartData.builder()
+                .ids(subjects.stream().map(this::extractId).collect(toList()))
+                .labels(subjects.stream().map(this::formatLabel).collect(toList()))
+                .data(source.stream()
+                        .collect(Collectors.groupingBy(PeriodIdMessageStatistic::getPeriodId))
+                        .entrySet().stream()
+                        .sorted(Map.Entry.comparingByKey())
+                        .map(entry -> formatDataRow(periodNameFunc.apply(entry.getKey()), entry.getValue(), subjects, attribute))
+                        .toArray(Object[][]::new))
+                .build();
+    }
+
+    public ChartData convert(List<? extends TimestampEntityTypesCount> source, ZoneId zoneId) {
         var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(zoneId);
         return ChartData.builder()
                 .id(1L)
@@ -35,7 +61,7 @@ public class ChartDataConverter {
                 .label("Users")
                 .data(source.stream()
                         .map(item -> new Object[]{
-                                formatter.format(item.getPeriod().toInstant()),
+                                formatter.format(item.getTimestamp().toInstant()),
                                 item.getChatCount(),
                                 item.getUserCount()
                         })
@@ -43,52 +69,38 @@ public class ChartDataConverter {
                 .build();
     }
 
-    public ChartData convert(List<? extends PeriodMessageStatistic<?>> source, Attribute attribute, boolean sortByTotal, ZoneId zoneId) {
-        var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(zoneId);
-
-        var subjects = sortByTotal
-                ? getSortedByTotalSubjects(source, attribute)
-                : getSubjects(source);
-
-        return ChartData.builder()
-                .ids(subjects.stream().map(this::extractId).collect(toList()))
-                .labels(subjects.stream().map(this::formatLabel).collect(toList()))
-                .data(source.stream()
-                        .collect(Collectors.groupingBy(PeriodMessageStatistic::getPeriod))
-                        .entrySet().stream()
-                        .sorted(Map.Entry.comparingByKey())
-                        .map(entry -> formatDataRow(entry.getKey(), entry.getValue(), subjects, attribute, formatter))
-                        .toArray(Object[][]::new))
-                .build();
-    }
-
-    private List<Object> getSubjects(List<? extends SubjectCount<?>> source) {
-        return source.stream()
-                .map(SubjectCount::getSubject)
-                .filter(Objects::nonNull)
-                .distinct()
-                .sorted()
-                .collect(toList());
-    }
-
-    private List<Object> getSortedByTotalSubjects(List<? extends PeriodMessageStatistic<?>> source, Attribute attribute) {
+    private List<Object> getSortedByTotalSubjects(List<? extends MessageStatistic<?>> source, Attribute attribute) {
         var totalCounts = source.stream()
                 .filter(statistic -> statistic.getSubject() != null)
-                .collect(Collectors.groupingBy(PeriodMessageStatistic::getSubject, summingLong(attribute.function)));
+                .collect(Collectors.groupingBy(MessageStatistic::getSubject, summingLong(attribute.function)));
         return source.stream()
-                .map(PeriodMessageStatistic::getSubject)
+                .map(MessageStatistic::getSubject)
                 .filter(Objects::nonNull)
                 .distinct()
                 .sorted(Comparator.comparing(totalCounts::get).reversed())
                 .collect(toList());
     }
 
-    private Object[] formatDataRow(Timestamp period, List<? extends PeriodMessageStatistic<?>> statistic,
+    private Object[] formatDataRow(Timestamp period, List<? extends MessageStatistic<?>> statistic,
                                    List<Object> subjects, Attribute attribute, DateTimeFormatter formatter) {
         var result = new Object[subjects.size() + 1];
         Arrays.fill(result, 0);
         result[0] = formatter.format(period.toInstant());
-        for (PeriodMessageStatistic<?> item : statistic) {
+        for (MessageStatistic<?> item : statistic) {
+            if (item.getSubject() != null) {
+                int index = subjects.indexOf(item.getSubject());
+                result[1 + index] = attribute.function.applyAsLong(item);
+            }
+        }
+        return result;
+    }
+
+    private Object[] formatDataRow(String periodName, List<? extends MessageStatistic<?>> statistic,
+                                   List<Object> subjects, Attribute attribute) {
+        var result = new Object[subjects.size() + 1];
+        Arrays.fill(result, 0);
+        result[0] = periodName;
+        for (MessageStatistic<?> item : statistic) {
             if (item.getSubject() != null) {
                 int index = subjects.indexOf(item.getSubject());
                 result[1 + index] = attribute.function.applyAsLong(item);
@@ -114,10 +126,10 @@ public class ChartDataConverter {
     @AllArgsConstructor
     @Getter
     public enum Attribute {
-        MESSAGES(PeriodMessageStatistic::getCount),
-        CHARACTERS(PeriodMessageStatistic::getLength),
+        MESSAGES(MessageStatistic::getCount),
+        CHARACTERS(MessageStatistic::getLength),
         SCORE(periodUserStatistic -> Math.round(periodUserStatistic.getScore()));
 
-        private final ToLongFunction<PeriodMessageStatistic<?>> function;
+        private final ToLongFunction<MessageStatistic<?>> function;
     }
 }

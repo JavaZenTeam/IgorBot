@@ -41,22 +41,36 @@ public class QueryUtils {
         return new EntityTypesCount(castLong(arr[0]), castLong(arr[1]));
     }
 
-    public PeriodEntityTypesCount mapPeriodEntityTypesCount(Object[] arr) {
+    public TimestampEntityTypesCount mapPeriodEntityTypesCount(Object[] arr) {
         Timestamp period = (Timestamp) arr[0];
-        return new PeriodEntityTypesCount(period, castLong(arr[1]), castLong(arr[2]));
+        return new TimestampEntityTypesCount(period, castLong(arr[1]), castLong(arr[2]));
     }
 
-    public <T> PeriodMessageStatistic<T> mapMessagePeriodStatistic(Object[] arr, Class<T> subjectClass) {
+    public <T> TimestampMessageStatistic<T> mapTimestampMessageStatistic(Object[] arr, Class<T> subjectClass) {
         Timestamp period = (Timestamp) arr[0];
         if (arr[4] == null) {
-            return new PeriodMessageStatistic<>(period);
+            return new TimestampMessageStatistic<>(period);
         } else {
             long count = castLong(arr[1]);
             long length = castLong(arr[2]);
             double score = castDouble(arr[3]);
 
             T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 4, arr.length), subjectClass);
-            return new PeriodMessageStatistic<>(period, subject, count, length, score);
+            return new TimestampMessageStatistic<>(period, subject, count, length, score);
+        }
+    }
+
+    public <T> PeriodIdMessageStatistic<T> mapNamedPeriodMessageStatistic(Object[] arr, Class<T> subjectClass) {
+        Integer periodId = ((Number) arr[0]).intValue();
+        if (arr[4] == null) {
+            return new PeriodIdMessageStatistic<>(periodId);
+        } else {
+            long count = castLong(arr[1]);
+            long length = castLong(arr[2]);
+            double score = castDouble(arr[3]);
+
+            T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 4, arr.length), subjectClass);
+            return new PeriodIdMessageStatistic<>(periodId, subject, count, length, score);
         }
     }
 

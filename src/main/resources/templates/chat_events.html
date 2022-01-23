@@ -6,8 +6,8 @@
         border-radius: 0.25rem;
     }
 </style>
-<div xmlns:th="http://www.thymeleaf.org">
-    <ul th:if="${!events.isEmpty()}" class="list-group" style="max-height: 250px; overflow-y: scroll">
+<div xmlns:th="http://www.thymeleaf.org" style="overflow-y: auto;">
+    <ul th:if="${!events.isEmpty()}" class="list-group" style="max-height: 350px;">
         <li class="list-group-item flex-column align-items-start"
             th:each="event : ${events}">
             <div class="d-flex w-100 justify-content-between">

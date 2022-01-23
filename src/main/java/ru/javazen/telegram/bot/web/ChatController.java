@@ -30,8 +30,6 @@ import java.util.TimeZone;
 @AllArgsConstructor
 @RequestMapping("/chat/{chatId}")
 public class ChatController {
-    private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT+04:00"); //TODO get actual tz from user
-
     private final DefaultAbsSender bot;
     private final StatisticDataSource<UserEntity> chatDataSource;
     private final StatisticDataSource<ChatEntity> userDataSource;
@@ -81,9 +79,10 @@ public class ChatController {
     }
 
     @PreAuthorize("hasAuthority('/chat/' + #chatId)")
-    @GetMapping("activity-chart")
+    @GetMapping("activity-trend-chart")
     @ResponseBody
     public ChartData getChatActivityChart(@PathVariable Long chatId,
+                                          TimeZone timeZone,
                                           @RequestParam(defaultValue = "SCORE")
                                                   ChartDataConverter.Attribute attribute,
                                           @RequestParam(defaultValue = "1")
@@ -97,25 +96,51 @@ public class ChatController {
                                           @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                   LocalDate to,
                                           @RequestParam(required = false) String chatType) {
-        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
+        DateRange dateRange = new DateRange(from, to, timeZone);
         TimeInterval timeInterval = new TimeInterval(intervalQuantity, intervalUnit);
         var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
-        var statistic = dataSource.activityChart(chatId, dateRange, timeInterval);
-        return chartDataConverter.convert(statistic, attribute, DEFAULT_TIME_ZONE.toZoneId());
+        var statistic = dataSource.activityTrend(chatId, dateRange, timeInterval);
+        return chartDataConverter.convert(statistic, attribute, timeZone.toZoneId());
+    }
+
+    @PreAuthorize("hasAuthority('/chat/' + #chatId)")
+    @GetMapping("activity-bar-chart")
+    @ResponseBody
+    public ChartData getPeriodsBarChart(@PathVariable Long chatId,
+                                        TimeZone timeZone,
+                                        @RequestParam(defaultValue = "SCORE")
+                                                ChartDataConverter.Attribute attribute,
+                                        @RequestParam(defaultValue = "1")
+                                                    int intervalQuantity,
+                                        @RequestParam(defaultValue = "DAY")
+                                                    TimeGroup.Field intervalUnit,
+                                        @RequestParam
+                                        @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                LocalDate from,
+                                        @RequestParam
+                                        @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                LocalDate to,
+                                        @RequestParam(required = false) String chatType) {
+        DateRange dateRange = new DateRange(from, to, timeZone);
+        var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
+        TimeGroup timeGroup = new TimeGroup(intervalQuantity, intervalUnit);
+        var statistic = dataSource.activityBar(chatId, dateRange, timeGroup);
+        return chartDataConverter.convert(statistic, attribute, timeGroup.getNameFunc());
     }
 
     @PreAuthorize("hasAuthority('/chat/' + #chatId)")
     @GetMapping("message-types")
     @ResponseBody
     public List<SubjectCount<String>> getMessageTypesChart(@PathVariable Long chatId,
+                                                           TimeZone timeZone,
                                                            @RequestParam
-                                                        @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                                LocalDate from,
+                                                           @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                   LocalDate from,
                                                            @RequestParam
-                                                        @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                                LocalDate to,
+                                                           @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                   LocalDate to,
                                                            @RequestParam(required = false) String chatType) {
-        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
+        DateRange dateRange = new DateRange(from, to, timeZone);
         var dataSource = Objects.equals(chatType, "user") ? userDataSource : chatDataSource;
         return dataSource.messageTypesUsage(chatId, dateRange);
     }

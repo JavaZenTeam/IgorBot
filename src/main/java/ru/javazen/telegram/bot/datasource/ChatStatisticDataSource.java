@@ -2,10 +2,7 @@ package ru.javazen.telegram.bot.datasource;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.javazen.telegram.bot.datasource.model.MessageStatistic;
-import ru.javazen.telegram.bot.datasource.model.PeriodMessageStatistic;
-import ru.javazen.telegram.bot.datasource.model.SubjectCount;
-import ru.javazen.telegram.bot.datasource.model.TimeInterval;
+import ru.javazen.telegram.bot.datasource.model.*;
 import ru.javazen.telegram.bot.datasource.query.*;
 import ru.javazen.telegram.bot.model.UserEntity;
 import ru.javazen.telegram.bot.util.DateRange;
@@ -17,7 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> {
     private final MemberActivityTableQuery activityTableQuery;
-    private final MemberActivityChartQuery activityChartQuery;
+    private final MemberActivityTrendChartQuery activityChartQuery;
+    private final MemberActivityBarChartQuery memberActivityBarChartQuery;
     private final TopUsedStickerQuery topUsedStickersQuery;
     private final MessageTypesQuery messageTypesQuery;
     private final MessageCountQuery messageCountQuery;
@@ -28,8 +26,13 @@ public class ChatStatisticDataSource implements StatisticDataSource<UserEntity> 
     }
 
     @Override
-    public List<PeriodMessageStatistic<UserEntity>> activityChart(Long chatId, DateRange dateRange, TimeInterval interval) {
+    public List<TimestampMessageStatistic<UserEntity>> activityTrend(Long chatId, DateRange dateRange, TimeInterval interval) {
         return activityChartQuery.getChatActivity(chatId, dateRange, interval);
+    }
+
+    @Override
+    public List<PeriodIdMessageStatistic<UserEntity>> activityBar(Long chatId, DateRange dateRange, TimeGroup periodType) {
+        return memberActivityBarChartQuery.chatPeriodsChart(chatId, dateRange, periodType);
     }
 
     @Override

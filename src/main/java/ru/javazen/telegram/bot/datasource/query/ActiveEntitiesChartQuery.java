@@ -2,7 +2,7 @@ package ru.javazen.telegram.bot.datasource.query;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.javazen.telegram.bot.datasource.model.PeriodEntityTypesCount;
+import ru.javazen.telegram.bot.datasource.model.TimestampEntityTypesCount;
 import ru.javazen.telegram.bot.datasource.model.TimeInterval;
 import ru.javazen.telegram.bot.util.DateRange;
 
@@ -27,7 +27,7 @@ public class ActiveEntitiesChartQuery {
             ") temp " +
             "GROUP BY generate_series";
 
-    public List<PeriodEntityTypesCount> getActiveEntitiesChart(DateRange dateRange, TimeInterval interval) {
+    public List<TimestampEntityTypesCount> getActiveEntitiesChart(DateRange dateRange, TimeInterval interval) {
         Query query = entityManager.createNativeQuery(SQL);
         query.setParameter("from", dateRange.getFrom());
         query.setParameter("to", dateRange.getTo());
