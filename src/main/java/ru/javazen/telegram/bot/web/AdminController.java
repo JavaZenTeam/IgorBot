@@ -32,8 +32,6 @@ import java.util.*;
 @PreAuthorize("hasAuthority('/admin')")
 @RequestMapping("/admin")
 public class AdminController {
-    private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT+04:00"); //TODO get actual tz from user
-
     private final DefaultAbsSender bot;
     private final MessageRepository messageRepository;
     private final CountEntitiesQuery countEntitiesQuery;
@@ -96,34 +94,37 @@ public class AdminController {
                                                        LocalDate from,
                                                @RequestParam
                                                @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                       LocalDate to) {
-        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
+                                                       LocalDate to,
+                                               TimeZone timeZone) {
+        DateRange dateRange = new DateRange(from, to, timeZone);
         TimeInterval timeInterval = new TimeInterval(intervalQuantity, intervalUnit);
         var statistics = activeEntitiesChartQuery.getActiveEntitiesChart(dateRange, timeInterval);
-        return chartDataConverter.convert(statistics, DEFAULT_TIME_ZONE.toZoneId());
+        return chartDataConverter.convert(statistics, timeZone.toZoneId());
     }
 
     @GetMapping("chat-types")
     @ResponseBody
     public List<SubjectCount<ChatType>> getChatTypesChart(@RequestParam
-                                                       @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                               LocalDate from,
+                                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                  LocalDate from,
                                                           @RequestParam
-                                                       @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                               LocalDate to) {
-        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
+                                                          @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                  LocalDate to,
+                                                          TimeZone timeZone) {
+        DateRange dateRange = new DateRange(from, to, timeZone);
         return chatTypesQuery.getChatTypes(dateRange);
     }
 
     @GetMapping("user-languages")
     @ResponseBody
     public List<SubjectCount<String>> getUserLanguagesChart(@RequestParam
-                                                         @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                                 LocalDate from,
+                                                            @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                    LocalDate from,
                                                             @RequestParam
-                                                         @DateTimeFormat(pattern = "dd.MM.yyyy")
-                                                                 LocalDate to) {
-        DateRange dateRange = new DateRange(from, to, DEFAULT_TIME_ZONE);
+                                                            @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                    LocalDate to,
+                                                            TimeZone timeZone) {
+        DateRange dateRange = new DateRange(from, to, timeZone);
         return userLanguagesQuery.getLanguages(dateRange);
     }
 }
