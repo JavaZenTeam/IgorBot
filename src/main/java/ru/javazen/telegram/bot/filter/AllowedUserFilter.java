@@ -11,7 +11,7 @@ public class AllowedUserFilter implements MessageFilter {
 
     @Override
     public boolean check(Message message) {
-        return allowedUserIds.contains(message.getFrom().getId().longValue());
+        return allowedUserIds.contains(message.getFrom().getId());
     }
 
     public List<Long> getAllowedUserIds() {
