@@ -8,19 +8,26 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.LeaveChat;
+import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.meta.generics.BotSession;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.javazen.telegram.bot.handler.base.UpdateHandler;
 import ru.javazen.telegram.bot.logging.TelegramLogger;
 import ru.javazen.telegram.bot.service.MessageCollectorService;
+import ru.javazen.telegram.bot.util.UpdateHelper;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Slf4j
@@ -35,9 +42,9 @@ public class CompositeBot extends TelegramLongPollingBot {
 
     private TelegramLogger tgLogger;
 
-    private Collection<UpdateHandler> updateHandlers = new ArrayList<>();
+    private final Collection<UpdateHandler> updateHandlers = new ArrayList<>();
 
-    private BotUsageLogWrapper wrapper = new BotUsageLogWrapper(this);
+    private final BotUsageLogWrapper wrapper = new BotUsageLogWrapper(this);
     private BotSession session;
 
     @Autowired
@@ -80,15 +87,26 @@ public class CompositeBot extends TelegramLongPollingBot {
         try {
             Message sentMessage = null;
             String handlerName = null;
+            Optional<Chat> chat = UpdateHelper.tryResolveChat(update);
 
             for (UpdateHandler handler : updateHandlers) {
-                boolean handled = handler.handle(update, wrapper);
+                try {
+                    boolean handled = handler.handle(update, wrapper);
 
-                if (handled) {
-                    sentMessage = wrapper.getSentMessage();
-                    handlerName = handler.getName();
-                    log.debug("Update {} handled by {}", update, handlerName);
-                    break;
+                    if (handled) {
+                        sentMessage = wrapper.getSentMessage();
+                        handlerName = handler.getName();
+                        log.debug("Update {} handled by {}", update, handlerName);
+                        break;
+                    }
+                } catch (TelegramApiRequestException e) {
+                    if (e.getApiResponse().contains("have no rights") && chat.isPresent()) {
+                        tryLeaveChat(chat.get());
+                    } else {
+                        log(update, handler, chat.orElse(null), e);
+                    }
+                } catch (Exception e) {
+                    log(update, handler, chat.orElse(null), e);
                 }
             }
 
@@ -98,8 +116,36 @@ public class CompositeBot extends TelegramLongPollingBot {
             }
 
         } catch (Exception e) {
-            log.error("Error on handling update", e);
+            log.error("Error on handling update {}", update, e);
             tgLogger.log(e);
+        }
+    }
+
+    private void log(Update update, UpdateHandler handler, Chat chat, Exception e) {
+        if (handler != null) {
+            log.error("Error on handling update {}; handler={}", update, handler, e);
+        } else {
+            log.error("Error on handling update {}", update, e);
+        }
+        Map<String, Object> context = new LinkedHashMap<>();
+        if (chat != null) {
+            context.put("chat.id", chat.getId());
+        }
+        if (handler != null) {
+            context.put("handler", handler.getName());
+        }
+        tgLogger.log(context, e);
+    }
+
+    private void tryLeaveChat(Chat chat) {
+        if (chat.isUserChat()) {
+            log.debug("Can't leave user chat (@{})", chat.getUserName());
+        } else {
+            try {
+                execute(new LeaveChat(String.valueOf(chat.getId())));
+            } catch (TelegramApiException e) {
+                log.error("Error on leave chat {}", chat, e);
+            }
         }
     }
 
@@ -108,7 +154,7 @@ public class CompositeBot extends TelegramLongPollingBot {
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         session = botsApi.registerBot(this);
 
-        log.info(String.format("'%s' bot started.", name));
+        log.info("{}' bot started.", name);
         tgLogger.setSender(this);
         tgLogger.log(startMessageSupplier.get());
     }
@@ -118,7 +164,6 @@ public class CompositeBot extends TelegramLongPollingBot {
         if (session != null) {
             session.stop();
         }
-        onClosing();
-        log.info(String.format("'%s' bot stopped.", name));
+        log.info("'{}' bot stopped.", name);
     }
 }
