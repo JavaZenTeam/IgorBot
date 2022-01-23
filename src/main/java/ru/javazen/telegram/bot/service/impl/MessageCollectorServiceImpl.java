@@ -4,9 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.javazen.telegram.bot.model.BotUsageLog;
-import ru.javazen.telegram.bot.model.MessageEntity;
-import ru.javazen.telegram.bot.model.MessagePK;
+import ru.javazen.telegram.bot.model.*;
 import ru.javazen.telegram.bot.repository.BotUsageLogRepository;
 import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.service.ChatConfigService;
@@ -34,7 +32,13 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     public void saveMessage(Message message) {
         MessageEntity entity = modelMapper.map(message, MessageEntity.class);
         if (!saveText(message)) {
-            entity.setText(null);
+            if (entity.getEventType() != EventType.NEW_TITLE) {
+                entity.setText(null);
+            }
+            if (entity.getEventType() != EventType.NEW_PHOTO && entity.getFileType() != FileType.STICKER) {
+                entity.setFileId(null);
+                entity.setFileUniqueId(null);
+            }
         }
         if (entity.getUser().equals(entity.getForwardFrom())) {
             entity.setForwardFrom(entity.getUser());

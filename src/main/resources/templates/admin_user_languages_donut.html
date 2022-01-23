@@ -1,0 +1,51 @@
+<div id="user-languages-donut-container">
+    <div class="bg-white border p-2 mb-2">
+        <div id="user-languages-donut"></div>
+    </div>
+</div>
+<script>
+    let userLanguagesColors = [
+        '#007bff',
+        '#28a745',
+        '#ffc107',
+        '#dc3545',
+        '#17a2b8',
+        '#6c757d',
+        '#1e7e34',
+        '#ff8107',
+        '#0062cc',
+        '#bd2130',
+    ];
+
+    function mapUserLanguagesData({subject, count}) {
+        return {
+            label: subject || '???',
+            value: count
+        }
+    }
+
+    $(document).ready(function () {
+        let param = $.param({
+            from: getFromDate(),
+            to: getToDate()
+        });
+        let path = window.location.pathname + "/user-languages";
+        $.get(path + "?" + param)
+            .done(function (response) {
+                if (response.length > 0) {
+                    Morris.Donut({
+                        element: 'user-languages-donut',
+                        data: response.map(mapUserLanguagesData),
+                        formatter: formatInteger,
+                        colors: userLanguagesColors,
+                        resize: true
+                    })
+                } else {
+                    $('#user-languages-donut-container').parent().replaceWith(
+                        '<div class="alert-info p-3 mb-3">' +
+                        'No data found for the selected period' +
+                        '</div>');
+                }
+            });
+    });
+</script>

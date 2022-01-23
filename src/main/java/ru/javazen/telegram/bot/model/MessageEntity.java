@@ -5,9 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table
@@ -70,5 +68,13 @@ public class MessageEntity {
 
     public UserEntity getMember() {
         return members.stream().findFirst().orElse(null);
+    }
+
+    public String getSmallFileId() {
+        return Optional.ofNullable(getFileId())
+                .map(s -> s.split(","))
+                .map(Arrays::asList)
+                .flatMap(list -> list.stream().findFirst())
+                .orElse(null);
     }
 }

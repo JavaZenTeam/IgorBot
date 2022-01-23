@@ -12,18 +12,7 @@
     </style>
     <div th:id="${elementId + '-container'}">
         <div class="row">
-            <div class="col-6">
-                <label class="chart-setting d-flex">
-                    <span class="d-none d-md-inline p-1 flex-fill">Mode</span>
-                    <select name="activity-chart-mode"
-                            class="custom-select custom-select-sm form-control form-control-sm flex-fill">
-                        <option value="DEFAULT">Default</option>
-                        <option value="SUM">Sum</option>
-                        <option value="RATIO">Ratio</option>
-                    </select>
-                </label>
-            </div>
-            <div class="col-6">
+            <div class="col-12">
                 <label class="chart-setting d-flex">
                     <span class="d-none d-md-inline p-1 flex-fill">Interval</span>
                     <select name="activity-chart-interval"
@@ -38,7 +27,7 @@
     <script>
         $(document).ready(function () {
             let containerId = '[[${elementId + "-container"}]]';
-            new ActivityLevelsChart(containerId, '[[${elementId + "-chart"}]]', '[[${url}]]');
-            });
+            new AdminActivityChart(containerId, '[[${elementId + "-chart"}]]', '[[${url}]]');
+        });
     </script>
 </div>

@@ -15,12 +15,14 @@ public class DateRange {
     private final LocalDate toDate;
     private final Date from;
     private final Date to;
+    private final TimeZone timeZone;
 
     public DateRange(Date from, Date to, TimeZone timeZone) {
         this.from = from;
         this.to = to;
         this.fromDate = from.toInstant().atZone(timeZone.toZoneId()).toLocalDate();
         this.toDate = to.toInstant().atZone(timeZone.toZoneId()).toLocalDate();
+        this.timeZone = timeZone;
     }
 
     public DateRange(LocalDate from, LocalDate to, TimeZone timeZone) {
@@ -30,6 +32,7 @@ public class DateRange {
         this.from = Date.from(fromDateTime.toInstant());
         ZonedDateTime toDateTime = ZonedDateTime.of(to, LocalTime.MAX, timeZone.toZoneId());
         this.to = Date.from(toDateTime.toInstant());
+        this.timeZone = timeZone;
     }
 
     public long days() {

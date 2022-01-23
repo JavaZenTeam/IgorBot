@@ -1,36 +1,24 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <!--/*@thymesVar id="activityStatistics" type="java.util.List"*/-->
-<div xmlns:th="http://www.thymeleaf.org" class="fix-height" th:fragment="table (tableId, activityStatistics)">
-    <table th:id="${tableId}" class="table table-bordered table-sm bg-white" th:if="${!activityStatistics.isEmpty()}">
+<div xmlns:th="http://www.thymeleaf.org" class="fix-height" th:fragment="table (tableId)">
+    <table th:id="${tableId}" class="table table-bordered table-sm bg-white">
         <thead class="thead-light text-center">
         <tr>
             <!--suppress HtmlDeprecatedAttribute-->
-            <th width="10%">#</th>
-            <th width="60%">Level</th>
-            <th width="30%">Count</th>
+            <th width="40%">Statistic</th>
+            <th width="30%">Chats</th>
+            <th width="30%">Users</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="item, iter : ${activityStatistics}">
-            <td class="custom-checkbox text-right" th:text="${iter.index + 1}">
+            <td class="custom-checkbox text-right" th:text="${item.key}">
             </td>
-            <td>
-                <span th:text="${item.subject.label}"
-                      th:title="${'At least ' + item.subject.lowerThreshold + ' messages per day'}"
-                      class="activity-level-label">
-                </span>
+            <td th:text="${#numbers.formatInteger(item.value.chatCount, 1, 'WHITESPACE')}" class="text-right">
             </td>
-            <td th:text="${#numbers.formatInteger(item.count, 1, 'WHITESPACE')}" class="text-right">
+            <td th:text="${#numbers.formatInteger(item.value.userCount, 1, 'WHITESPACE')}" class="text-right">
             </td>
         </tr>
         </tbody>
     </table>
-    <div class="alert-info p-3 mb-3" th:if="${activityStatistics.isEmpty()}">
-        No data found for the selected period
-    </div>
-    <script>
-        $(document).ready(function () {
-            $('.activity-level-label').tooltip({placement: 'right'});
-        });
-    </script>
 </div>

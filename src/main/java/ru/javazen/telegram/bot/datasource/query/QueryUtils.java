@@ -1,12 +1,10 @@
 package ru.javazen.telegram.bot.datasource.query;
 
 import lombok.experimental.UtilityClass;
-import ru.javazen.telegram.bot.datasource.model.PeriodStatistic;
-import ru.javazen.telegram.bot.datasource.model.Statistic;
+import ru.javazen.telegram.bot.datasource.model.*;
 
 import javax.persistence.Query;
 import java.lang.reflect.Constructor;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
@@ -29,57 +27,55 @@ public class QueryUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Class<Statistic<T>> statisticClassFor(Class<T> target) {
-        return (Class<Statistic<T>>) ((Class<?>) Statistic.class);
+    public <T> Class<MessageStatistic<T>> messageCountFor(Class<T> target) {
+        return (Class<MessageStatistic<T>>) ((Class<?>) MessageStatistic.class);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Class<PeriodStatistic<T>> periodStatisticClassFor(Class<T> target) {
-        return (Class<PeriodStatistic<T>>) ((Class<?>) PeriodStatistic.class);
+    public <T> Class<SubjectCount<T>> countFor(Class<T> target) {
+        return (Class<SubjectCount<T>>) ((Class<?>) SubjectCount.class);
     }
 
-    public <T> PeriodStatistic<T> mapFullPeriodStatistic(Object[] arr, Class<T> subjectClass) {
+    public EntityTypesCount mapEntityTypesCount(Object object) {
+        Object[] arr = (Object[]) object;
+        return new EntityTypesCount(castLong(arr[0]), castLong(arr[1]));
+    }
+
+    public TimestampEntityTypesCount mapPeriodEntityTypesCount(Object[] arr) {
+        Timestamp period = (Timestamp) arr[0];
+        return new TimestampEntityTypesCount(period, castLong(arr[1]), castLong(arr[2]));
+    }
+
+    public <T> TimestampMessageStatistic<T> mapTimestampMessageStatistic(Object[] arr, Class<T> subjectClass) {
         Timestamp period = (Timestamp) arr[0];
         if (arr[4] == null) {
-            return new PeriodStatistic<>(period);
+            return new TimestampMessageStatistic<>(period);
         } else {
             long count = castLong(arr[1]);
             long length = castLong(arr[2]);
             double score = castDouble(arr[3]);
 
             T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 4, arr.length), subjectClass);
-            return new PeriodStatistic<>(period, subject, count, length, score);
+            return new TimestampMessageStatistic<>(period, subject, count, length, score);
         }
     }
 
-    public <T> PeriodStatistic<T> mapCountPeriodStatistic(Object[] arr, Class<T> subjectClass) {
-        Timestamp period = (Timestamp) arr[0];
-        if (arr[2] == null) {
-            return new PeriodStatistic<>(period);
+    public <T> PeriodIdMessageStatistic<T> mapNamedPeriodMessageStatistic(Object[] arr, Class<T> subjectClass) {
+        Integer periodId = ((Number) arr[0]).intValue();
+        if (arr[4] == null) {
+            return new PeriodIdMessageStatistic<>(periodId);
         } else {
             long count = castLong(arr[1]);
-            T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 2, arr.length), subjectClass);
-            return new PeriodStatistic<>(period, subject, count);
+            long length = castLong(arr[2]);
+            double score = castDouble(arr[3]);
+
+            T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 4, arr.length), subjectClass);
+            return new PeriodIdMessageStatistic<>(periodId, subject, count, length, score);
         }
-    }
-
-    public <T> Statistic<T> mapFullStatistic(Object[] arr, Class<T> subjectClass) {
-        long count = castLong(arr[0]);
-        long length = castLong(arr[1]);
-        double score = castDouble(arr[2]);
-        T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 3, arr.length), subjectClass);
-        return new Statistic<>(subject, count, length, score);
-    }
-
-    public <T> Statistic<T> mapCountStatistic(Object[] arr, Class<T> subjectClass) {
-        long count = castLong(arr[0]);
-        T subject = QueryUtils.constructObject(Arrays.copyOfRange(arr, 1, arr.length), subjectClass);
-        return new Statistic<>(subject, count);
     }
 
     @SuppressWarnings("unchecked")
     public <T> T constructObject(Object[] rawResult, Class<T> objectClass) {
-        fixBigIntegerToLong(rawResult);
         Class<?>[] paramTypes = Arrays.stream(rawResult)
                 .map(object -> object == null ? null : object.getClass())
                 .toArray(Class[]::new);
@@ -90,20 +86,10 @@ public class QueryUtils {
                 .map(constructor -> newInstance((Constructor<T>) constructor, rawResult))
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Suitable constructor is not found"));
-    }
-
-    /**
-     * In the DB we have stored the long values as bigint type. But JPA loads it as BigInteger.
-     * The class used to fix BigInteger values to the Long values.
-     * @param array a list with values from DB
-     */
-    private void fixBigIntegerToLong(Object[] array) {
-        for (int i = 0; i < array.length; i++) {
-            if (array[i] instanceof BigInteger) {
-                array[0] = ((BigInteger) array[0]).longValue();
-            }
-        }
+                .orElseThrow(() -> {
+                    String msg = objectClass.getSimpleName() + " class doesn't have a constructor with following types of arguments: " + Arrays.toString(paramTypes);
+                    return new NoSuchElementException(msg);
+                });
     }
 
     private <T> T newInstance(Constructor<T> constructor, Object[] params) {
