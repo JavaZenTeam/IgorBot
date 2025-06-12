@@ -29,7 +29,9 @@ import org.telegram.telegrambots.facilities.TelegramHttpClientBuilder;
 import ru.javazen.telegram.bot.client.FileServiceClient;
 import ru.javazen.telegram.bot.handler.SayTextHandler;
 import ru.javazen.telegram.bot.handler.base.InlineQueryHandler;
+import ru.javazen.telegram.bot.service.AudioConverterService;
 import ru.javazen.telegram.bot.service.VoiceService;
+import ru.javazen.telegram.bot.service.impl.AudioConverterServiceImpl;
 import ru.javazen.telegram.bot.service.impl.VoiceServiceImpl;
 import ru.javazen.telegram.bot.util.comparator.RandomComparator;
 
@@ -150,8 +152,14 @@ public class AppConfig {
 
     @Bean
     @Profile("say-text")
-    VoiceService voiceService(FileServiceClient fileServiceClient, AmazonPolly amazonClient) {
-        return new VoiceServiceImpl(fileServiceClient, amazonClient);
+    AudioConverterService audioConverterService() {
+        return new AudioConverterServiceImpl();
+    }
+
+    @Bean
+    @Profile("say-text")
+    VoiceService voiceService(FileServiceClient fileServiceClient, AmazonPolly amazonClient, AudioConverterService audioConverterService) {
+        return new VoiceServiceImpl(fileServiceClient, amazonClient, audioConverterService);
     }
 
     @Bean
