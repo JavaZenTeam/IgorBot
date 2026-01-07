@@ -24,7 +24,9 @@ server:
   port: 8080
 ---
 spring:
-  profiles: say-text
+  config:
+    activate:
+      on-profile: say-text
 polly:
   access-key: ${POLLY_ACCESS_KEY}
   secret-key: ${POLLY_SECRET_KEY}
@@ -32,7 +34,9 @@ file-service:
   url: ${FILE_SERVICE_URL}
 ---
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
 logging:
   level:
     org.springframework.web: DEBUG
@@ -40,7 +44,9 @@ logging:
     org.hibernate: DEBUG
 ---
 spring:
-  profiles: production
+  config:
+    activate:
+      on-profile: production
   datasource:
     url: ${IGOR_DB_CONNECTION_URL}
     username: ${IGOR_DB_USER}
