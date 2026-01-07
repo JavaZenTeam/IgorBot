@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.javazen.telegram.bot.datasource.model.SubjectCount;
 import ru.javazen.telegram.bot.util.DateRange;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;

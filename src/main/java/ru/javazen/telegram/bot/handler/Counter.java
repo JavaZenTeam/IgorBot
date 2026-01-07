@@ -1,7 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.scheduling.TaskScheduler;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -57,12 +56,12 @@ public class Counter implements TextMessageHandler {
         return result;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setPattern(String pattern) {
         this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
     }
 
-    @Required
+    @Autowired(required = true)
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }

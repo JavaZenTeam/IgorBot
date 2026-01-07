@@ -13,7 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Controller

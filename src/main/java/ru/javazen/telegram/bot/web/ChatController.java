@@ -20,6 +20,7 @@ import ru.javazen.telegram.bot.repository.MessageRepository;
 import ru.javazen.telegram.bot.util.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +54,9 @@ public class ChatController {
         if (range == DateRanges.CUSTOM) {
             dateRange = new DateRange(from, to, timeZone);
         } else if (range == DateRanges.ALL_TIME) {
-            dateRange = new DateRange(messageRepository.startChatDate(chatId), new Date(), timeZone);
+            // Date из БД уже в UTC, используем напрямую
+            Date startDate = messageRepository.startChatDate(chatId);
+            dateRange = new DateRange(startDate != null ? startDate : new Date(0), new Date(), timeZone);
         }
 
         model.addAttribute("dateRange", dateRange);
@@ -73,7 +76,9 @@ public class ChatController {
         model.addAttribute("milestoneSummary", milestoneHelper.getMilestoneSummary(prevMessageCount, currMessageCount));
 
         if (!chat.isUserChat()) {
-            model.addAttribute("events", messageRepository.findEventsByChatId(chatId, dateRange.getFrom(), dateRange.getTo()));
+            LocalDateTime fromDateTime = dateRange.getFrom().toInstant().atZone(timeZone.toZoneId()).toLocalDateTime();
+            LocalDateTime toDateTime = dateRange.getTo().toInstant().atZone(timeZone.toZoneId()).toLocalDateTime();
+            model.addAttribute("events", messageRepository.findEventsByChatId(chatId, fromDateTime, toDateTime));
         }
         return "chat";
     }

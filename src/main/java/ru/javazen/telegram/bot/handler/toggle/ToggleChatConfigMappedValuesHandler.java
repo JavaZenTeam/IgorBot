@@ -1,7 +1,6 @@
 package ru.javazen.telegram.bot.handler.toggle;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -35,12 +34,12 @@ public class ToggleChatConfigMappedValuesHandler implements TextMessageHandler {
         return "ToggleChatConfig:" + configKey;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setConfigKey(String configKey) {
         this.configKey = configKey;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setPattern2value(Map<String, String> pattern2value) {
         this.pattern2value = pattern2value;
     }

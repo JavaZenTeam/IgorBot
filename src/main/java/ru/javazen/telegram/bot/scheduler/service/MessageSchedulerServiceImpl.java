@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -19,8 +18,8 @@ import ru.javazen.telegram.bot.repository.UserEntityRepository;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.DateInterval;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,8 +35,7 @@ import static ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler.TIMEZONE_
 @Slf4j
 public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
-    private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
-
+    private final TaskScheduler taskScheduler;
     private Map<Long, FutureTask> futureTasks = new HashMap<>();
 
     private final MessageTaskRepository messageTaskRepository;
@@ -47,8 +45,9 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
     private UserEntityRepository userEntityRepository;
     private ChatConfigService chatConfigService;
 
-    public MessageSchedulerServiceImpl(MessageTaskRepository messageTaskRepository) {
+    public MessageSchedulerServiceImpl(MessageTaskRepository messageTaskRepository, TaskScheduler taskScheduler) {
         this.messageTaskRepository = messageTaskRepository;
+        this.taskScheduler = taskScheduler;
     }
 
     @Autowired

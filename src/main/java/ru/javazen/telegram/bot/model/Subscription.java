@@ -6,9 +6,9 @@ import lombok.Getter;
 import ru.javazen.telegram.bot.util.StringMatchRule;
 import ru.javazen.telegram.bot.util.WordSplitter;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;

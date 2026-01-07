@@ -7,7 +7,7 @@ import ru.javazen.telegram.bot.model.MessageEntity;
 import ru.javazen.telegram.bot.model.MessageEntity_;
 import ru.javazen.telegram.bot.util.DateRange;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 @Component
 @RequiredArgsConstructor

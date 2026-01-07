@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.springframework.util.StringUtils.isEmpty;
+import static org.springframework.util.StringUtils.hasText;
 
 public class SpecificTimeParser extends ScheduledWithRepetitionParser {
 
@@ -62,10 +62,10 @@ public class SpecificTimeParser extends ScheduledWithRepetitionParser {
                 Integer repetitions = repetitionResult.getRepetitions();
                 String interval = repetitionResult.getInterval();
                 
-                if (isEmpty(returnMessage) && message.getReplyToMessage() != null) {
+                if (!hasText(returnMessage) && message.getReplyToMessage() != null) {
                     returnMessage = MessageHelper.getActualText(message.getReplyToMessage());
                 }
-                if (isEmpty(returnMessage)) {
+                if (!hasText(returnMessage)) {
                     returnMessage = defaultMessageSupplier.get();
                 }
 

@@ -9,8 +9,8 @@ import ru.javazen.telegram.bot.model.ChatEntity;
 import ru.javazen.telegram.bot.model.UserEntity;
 import ru.javazen.telegram.bot.util.DateRange;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.function.Function;

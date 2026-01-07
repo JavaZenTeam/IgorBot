@@ -4,7 +4,6 @@ import com.amazonaws.services.polly.model.VoiceId;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultVoice;
@@ -13,7 +12,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.javazen.telegram.bot.handler.base.InlineQueryHandler;
 import ru.javazen.telegram.bot.service.VoiceService;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -24,11 +24,12 @@ public class SayTextHandler implements InlineQueryHandler {
     private static final int RANDOM_LENGTH = 10;
 
     private final VoiceService voiceService;
-    private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
+    private final TaskScheduler taskScheduler;
     private HashMap<Long, String> queries = new HashMap<>();
 
-    public SayTextHandler(VoiceService voiceService) {
+    public SayTextHandler(VoiceService voiceService, TaskScheduler taskScheduler) {
         this.voiceService = voiceService;
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -42,8 +43,7 @@ public class SayTextHandler implements InlineQueryHandler {
     }
 
     private void scheduleTask(InlineQuery inlineQuery, AbsSender sender) {
-        Calendar date = Calendar.getInstance();
-        date.add(Calendar.SECOND, VOICE_GENERATION_PAUSE);
+        Instant scheduleTime = Instant.now().plus(VOICE_GENERATION_PAUSE, ChronoUnit.SECONDS);
 
         String text = inlineQuery.getQuery();
         Long userId = inlineQuery.getFrom().getId();
@@ -68,6 +68,6 @@ public class SayTextHandler implements InlineQueryHandler {
                     throw new RuntimeException("Can't execute answerInlineQuery", e);
                 }
             }
-        }, date.getTime());
+        }, scheduleTime);
     }
 }

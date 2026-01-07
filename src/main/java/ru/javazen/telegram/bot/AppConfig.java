@@ -24,6 +24,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+
+import java.util.concurrent.Executors;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.facilities.TelegramHttpClientBuilder;
 import ru.javazen.telegram.bot.client.FileServiceClient;
@@ -91,7 +93,7 @@ public class AppConfig {
 
     @Bean
     public TaskScheduler taskScheduler() {
-        return new ConcurrentTaskScheduler();
+        return new ConcurrentTaskScheduler(Executors.newScheduledThreadPool(10));
     }
 
     @Bean
@@ -164,8 +166,8 @@ public class AppConfig {
 
     @Bean
     @Profile("say-text")
-    SayTextHandler sayTextHandler(VoiceService voiceService) {
-        return new SayTextHandler(voiceService);
+    SayTextHandler sayTextHandler(VoiceService voiceService, TaskScheduler taskScheduler) {
+        return new SayTextHandler(voiceService, taskScheduler);
     }
 
     @Bean("sayTextHandler")
