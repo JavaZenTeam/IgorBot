@@ -97,6 +97,12 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+            <version>10.10.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>10.10.0</version>
         </dependency>
 
         <dependency>
@@ -190,6 +196,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
+                <version>10.10.0</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
