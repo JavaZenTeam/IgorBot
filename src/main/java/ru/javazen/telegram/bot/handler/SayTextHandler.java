@@ -4,7 +4,6 @@ import com.amazonaws.services.polly.model.VoiceId;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultVoice;
@@ -25,11 +24,12 @@ public class SayTextHandler implements InlineQueryHandler {
     private static final int RANDOM_LENGTH = 10;
 
     private final VoiceService voiceService;
-    private TaskScheduler taskScheduler = new DefaultManagedTaskScheduler();
+    private final TaskScheduler taskScheduler;
     private HashMap<Long, String> queries = new HashMap<>();
 
-    public SayTextHandler(VoiceService voiceService) {
+    public SayTextHandler(VoiceService voiceService, TaskScheduler taskScheduler) {
         this.voiceService = voiceService;
+        this.taskScheduler = taskScheduler;
     }
 
     @Override

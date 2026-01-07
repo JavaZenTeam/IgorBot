@@ -166,8 +166,8 @@ public class AppConfig {
 
     @Bean
     @Profile("say-text")
-    SayTextHandler sayTextHandler(VoiceService voiceService) {
-        return new SayTextHandler(voiceService);
+    SayTextHandler sayTextHandler(VoiceService voiceService, TaskScheduler taskScheduler) {
+        return new SayTextHandler(voiceService, taskScheduler);
     }
 
     @Bean("sayTextHandler")
