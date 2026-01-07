@@ -19,8 +19,8 @@ import ru.javazen.telegram.bot.repository.UserEntityRepository;
 import ru.javazen.telegram.bot.service.ChatConfigService;
 import ru.javazen.telegram.bot.util.DateInterval;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;

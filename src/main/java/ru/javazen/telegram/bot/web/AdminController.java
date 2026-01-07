@@ -57,7 +57,9 @@ public class AdminController {
         if (range == DateRanges.CUSTOM) {
             dateRange = new DateRange(from, to, timeZone);
         } else if (range == DateRanges.ALL_TIME) {
-            dateRange = new DateRange(messageRepository.startBotDate(), new Date(), timeZone);
+            // Date из БД уже в UTC, используем напрямую
+            Date startDate = messageRepository.startBotDate();
+            dateRange = new DateRange(startDate != null ? startDate : new Date(0), new Date(), timeZone);
         }
 
         model.addAttribute("dateRange", dateRange);

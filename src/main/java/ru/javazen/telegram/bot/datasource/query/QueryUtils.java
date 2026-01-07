@@ -3,7 +3,7 @@ package ru.javazen.telegram.bot.datasource.query;
 import lombok.experimental.UtilityClass;
 import ru.javazen.telegram.bot.datasource.model.*;
 
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 import java.lang.reflect.Constructor;
 import java.sql.Timestamp;
 import java.util.Arrays;

@@ -10,9 +10,9 @@ import ru.javazen.telegram.bot.model.MessageEntity_;
 import ru.javazen.telegram.bot.model.UserEntity;
 import ru.javazen.telegram.bot.util.DateRange;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.*;
-import javax.persistence.metamodel.SingularAttribute;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.*;
+import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 
 @Component

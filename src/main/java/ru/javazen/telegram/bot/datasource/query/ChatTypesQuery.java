@@ -6,8 +6,8 @@ import ru.javazen.telegram.bot.datasource.model.SubjectCount;
 import ru.javazen.telegram.bot.model.*;
 import ru.javazen.telegram.bot.util.DateRange;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.*;
 import java.util.List;
 
 @Component

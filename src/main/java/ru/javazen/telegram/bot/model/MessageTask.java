@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "MESSAGE_TASK")

@@ -1,6 +1,6 @@
 package ru.javazen.telegram.bot.handler;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -26,17 +26,17 @@ public class ChoiceMaker implements TextMessageHandler {
         this.preprocessors = preprocessors;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setPattern(String pattern) {
         this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
     }
 
-    @Required
+    @Autowired(required = true)
     public void setSplitPattern(String splitPattern) {
         this.splitPattern = splitPattern;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setComparator(Comparator<String> comparator) {
         this.comparator = comparator;
     }
