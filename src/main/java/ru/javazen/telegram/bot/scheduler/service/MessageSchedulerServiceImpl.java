@@ -134,7 +134,9 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(task.getChatId().toString());
-        sendMessage.setReplyToMessageId(task.getReplyMessageId().intValue());
+        if (task.getReplyMessageId() != null) {
+            sendMessage.setReplyToMessageId(task.getReplyMessageId().intValue());
+        }
         sendMessage.setText(task.getScheduledText());
         sendMessage.setMessageThreadId(task.getMessageThreadId());
 
@@ -158,24 +160,28 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                 format.setTimeZone(timeZone);
 
                 String formattedDate = format.format(new Date(task.getTimeOfCompletion()));
+                String apiResponse = e.getApiResponse();
 
-                if (e.getApiResponse().contains("replied message not found")) {
+                if (apiResponse.contains("replied message not found") || 
+                    apiResponse.contains("message to be replied not found")) {
+                    // Если сообщение для ответа не найдено, отправляем без реплая
                     sendMessage.setReplyToMessageId(null);
                     String username = findUsernameById(task.getUserId().intValue());
                     username = username == null ? "Незнакомец под номером '" + task.getUserId() + "'" : "@" + username;
 
                     sendMessage.setText(username +  ", как-то давно (" + formattedDate + ") ты просил меня напомнить: " +
                             sendMessage.getText());
-                } else if (e.getApiResponse().contains("group chat was upgraded to a supergroup chat")) {
+                } else if (apiResponse.contains("group chat was upgraded to a supergroup chat")) {
                     sendMessage.setChatId(e.getParameters().getMigrateToChatId().toString());
                     sendMessage.setText("Когда-то (" + formattedDate + ") вы просили напомнить. Но я не мог с вами " +
                             "связаться. В общем, вот: " + sendMessage.getText());
-                } else if (e.getApiResponse().contains("chat not found")) {
+                } else if (apiResponse.contains("chat not found")) {
+                    // Если чат не найден, пытаемся отправить пользователю напрямую
                     sendMessage.setChatId(task.getUserId().toString());
                     sendMessage.setReplyToMessageId(null);
                     sendMessage.setText("Когда-то (" + formattedDate + ") ты завел напоминание. Но чата больше нет. " +
                             "В общем, вот: " + sendMessage.getText());
-                } else if (e.getApiResponse().contains("bot was kicked from the group chat")) {
+                } else if (apiResponse.contains("bot was kicked from the group chat")) {
                     String newMessageToSend = "Когда-то (" + formattedDate + ") ты завел напоминание: https://t.me/c/" +
                             sendMessage.getChatId() + "/" + sendMessage.getReplyToMessageId() + ". Но меня удалили " +
                             "из чата. В общем, вот: " + sendMessage.getText();
@@ -183,27 +189,81 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                     sendMessage.setReplyToMessageId(null);
                     sendMessage.setText(newMessageToSend);
                 } else {
-                    log.error("Can't send message", e);
-                    tgLogger.log(e);
-                    throw new RuntimeException(e);
+                    // Неизвестная ошибка - проверяем, постоянная ли она
+                    if (isPermanentError(e)) {
+                        log.error("Permanent error sending message for task {}. Removing task.", task.getId(), e);
+                        tgLogger.log(e);
+                        futureTasks.remove(futureTask.taskId);
+                        messageTaskRepository.delete(task);
+                        return;
+                    } else {
+                        // Временная ошибка - перепланируем на 10 минут вперед для повторной попытки
+                        log.warn("Temporary error sending message for task {}. Will retry in 10 minutes.", task.getId(), e);
+                        tgLogger.log(e);
+                        // Перепланируем задачу на 10 минут вперед для повторной попытки
+                        task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
+                        messageTaskRepository.save(task);
+                        futureTask.setFuture(getFuture(task));
+                        return;
+                    }
                 }
+                
+                // Повторная попытка отправки с исправленным сообщением
                 try {
                     futureTask.getSender().execute(sendMessage);
-                } catch (RuntimeException rex) {
-                    log.error("Something is wrong with task with {} id. Error message: {}", task.getId(), rex.getMessage());
-                    tgLogger.log(rex);
-                    throw rex;
+                } catch (TelegramApiRequestException retryE) {
+                    // Если при повторной попытке снова ошибка (например, пользователь заблокировал бота),
+                    // проверяем, постоянная ли она
+                    if (isPermanentError(retryE)) {
+                        log.warn("Failed to send scheduled message to user {} (task {}). Permanent error. Removing task.", 
+                                task.getUserId(), task.getId());
+                        tgLogger.log(retryE);
+                        futureTasks.remove(futureTask.taskId);
+                        messageTaskRepository.delete(task);
+                        return;
+                    } else {
+                        // Временная ошибка при повторной попытке - перепланируем на 10 минут вперед
+                        log.warn("Temporary error on retry for task {}. Will retry in 10 minutes.", task.getId(), retryE);
+                        tgLogger.log(retryE);
+                        // Перепланируем задачу на 10 минут вперед для повторной попытки
+                        task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
+                        messageTaskRepository.save(task);
+                        futureTask.setFuture(getFuture(task));
+                        return;
+                    }
                 } catch (TelegramApiException te) {
-                    log.error("Can't send message", te);
+                    // Для других ошибок Telegram API - считаем временными, перепланируем на 10 минут
+                    log.warn("Telegram API error on retry for task {}. Will retry in 10 minutes.", task.getId(), te);
                     tgLogger.log(te);
-                    throw new RuntimeException(te);
+                    // Перепланируем задачу на 10 минут вперед для повторной попытки
+                    task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
+                    messageTaskRepository.save(task);
+                    futureTask.setFuture(getFuture(task));
+                    return;
+                } catch (RuntimeException rex) {
+                    // Runtime исключения могут быть разными - логируем как ошибку
+                    // Перепланируем на 10 минут для повторной попытки
+                    log.error("Runtime error when retrying to send message for task {}. Will retry in 10 minutes.", task.getId(), rex);
+                    tgLogger.log(rex);
+                    // Перепланируем задачу на 10 минут вперед для повторной попытки
+                    task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
+                    messageTaskRepository.save(task);
+                    futureTask.setFuture(getFuture(task));
+                    return;
                 }
             } catch (TelegramApiException te) {
-                log.error("Can't send message", te);
+                // Если это не TelegramApiRequestException, а другой тип TelegramApiException
+                // Считаем временной ошибкой, перепланируем на 10 минут
+                log.warn("Telegram API error for task {}. Will retry in 10 minutes.", task.getId(), te);
                 tgLogger.log(te);
-                throw new RuntimeException(te);
+                // Перепланируем задачу на 10 минут вперед для повторной попытки
+                task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
+                messageTaskRepository.save(task);
+                futureTask.setFuture(getFuture(task));
+                return;
             }
 
+            // Если отправка успешна, обрабатываем повторения
             Integer repeatCount = task.getRepeatCount();
             if (repeatCount != null && repeatCount != 0) {
                 task.setTimeOfCompletion(DateInterval.apply(task.getRepeatInterval(), new Date(task.getTimeOfCompletion())).getTime());
@@ -232,6 +292,58 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
             return userEntity.getUsername();
         }
         return null;
+    }
+
+    /**
+     * Определяет, является ли ошибка постоянной (permanent) или временной (temporary).
+     * Постоянные ошибки означают, что задача никогда не сможет быть выполнена.
+     * Временные ошибки могут быть решены при следующей попытке.
+     * 
+     * @param e исключение Telegram API
+     * @return true если ошибка постоянная, false если временная
+     */
+    private boolean isPermanentError(TelegramApiRequestException e) {
+        String apiResponse = e.getApiResponse();
+        if (apiResponse == null) {
+            // Если нет ответа API, считаем временной ошибкой
+            return false;
+        }
+        
+        String lowerResponse = apiResponse.toLowerCase();
+        
+        // Постоянные ошибки - чат/пользователь недоступен
+        if (lowerResponse.contains("chat not found") ||
+            lowerResponse.contains("bot was blocked by the user") ||
+            lowerResponse.contains("user is deactivated") ||
+            lowerResponse.contains("chat_id is empty") ||
+            lowerResponse.contains("can't access the chat") ||
+            lowerResponse.contains("not enough rights") ||
+            lowerResponse.contains("message is too long")) {
+            return true;
+        }
+        
+        // Временные ошибки - проблемы сети, rate limiting, проблемы на стороне Telegram
+        if (lowerResponse.contains("too many requests") ||
+            e.getErrorCode() == 429 || // Too Many Requests
+            e.getErrorCode() >= 500 || // Server errors
+            e.getErrorCode() == 408 || // Request Timeout
+            lowerResponse.contains("timeout") ||
+            lowerResponse.contains("connection") ||
+            lowerResponse.contains("network")) {
+            return false;
+        }
+        
+        // HTTP 400 Bad Request обычно означает постоянную ошибку (неправильные параметры)
+        // но некоторые могут быть временными, поэтому проверяем конкретные сообщения выше
+        if (e.getErrorCode() == 400) {
+            // Если это известная постоянная ошибка из списка выше - уже обработано
+            // Иначе считаем постоянной (неправильные параметры запроса)
+            return true;
+        }
+        
+        // По умолчанию для неизвестных ошибок считаем временными,
+        // чтобы не потерять задачи из-за неожиданных проблем
+        return false;
     }
 
     private static class FutureTask {
