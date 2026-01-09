@@ -31,6 +31,15 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
     @Override
     public void saveMessage(Message message) {
         MessageEntity entity = modelMapper.map(message, MessageEntity.class);
+        
+        // Проверяем и исправляем userId, если он не установлен (на случай, если конвертер не сработал)
+        if (entity.getUser() != null && entity.getUser().getUserId() == null && message.getFrom() != null) {
+            entity.getUser().setUserId(message.getFrom().getId());
+        }
+        if (entity.getForwardFrom() != null && entity.getForwardFrom().getUserId() == null && message.getForwardFrom() != null) {
+            entity.getForwardFrom().setUserId(message.getForwardFrom().getId());
+        }
+        
         if (!saveText(message)) {
             if (entity.getEventType() != EventType.NEW_TITLE) {
                 entity.setText(null);
@@ -40,7 +49,7 @@ public class MessageCollectorServiceImpl implements MessageCollectorService {
                 entity.setFileUniqueId(null);
             }
         }
-        if (entity.getUser().equals(entity.getForwardFrom())) {
+        if (entity.getUser() != null && entity.getForwardFrom() != null && entity.getUser().equals(entity.getForwardFrom())) {
             entity.setForwardFrom(entity.getUser());
         }
         messageRepository.save(entity);
