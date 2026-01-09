@@ -22,10 +22,11 @@ public class HelpMainPostCommandHandler implements MessageHandler {
 
         SendMessage response = SendMessage.builder()
                 .chatId(message.getChatId().toString())
+                .messageThreadId(message.getMessageThreadId())
+                .replyMarkup(helpMessage.getInlineKeyboardMarkup())
                 .text(helpMessage.getMessageText())
                 .parseMode(ParseMode.MARKDOWN)
                 .build();
-        response.setReplyMarkup(helpMessage.getInlineKeyboardMarkup());
 
         sender.execute(response);
 
