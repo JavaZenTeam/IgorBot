@@ -18,7 +18,9 @@ public class SimpleAnswer implements MessageHandler {
 
     @Override
     public boolean handle(Message message, AbsSender sender) throws TelegramApiException {
-        sender.execute(new SendMessage(message.getChatId().toString(), answer));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), answer);
+        sendMessage.setMessageThreadId(message.getMessageThreadId());
+        sender.execute(sendMessage);
         return true;
     }
 }

@@ -41,10 +41,13 @@ public class CreateSubscriptionHandler implements TextMessageHandler {
         try {
             subscriptionService.createSubscription(template);
             SendMessage answer = new SendMessage(message.getChatId().toString(), successResponseSupplier.get());
+            answer.setMessageThreadId(message.getMessageThreadId());
             Message sentMessage = sender.execute(answer);
             subscriptionService.saveSubscriptionReply(subscriptionPK, sentMessage.getMessageId());
         } catch (SubscriptionService.TooManyDuplicatesException e) {
-            sender.execute(new SendMessage(message.getChatId().toString(), tooManyDuplicatesErrorSupplier.get()));
+            SendMessage errorMsg = new SendMessage(message.getChatId().toString(), tooManyDuplicatesErrorSupplier.get());
+            errorMsg.setMessageThreadId(message.getMessageThreadId());
+            sender.execute(errorMsg);
         }
         return true;
     }

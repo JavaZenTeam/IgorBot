@@ -25,7 +25,9 @@ public class ToggleChatConfigMappedValuesHandler implements TextMessageHandler {
         chatConfigService.setProperty(message.getChatId(), configKey, configValue);
 
         String response = value2response.getOrDefault(configValue, () -> configKey + "=" + configValue).get();
-        sender.execute(new SendMessage(message.getChatId().toString(), response));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), response);
+        sendMessage.setMessageThreadId(message.getMessageThreadId());
+        sender.execute(sendMessage);
         return true;
     }
 

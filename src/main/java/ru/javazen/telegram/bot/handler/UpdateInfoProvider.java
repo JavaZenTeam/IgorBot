@@ -31,13 +31,17 @@ public class UpdateInfoProvider implements TextMessageHandler {
             if (args.length > 1) requestedEntity = resolveEntity(requestedEntity, args[1]);
 
             String answer = mapper.writeValueAsString(requestedEntity);
-            sender.execute(SendMessage.builder()
+            SendMessage sendMessage = SendMessage.builder()
                     .chatId(message.getChatId().toString())
+                    .messageThreadId(message.getMessageThreadId())
                     .text("```\n" + answer + "```")
-                    .parseMode(ParseMode.MARKDOWN).build());
+                    .parseMode(ParseMode.MARKDOWN).build();
+            sender.execute(sendMessage);
             return true;
         } catch (IllegalArgumentException e) {
-            sender.execute(new SendMessage(message.getChatId().toString(), invalidPathMessageSupplier.get()));
+            SendMessage errorMsg = new SendMessage(message.getChatId().toString(), invalidPathMessageSupplier.get());
+            errorMsg.setMessageThreadId(message.getMessageThreadId());
+            sender.execute(errorMsg);
             return true;
         } catch (IOException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);

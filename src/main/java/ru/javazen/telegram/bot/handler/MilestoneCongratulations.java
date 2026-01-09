@@ -28,6 +28,7 @@ public class MilestoneCongratulations implements MessageHandler {
 
             SendMessage sendMessage = new SendMessage(message.getChatId().toString(), text);
             sendMessage.setReplyToMessageId(message.getMessageId());
+            sendMessage.setMessageThreadId(message.getMessageThreadId());
             sender.execute(sendMessage);
         }
         return false;

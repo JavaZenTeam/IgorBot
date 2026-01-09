@@ -24,7 +24,9 @@ public class LinkToChatPageHandler implements MessageHandler {
         String token = authenticationTokenService.generateToken(path).getToken();
 
         String link = MessageFormat.format(linkTemplate, token);
-        sender.execute(new SendMessage(message.getChatId().toString(), link));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), link);
+        sendMessage.setMessageThreadId(message.getMessageThreadId());
+        sender.execute(sendMessage);
         return true;
     }
 }

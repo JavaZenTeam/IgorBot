@@ -10,7 +10,9 @@ public class Repeater implements TextMessageHandler {
 
     @Override
     public boolean handle(Message message, String text, AbsSender sender) throws TelegramApiException {
-        sender.execute(new SendMessage(message.getChatId().toString(), text));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), text);
+        sendMessage.setMessageThreadId(message.getMessageThreadId());
+        sender.execute(sendMessage);
         return true;
     }
 }

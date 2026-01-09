@@ -29,7 +29,9 @@ public class RandomAnswer implements TextMessageHandler {
         String answer = container.get(random.nextDouble() * container.size());
         if (answer == null) return false;
 
-        sender.execute(new SendMessage(message.getChatId().toString(), answer));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), answer);
+        sendMessage.setMessageThreadId(message.getMessageThreadId());
+        sender.execute(sendMessage);
         return true;
     }
 

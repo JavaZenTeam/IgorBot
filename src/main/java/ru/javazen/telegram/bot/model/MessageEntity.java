@@ -51,6 +51,9 @@ public class MessageEntity {
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
+    @Column(name = "message_thread_id")
+    private Integer messageThreadId;
+
     @JoinTable(
             name = "message_entity_member",
             joinColumns = {

@@ -46,6 +46,7 @@ public class ModelMapperConfig {
                 when(Conditions.isNotNull())
                         .map(source.getLeftChatMember(), destination.getMember());
                 using(eventTypeConverter).map(source, destination.getEventType());
+                map(source.getMessageThreadId(), destination.getMessageThreadId());
             }
         };
     }
