@@ -36,9 +36,7 @@ public class ModelMapperConfig {
                 using(scoreConverter).map(source, destination.getScore());
                 using(dateConverter).map(source.getDate(), destination.getDate());
                 map(source.getChat(), destination.getChat());
-                skip(destination.getUser());
                 using(userConverter).map(source.getFrom(), destination.getUser());
-                skip(destination.getForwardFrom());
                 using(userConverter).map(source.getForwardFrom(), destination.getForwardFrom());
                 using(fileTypeConverter).map(source, destination.getFileType());
                 using(fileIdConverter).map(source, destination.getFileId());
