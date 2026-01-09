@@ -26,7 +26,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler.TIMEZONE_OFFSET_CONFIG_KEY;
 
@@ -36,6 +39,7 @@ import static ru.javazen.telegram.bot.scheduler.SchedulerNotifyHandler.TIMEZONE_
 public class MessageSchedulerServiceImpl implements MessageSchedulerService {
 
     private final TaskScheduler taskScheduler;
+    private final ScheduledExecutorService retryExecutor;
     private Map<Long, FutureTask> futureTasks = new HashMap<>();
 
     private final MessageTaskRepository messageTaskRepository;
@@ -45,9 +49,13 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
     private UserEntityRepository userEntityRepository;
     private ChatConfigService chatConfigService;
 
+    private static final int MAX_RETRY_ATTEMPTS = 3;
+    private static final long INITIAL_RETRY_DELAY_SECONDS = 5;
+
     public MessageSchedulerServiceImpl(MessageTaskRepository messageTaskRepository, TaskScheduler taskScheduler) {
         this.messageTaskRepository = messageTaskRepository;
         this.taskScheduler = taskScheduler;
+        this.retryExecutor = Executors.newScheduledThreadPool(5);
     }
 
     @Autowired
@@ -197,13 +205,10 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                         messageTaskRepository.delete(task);
                         return;
                     } else {
-                        // Временная ошибка - перепланируем на 10 минут вперед для повторной попытки
-                        log.warn("Temporary error sending message for task {}. Will retry in 10 minutes.", task.getId(), e);
+                        // Временная ошибка - делаем retry с задержкой
+                        log.warn("Temporary error sending message for task {}. Will retry.", task.getId(), e);
                         tgLogger.log(e);
-                        // Перепланируем задачу на 10 минут вперед для повторной попытки
-                        task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
-                        messageTaskRepository.save(task);
-                        futureTask.setFuture(getFuture(task));
+                        retrySendMessage(sendMessage, task, futureTask, 0);
                         return;
                     }
                 }
@@ -211,6 +216,9 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                 // Повторная попытка отправки с исправленным сообщением
                 try {
                     futureTask.getSender().execute(sendMessage);
+                    // Успешная отправка с исправленным сообщением
+                    handleSuccessfulSend(task, futureTask);
+                    return;
                 } catch (TelegramApiRequestException retryE) {
                     // Если при повторной попытке снова ошибка (например, пользователь заблокировал бота),
                     // проверяем, постоянная ли она
@@ -222,60 +230,30 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
                         messageTaskRepository.delete(task);
                         return;
                     } else {
-                        // Временная ошибка при повторной попытке - перепланируем на 10 минут вперед
-                        log.warn("Temporary error on retry for task {}. Will retry in 10 minutes.", task.getId(), retryE);
+                        // Временная ошибка - делаем retry с задержкой
+                        log.warn("Temporary error on retry for task {}. Will retry.", task.getId(), retryE);
                         tgLogger.log(retryE);
-                        // Перепланируем задачу на 10 минут вперед для повторной попытки
-                        task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
-                        messageTaskRepository.save(task);
-                        futureTask.setFuture(getFuture(task));
+                        retrySendMessage(sendMessage, task, futureTask, 0);
                         return;
                     }
-                } catch (TelegramApiException te) {
-                    // Для других ошибок Telegram API - считаем временными, перепланируем на 10 минут
-                    log.warn("Telegram API error on retry for task {}. Will retry in 10 minutes.", task.getId(), te);
-                    tgLogger.log(te);
-                    // Перепланируем задачу на 10 минут вперед для повторной попытки
-                    task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
-                    messageTaskRepository.save(task);
-                    futureTask.setFuture(getFuture(task));
-                    return;
-                } catch (RuntimeException rex) {
-                    // Runtime исключения могут быть разными - логируем как ошибку
-                    // Перепланируем на 10 минут для повторной попытки
-                    log.error("Runtime error when retrying to send message for task {}. Will retry in 10 minutes.", task.getId(), rex);
-                    tgLogger.log(rex);
-                    // Перепланируем задачу на 10 минут вперед для повторной попытки
-                    task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
-                    messageTaskRepository.save(task);
-                    futureTask.setFuture(getFuture(task));
+                } catch (Exception ex) {
+                    // Для других ошибок (TelegramApiException, RuntimeException и т.д.) - делаем retry с задержкой
+                    log.warn("Error on retry for task {}. Will retry.", task.getId(), ex);
+                    tgLogger.log(ex);
+                    retrySendMessage(sendMessage, task, futureTask, 0);
                     return;
                 }
             } catch (TelegramApiException te) {
                 // Если это не TelegramApiRequestException, а другой тип TelegramApiException
-                // Считаем временной ошибкой, перепланируем на 10 минут
-                log.warn("Telegram API error for task {}. Will retry in 10 minutes.", task.getId(), te);
+                // Считаем временной ошибкой, делаем retry с задержкой
+                log.warn("Telegram API error for task {}. Will retry.", task.getId(), te);
                 tgLogger.log(te);
-                // Перепланируем задачу на 10 минут вперед для повторной попытки
-                task.setTimeOfCompletion(task.getTimeOfCompletion() + 10 * 60 * 1000); // +10 минут
-                messageTaskRepository.save(task);
-                futureTask.setFuture(getFuture(task));
+                retrySendMessage(sendMessage, task, futureTask, 0);
                 return;
             }
 
             // Если отправка успешна, обрабатываем повторения
-            Integer repeatCount = task.getRepeatCount();
-            if (repeatCount != null && repeatCount != 0) {
-                task.setTimeOfCompletion(DateInterval.apply(task.getRepeatInterval(), new Date(task.getTimeOfCompletion())).getTime());
-                if (repeatCount > 0) {
-                    task.setRepeatCount(repeatCount - 1);
-                }
-                messageTaskRepository.save(task);
-                futureTask.setFuture(getFuture(task));
-            } else {
-                futureTasks.remove(futureTask.taskId);
-                messageTaskRepository.delete(task);
-            }
+            handleSuccessfulSend(task, futureTask);
         }, new Date(task.getTimeOfCompletion()));
     }
 
@@ -283,6 +261,15 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
     public void destroy() {
         for (FutureTask futureTask : futureTasks.values()) {
             futureTask.getFuture().cancel(true);
+        }
+        retryExecutor.shutdown();
+        try {
+            if (!retryExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                retryExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            retryExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -292,6 +279,69 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
             return userEntity.getUsername();
         }
         return null;
+    }
+
+    /**
+     * Выполняет retry отправки сообщения с экспоненциальной задержкой.
+     * 
+     * @param sendMessage сообщение для отправки
+     * @param task задача планировщика
+     * @param futureTask будущая задача
+     * @param attempt номер попытки (начинается с 0)
+     */
+    private void retrySendMessage(SendMessage sendMessage, MessageTask task, FutureTask futureTask, int attempt) {
+        if (attempt >= MAX_RETRY_ATTEMPTS) {
+            log.error("Failed to send message for task {} after {} attempts. Removing task.", task.getId(), MAX_RETRY_ATTEMPTS);
+            futureTasks.remove(futureTask.taskId);
+            messageTaskRepository.delete(task);
+            return;
+        }
+
+        long delaySeconds = INITIAL_RETRY_DELAY_SECONDS * (1L << attempt); // Экспоненциальная задержка: 5, 10, 20 секунд
+        log.warn("Retrying to send message for task {} (attempt {}/{}) in {} seconds", 
+                task.getId(), attempt + 1, MAX_RETRY_ATTEMPTS, delaySeconds);
+
+        retryExecutor.schedule(() -> {
+            try {
+                futureTask.getSender().execute(sendMessage);
+                // Успешная отправка - обрабатываем повторения
+                handleSuccessfulSend(task, futureTask);
+            } catch (TelegramApiRequestException retryE) {
+                if (isPermanentError(retryE)) {
+                    log.error("Permanent error on retry {} for task {}. Removing task.", attempt + 1, task.getId(), retryE);
+                    tgLogger.log(retryE);
+                    futureTasks.remove(futureTask.taskId);
+                    messageTaskRepository.delete(task);
+                } else {
+                    // Временная ошибка - повторяем попытку
+                    tgLogger.log(retryE);
+                    retrySendMessage(sendMessage, task, futureTask, attempt + 1);
+                }
+            } catch (Exception ex) {
+                // Временная ошибка (TelegramApiException, RuntimeException и т.д.) - повторяем попытку
+                log.warn("Error on retry {} for task {}. Will retry.", attempt + 1, task.getId(), ex);
+                tgLogger.log(ex);
+                retrySendMessage(sendMessage, task, futureTask, attempt + 1);
+            }
+        }, delaySeconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Обрабатывает успешную отправку сообщения - обновляет задачу или удаляет её.
+     */
+    private void handleSuccessfulSend(MessageTask task, FutureTask futureTask) {
+        Integer repeatCount = task.getRepeatCount();
+        if (repeatCount != null && repeatCount != 0) {
+            task.setTimeOfCompletion(DateInterval.apply(task.getRepeatInterval(), new Date(task.getTimeOfCompletion())).getTime());
+            if (repeatCount > 0) {
+                task.setRepeatCount(repeatCount - 1);
+            }
+            messageTaskRepository.save(task);
+            futureTask.setFuture(getFuture(task));
+        } else {
+            futureTasks.remove(futureTask.taskId);
+            messageTaskRepository.delete(task);
+        }
     }
 
     /**
