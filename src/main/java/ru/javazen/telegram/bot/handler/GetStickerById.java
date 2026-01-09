@@ -26,6 +26,7 @@ public class GetStickerById implements TextMessageHandler {
         SendSticker sendSticker = new SendSticker();
         sendSticker.setChatId(message.getChatId().toString());
         sendSticker.setSticker(new InputFile(matcher.group(1)));
+        sendSticker.setMessageThreadId(message.getMessageThreadId());
 
         try {
             sender.execute(sendSticker);
@@ -34,6 +35,7 @@ public class GetStickerById implements TextMessageHandler {
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(message.getChatId().toString());
                 sendMessage.setText(failedResponseSupplier.get());
+                sendMessage.setMessageThreadId(message.getMessageThreadId());
                 sender.execute(sendMessage);
             } else {
                 throw e;

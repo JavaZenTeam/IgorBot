@@ -41,6 +41,9 @@ public class MessageTask {
     @Column(name = "REPEAT_COUNT")
     private Integer repeatCount;
 
+    @Column(name = "MESSAGE_THREAD_ID")
+    private Integer messageThreadId;
+
     public Long getId() {
         return id;
     }
@@ -129,6 +132,14 @@ public class MessageTask {
         this.repeatCount = repeatCount;
     }
 
+    public Integer getMessageThreadId() {
+        return messageThreadId;
+    }
+
+    public void setMessageThreadId(Integer messageThreadId) {
+        this.messageThreadId = messageThreadId;
+    }
+
     @Override
     public String toString() {
         return "MessageTask{" +
@@ -143,6 +154,7 @@ public class MessageTask {
                 ", chatId=" + chatId +
                 ", messageId=" + messageId +
                 ", botName='" + botName + '\'' +
+                ", messageThreadId=" + messageThreadId +
                 '}';
     }
 }

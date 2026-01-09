@@ -25,7 +25,9 @@ public class SongSinger implements TextMessageHandler {
         if (nextLine.getNextLine() != null)
             lastSongLine = songLine;
 
-        sender.execute(new SendMessage(message.getChatId().toString(), nextLine.getString()));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), nextLine.getString());
+        sendMessage.setMessageThreadId(message.getMessageThreadId());
+        sender.execute(sendMessage);
         return true;
     }
 

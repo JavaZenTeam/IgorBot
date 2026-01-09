@@ -43,6 +43,7 @@ public class ContinueRepeatableSequence implements MessageHandler {
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(message.getChatId().toString());
             sendMessage.setText(message.getText());
+            sendMessage.setMessageThreadId(message.getMessageThreadId());
             sender.execute(sendMessage);
             messageQueue.clear();
             return true;
@@ -51,6 +52,7 @@ public class ContinueRepeatableSequence implements MessageHandler {
             SendSticker sendSticker = new SendSticker();
             sendSticker.setChatId(message.getChatId().toString());
             sendSticker.setSticker(new InputFile(message.getSticker().getFileId()));
+            sendSticker.setMessageThreadId(message.getMessageThreadId());
             sender.execute(sendSticker);
             messageQueue.clear();
             return true;

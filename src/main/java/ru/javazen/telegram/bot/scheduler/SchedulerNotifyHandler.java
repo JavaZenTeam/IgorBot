@@ -78,7 +78,9 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, daysLimit);
         if (result.getDate().compareTo(calendar.getTime()) > 0) {
-            sender.execute(new SendMessage(message.getChatId().toString(), "Так долго я помнить не смогу, сорри"));
+            SendMessage errorMsg = new SendMessage(message.getChatId().toString(), "Так долго я помнить не смогу, сорри");
+            errorMsg.setMessageThreadId(message.getMessageThreadId());
+            sender.execute(errorMsg);
             return true;
         }
 
@@ -87,7 +89,9 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
         if (result.getRepetitions() != null &&
                 (result.getRepetitions() < 0 || result.getRepetitions() > repetitionMaxTimesUnderLimit) &&
                 DateInterval.apply(result.getInterval(), result.getDate()).compareTo(calendar.getTime()) < 0) {
-            sender.execute(new SendMessage(message.getChatId().toString(), "Не, я устану повторять так часто"));
+            SendMessage errorMsg = new SendMessage(message.getChatId().toString(), "Не, я устану повторять так часто");
+            errorMsg.setMessageThreadId(message.getMessageThreadId());
+            sender.execute(errorMsg);
             return true;
         }
 
@@ -107,7 +111,9 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
                 (needClarify ? ", завел на " + format.format(result.getDate()): "") +
                 (result.getRepetitions() != null ? ", буду повторять каждые " +
                         DateInterval.getText(result.getInterval()) : "");
-        sender.execute(new SendMessage(message.getChatId().toString(), responseMessage));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), responseMessage);
+        sendMessage.setMessageThreadId(message.getMessageThreadId());
+        sender.execute(sendMessage);
 
         MessageTask task = new MessageTask();
         task.setChatId(message.getChatId());
@@ -118,6 +124,8 @@ public class SchedulerNotifyHandler implements TextMessageHandler {
         task.setTimeOfCompletion(result.getDate().getTime());
         task.setRepeatCount(result.getRepetitions());
         task.setRepeatInterval(result.getInterval());
+        // Сохраняем message_thread_id для планировщика
+        task.setMessageThreadId(message.getMessageThreadId());
 
         messageSchedulerService.scheduleTask(task);
 

@@ -136,6 +136,7 @@ public class MessageSchedulerServiceImpl implements MessageSchedulerService {
         sendMessage.setChatId(task.getChatId().toString());
         sendMessage.setReplyToMessageId(task.getReplyMessageId().intValue());
         sendMessage.setText(task.getScheduledText());
+        sendMessage.setMessageThreadId(task.getMessageThreadId());
 
         return taskScheduler.schedule(() -> {
             FutureTask futureTask = futureTasks.get(task.getId());

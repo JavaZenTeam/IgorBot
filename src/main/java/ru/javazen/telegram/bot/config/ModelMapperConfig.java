@@ -36,8 +36,8 @@ public class ModelMapperConfig {
                 using(scoreConverter).map(source, destination.getScore());
                 using(dateConverter).map(source.getDate(), destination.getDate());
                 map(source.getChat(), destination.getChat());
-                map(source.getFrom(), destination.getUser());
-                map(source.getForwardFrom(), destination.getForwardFrom());
+                using(userConverter).map(source.getFrom(), destination.getUser());
+                using(userConverter).map(source.getForwardFrom(), destination.getForwardFrom());
                 using(fileTypeConverter).map(source, destination.getFileType());
                 using(fileIdConverter).map(source, destination.getFileId());
                 using(fileUniqueIdConverter).map(source, destination.getFileUniqueId());
@@ -46,6 +46,7 @@ public class ModelMapperConfig {
                 when(Conditions.isNotNull())
                         .map(source.getLeftChatMember(), destination.getMember());
                 using(eventTypeConverter).map(source, destination.getEventType());
+                map(source.getMessageThreadId(), destination.getMessageThreadId());
             }
         };
     }
@@ -186,6 +187,20 @@ public class ModelMapperConfig {
     private final Converter<String, ChatType> chatTypeConverter = ctx -> Optional
             .ofNullable(EnumUtils.getEnumIgnoreCase(ChatType.class, ctx.getSource()))
             .orElse(ChatType.UNKNOWN);
+
+    private final Converter<User, UserEntity> userConverter = ctx -> {
+        User source = ctx.getSource();
+        if (source == null) {
+            return null;
+        }
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUserId(source.getId());
+        userEntity.setUsername(source.getUserName());
+        userEntity.setFirstName(source.getFirstName());
+        userEntity.setLastName(source.getLastName());
+        userEntity.setLanguageCode(source.getLanguageCode());
+        return userEntity;
+    };
 
     @Bean
     public ModelMapper modelMapper(List<PropertyMap<?, ?>> propertyMaps) {

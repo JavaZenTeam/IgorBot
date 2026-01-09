@@ -27,7 +27,9 @@ public class CancelSubscriptionHandler implements MessageHandler {
                 || subscriptionService.cancelSubscriptionByReply(messagePK);
 
         if (!canceled) return false;
-        sender.execute(new SendMessage(message.getChatId().toString(), successResponseSupplier.get()));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), successResponseSupplier.get());
+        sendMessage.setMessageThreadId(message.getMessageThreadId());
+        sender.execute(sendMessage);
         return true;
     }
 
