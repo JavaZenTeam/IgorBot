@@ -9,11 +9,27 @@ on:
   pull_request:
 
 jobs:
-  docker:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Run tests
+        run: mvn -B -ntp test
+      - name: Build package
+        run: mvn -B -ntp clean package
+
+  docker:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
