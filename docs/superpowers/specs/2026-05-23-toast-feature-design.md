@@ -9,7 +9,7 @@ Add a "toast" (drinking toast) feature to the bot. When someone says something a
 A `RegexpFilter` matches messages containing drinking-related keywords:
 
 ```
-(выпь(ем|[ие]ть|ют)|тост\w*|наливай|налито|горько|поднимем\s+бокалы|за\s+встречу|бокалы)
+.*(выпь(ем|[ие]ть|ют)|тост\p{L}*|наливай|налито|горько|поднимем\s+бокалы|за\s+встречу|бокалы).*
 ```
 
 ## Handler: `ToastHandler`

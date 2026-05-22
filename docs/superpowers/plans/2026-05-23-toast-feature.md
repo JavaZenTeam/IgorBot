@@ -205,7 +205,7 @@ Add FilterAdapter bean before `updateHandlers` list:
         <constructor-arg name="filter">
             <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
                 <property name="pattern"
-                          value="(выпь(ем|[ие]ть|ют)|тост\w*|наливай|налито|горько|поднимем\s+бокалы|за\s+встречу|бокалы)"/>
+                          value=".*(выпь(ем|[ие]ть|ют)|тост\p{L}*|наливай|налито|горько|поднимем\s+бокалы|за\s+встречу|бокалы).*"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="handler">
