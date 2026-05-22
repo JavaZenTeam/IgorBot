@@ -8,6 +8,7 @@
     <import resource="answers.xml"/>
     <import resource="processors.xml"/>
     <import resource="songs.xml"/>
+    <import resource="toasts.xml"/>
 
     <bean id="randomYesNoAnswerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
         <constructor-arg name="filter">
@@ -490,6 +491,20 @@
         </constructor-arg>
     </bean>
 
+    <bean id="toastHandlerModule" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.RegexpFilter">
+                <property name="pattern"
+                          value="(выпь(ем|[ие]ть|ют)|тост\w*|наливай|налито|горько|поднимем\s+бокалы|за\s+встречу|бокалы)"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <bean class="ru.javazen.telegram.bot.handler.ToastHandler">
+                <property name="toasts" ref="toasts"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <bean id="updateHandlers" class="java.util.ArrayList">
         <constructor-arg name="c">
             <list value-type="ru.javazen.telegram.bot.handler.base.UpdateHandler">
@@ -526,6 +541,7 @@
                 <ref bean="songSingerModule"/>
                 <ref bean="secretAndSacred"/>
                 <ref bean="boysForAll"/>
+                <ref bean="toastHandlerModule"/>
                 <ref bean="helpCommandHandler"/>
                 <ref bean="helpInlineListHandler"/>
                 <ref bean="helpInlineFeatureHandler"/>

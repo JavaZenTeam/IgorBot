@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util
+            http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <util:map id="toasts">
+        <entry key="За встречу!" value="5"/>
+        <entry key="За нас!" value="4"/>
+        <entry key="Будем здоровы!" value="4"/>
+        <entry key="За любовь!" value="4"/>
+        <entry key="Ну, поехали!" value="3"/>
+        <entry key="Горько!" value="3"/>
+        <entry key="Выпьем за удачу!" value="3"/>
+        <entry key="Пусть всё будет хорошо!" value="3"/>
+        <entry key="До дна!" value="2"/>
+        <entry key="С Богом!" value="2"/>
+        <entry key="Будем!" value="2"/>
+        <entry key="За тех, кто в море!" value="2"/>
+        <entry key="За присутствующих!" value="2"/>
+        <entry key="За отсутствующих!" value="2"/>
+    </util:map>
+</beans>
