@@ -21,11 +21,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-
-import java.util.concurrent.Executors;
+import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.facilities.TelegramHttpClientBuilder;
 import ru.javazen.telegram.bot.client.FileServiceClient;
@@ -37,10 +38,11 @@ import ru.javazen.telegram.bot.service.impl.AudioConverterServiceImpl;
 import ru.javazen.telegram.bot.service.impl.VoiceServiceImpl;
 import ru.javazen.telegram.bot.util.comparator.RandomComparator;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Random;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
-
 
 @Configuration
 @EnableCaching
@@ -97,40 +99,26 @@ public class AppConfig {
     }
 
     @Bean
-    public DefaultBotOptions proxyBotOptions(
-            @Value("${http.proxy.url}") String proxyUrl) throws MalformedURLException {
-        DefaultBotOptions botOptions = new DefaultBotOptions();
-
-        /*if (!StringUtils.isEmpty(proxyUrl)) {
-            URL url = new URL(proxyUrl);
-            String proxyHost = url.getHost();
-            int proxyPort = url.getPort();
-
-            log.debug("Http proxy provided: [{}:{}]", proxyHost, proxyPort);
-            String userInfo = url.getUserInfo();
-            boolean isAuth = !StringUtils.isEmpty(userInfo);
-            if (isAuth) {
-                StringTokenizer tokenizer = new StringTokenizer(userInfo, ":");
-                String username = tokenizer.nextToken();
-                String password = tokenizer.nextToken();
-                log.debug("Http proxy with authentication, will configure Authenticator. " +
-                        "Username: [{}]", username);
-
-                Authenticator.setDefault(new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(username, password.toCharArray());
-                    }
-                });
-
-                // Todo: fix 407 Proxy Authentication Required
-                // https://github.com/rubenlagus/TelegramBots/wiki/Using-Http-Proxy
+    public RestTemplate restTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new ResponseErrorHandler() {
+            @Override
+            public boolean hasError(ClientHttpResponse response) throws IOException {
+                return response.getStatusCode().isError();
             }
 
-            botOptions.setProxyHost(proxyHost);
-            botOptions.setProxyPort(proxyPort);
-            botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
-        }*/
+            @Override
+            public void handleError(ClientHttpResponse response) throws IOException {
+                // Do nothing, we want to handle the error ourselves
+            }
+        });
+        return restTemplate;
+    }
+
+    @Bean
+    public DefaultBotOptions proxyBotOptions(
+            @Value("${http.proxy.url:}") String proxyUrl) throws MalformedURLException {
+        DefaultBotOptions botOptions = new DefaultBotOptions();
         return botOptions;
     }
 
@@ -180,6 +168,4 @@ public class AppConfig {
     HttpClient telegramHttpClient(DefaultBotOptions options) {
         return TelegramHttpClientBuilder.build(options);
     }
-
-
 }

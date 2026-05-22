@@ -351,7 +351,22 @@
         </constructor-arg>
     </bean>
 
+    <bean id="aiCommandHandler" class="ru.javazen.telegram.bot.handler.AiCommandHandler"/>
+
+    <bean id="aiCommandHandlerFilterAdapter" class="ru.javazen.telegram.bot.handler.FilterAdapter">
+        <constructor-arg name="filter">
+            <bean class="ru.javazen.telegram.bot.filter.CommandFilter">
+                <constructor-arg name="botName" value="${bot.name}"/>
+                <constructor-arg name="command" value="/ai"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="handler">
+            <ref bean="aiCommandHandler"/>
+        </constructor-arg>
+    </bean>
+
     <!--Subscription Module-->
+
     <bean id="subscriptionListen" class="ru.javazen.telegram.bot.handler.subscriptions.ListenSubscriptionKeysHandler">
     </bean>
     <bean id="subscriptionCreate" class="ru.javazen.telegram.bot.handler.subscriptions.CreateSubscriptionHandler">
@@ -514,6 +529,7 @@
                 <ref bean="helpCommandHandler"/>
                 <ref bean="helpInlineListHandler"/>
                 <ref bean="helpInlineFeatureHandler"/>
+                <ref bean="aiCommandHandlerFilterAdapter"/>
             </list>
         </constructor-arg>
     </bean>

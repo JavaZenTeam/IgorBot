@@ -17,6 +17,17 @@ bot:
   token: ${IGOR_BOT_TOKEN}
   baseUrl: ${BASE_URL:http://127.0.0.1:${server.port}}
   supportChat: ${IGOR_BOT_SUPPORT_CHAT:}
+  ai:
+    url: ${AI_API_URL}
+    key: ${AI_API_KEY}
+    model: ${AI_API_MODEL:gpt-4o}
+    timeout: ${AI_API_TIMEOUT:30000}
+  openai:
+    api-key: ${AI_API_KEY}
+    base-url: ${AI_API_URL}
+    chat:
+      options:
+        model: ${AI_API_MODEL:gpt-4o}
 http:
   proxy:
     url: ${PROXY_URL:}

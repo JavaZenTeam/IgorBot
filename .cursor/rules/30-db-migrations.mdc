@@ -1,0 +1,17 @@
+---
+description: Flyway and persistence safety rules
+globs: "src/main/resources/db/migration/**/*.sql,src/main/java/ru/javazen/telegram/bot/model/**/*.java,src/main/java/ru/javazen/telegram/bot/repository/**/*.java"
+alwaysApply: false
+---
+
+# Database And Migration Rules
+
+- Never edit old Flyway migrations already in history.
+- Add new migrations with clear forward-only intent.
+- Keep entity and repository updates aligned with migration changes.
+- Preserve compatibility for production profile DB settings in `application.yml`.
+
+# Validation
+
+- Run tests that touch persistence.
+- Run package build to ensure JPA metamodel generation remains healthy.

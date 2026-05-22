@@ -1,0 +1,18 @@
+---
+description: Java and Spring conventions for IgorBot
+globs: "**/*.java,src/main/resources/**/*.yml"
+alwaysApply: false
+---
+
+# Java And Spring Rules
+
+- Follow existing package boundaries under `ru.javazen.telegram.bot`.
+- Keep controller logic light; move business logic to service classes.
+- Reuse existing repository and model patterns for persistence updates.
+- For config changes, prefer `application.yml` and existing config classes over ad-hoc constants.
+
+# Change Discipline
+
+- Preserve public behavior unless task explicitly requests behavioral change.
+- Keep method signatures stable when used by XML wiring or interfaces.
+- When adding new component beans, verify profile scope and startup impact.
