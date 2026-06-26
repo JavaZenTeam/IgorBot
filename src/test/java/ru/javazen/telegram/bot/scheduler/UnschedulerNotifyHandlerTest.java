@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators;
+import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
@@ -76,6 +77,19 @@ public class UnschedulerNotifyHandlerTest {
     }
 
     @Test
+    public void personalChatUserCanCancelAnotherAuthorTask() throws TelegramApiException {
+        setMessageAuthor(111L);
+        setReplyAuthor(999L);
+        setPersonalChat();
+        when(messageSchedulerService.cancelTaskByChatAndMessage(CHAT_ID, TASK_MESSAGE_ID)).thenReturn(true);
+
+        assertTrue(handler.handle(message, "", sender));
+
+        verify(messageSchedulerService).cancelTaskByChatAndMessage(CHAT_ID, TASK_MESSAGE_ID);
+        verify(sender, never()).execute(any(GetChatAdministrators.class));
+    }
+
+    @Test
     public void nonAdminCanNotCancelAnotherAuthorTask() throws TelegramApiException {
         setMessageAuthor(111L);
         setReplyAuthor(999L);
@@ -84,6 +98,12 @@ public class UnschedulerNotifyHandlerTest {
         assertFalse(handler.handle(message, "", sender));
 
         verify(messageSchedulerService, never()).cancelTaskByChatAndMessage(anyLong(), anyInt());
+    }
+
+    private void setPersonalChat() {
+        Chat chat = mock(Chat.class);
+        when(chat.isUserChat()).thenReturn(true);
+        when(message.getChat()).thenReturn(chat);
     }
 
     private void setMessageAuthor(Long userId) {

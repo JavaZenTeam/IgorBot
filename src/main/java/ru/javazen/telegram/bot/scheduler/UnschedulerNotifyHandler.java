@@ -2,6 +2,7 @@ package ru.javazen.telegram.bot.scheduler;
 
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -51,6 +52,11 @@ public class UnschedulerNotifyHandler implements TextMessageHandler {
     }
 
     private boolean isChatAdmin(Message message, AbsSender sender) throws TelegramApiException {
+        Chat chat = message.getChat();
+        if (chat != null && chat.isUserChat()) {
+            return true;
+        }
+
         GetChatAdministrators getChatAdministrators = new GetChatAdministrators();
         getChatAdministrators.setChatId(message.getChatId());
 
