@@ -18,7 +18,10 @@ src/main/java/ru/javazen/telegram/bot/
 ├── CompositeBot.java                # LongPollingBot, chain-of-responsibility router
 ├── handler/
 │   ├── base/                        # UpdateHandler, MessageHandler, CallbackQueryHandler, ...
-│   └── impl/                        # ~20 feature handlers
+│   ├── stats/                       # Link-to-admin/chat stats handlers
+│   ├── subscriptions/               # Trigger/response subscription handlers
+│   ├── toggle/                      # Chat-config toggle handlers
+│   └── (25 feature handler classes directly in this package)
 ├── filter/                          # Filter, MessageFilter, RegexpFilter, RandomFilter, ...
 ├── scheduler/
 │   ├── parser/                      # SpecificTimeParser, ShiftTimeParser
@@ -34,12 +37,13 @@ src/main/resources/
 ├── application.yml                  # Runtime config, profiles
 ├── spring/
 │   ├── app.xml                      # Java config, cache, scheduler bean
-│   ├── botConfig.xml                # Handler/filter bean wiring (537 lines)
+│   ├── botConfig.xml                # Handler/filter bean wiring (553 lines)
 │   ├── answers.xml                  # Weighted answer pools
 │   ├── processors.xml               # Text preprocessors
-│   └── songs.xml                    # Song lyrics (~1700 songs)
+│   ├── songs.xml                    # Song lyrics (~1700 songs)
+│   └── toasts.xml                   # Weighted toast phrases
 ├── templates/                       # Thymeleaf views (16 files)
-└── db/migration/                    # Flyway migrations (V1 — V5.4, 22 files)
+└── db/migration/                    # Flyway migrations (V1 — V5.4; common/ + postgresql/)
 ```
 
 ## Core Architecture
@@ -81,6 +85,7 @@ Hybrid Java + XML wiring:
 | `spring/answers.xml` | Weighted pools: yes/no, milestones, start messages, etc. |
 | `spring/processors.xml` | Text normalization (pronoun replacement, relative dates) |
 | `spring/songs.xml` | Song lyrics by artist |
+| `spring/toasts.xml` | Weighted toast phrase pools |
 
 ### Handler Framework
 
@@ -162,6 +167,7 @@ All extend custom `Repository<T, K>` (wraps `CrudRepository`) or `CrudRepository
 | `ChatController` | `GET /chat/{chatId}`, `/activity-trend-chart`, `/activity-bar-chart`, `/message-types` | `/chat/{chatId}` authority |
 | `FileController` | `GET /file/{fileId}` | Public (proxy download from Telegram) |
 | `TokenController` | `GET /stats/{token}` → redirect | Token validation |
+| `ErrorPagesController` | Error views (`BasicErrorController`) | Adds bot info to error model |
 
 ### Tech Stack
 
@@ -177,7 +183,7 @@ Token-based path mapping (no passwords/cookies):
 ```
 User opens: https://bot.com/stats/abcdefgh
               ↓
-TokenAuthenticationFilter extracts "abcdefgh" from path
+AuthenticationTokenFilter extracts "abcdefgh" from path
               ↓
 AuthenticationTokenService resolves token → path (e.g., /chat/12345)
               ↓
@@ -251,6 +257,7 @@ Users/Messages ──► JPA Repositories
 | `IGOR_BOT_ACTIVE_PROFILE` | Spring profile |
 | `IGOR_DB_CONNECTION_URL`, `IGOR_DB_USER`, `IGOR_DB_PASSWORD` | Database connection |
 | `AI_API_URL`, `AI_API_KEY`, `AI_API_MODEL` | OpenAI-compatible AI |
+| `AI_API_TIMEOUT` | AI request timeout in ms (default `30000`) |
 | `POLLY_ACCESS_KEY`, `POLLY_SECRET_KEY` | AWS Polly credentials |
 | `PROXY_URL` | HTTP proxy for bot |
 | `BASE_URL` | Public base URL for web |
@@ -280,7 +287,7 @@ Two-stage pipeline:
 
 ## Handler Registration Order
 
-Order in `botConfig.xml` is critical (first match wins). Top-level registration order:
+Order in `botConfig.xml` is critical (first match wins). The chain contains additional small handlers; the list below covers the main feature modules in registration order:
 
 1. `milestoneCongratulationsHandler` — Message count celebrations
 2. `sayTextHandler` — TTS inline query (profile-dependent)
@@ -305,12 +312,13 @@ Order in `botConfig.xml` is critical (first match wins). Top-level registration 
 21. `lowLevelJokesToggle` / `lowLevelJokes` — Profane jokes toggle
 22. `songSingerModule` — Song lyric playback (inline query)
 23. `secretAndSacred` / `boysForAll` — Restricted chat handlers
-24. `helpCommandHandler` / `helpInline*` — Help system
-25. `aiCommandHandlerFilterAdapter` — `/ai` command (Spring AI)
+24. `toastHandlerModule` — Toast congratulations
+25. `helpCommandHandler` / `helpInline*` — Help system
+26. `aiCommandHandlerFilterAdapter` — `/ai` command (Spring AI)
 
 ## Database Migrations
 
-22 Flyway migrations (`V1` → `V5.4`) covering:
+22 Flyway migrations (`V1` → `V5.4`): 21 under `db/migration/common/` plus 1 PostgreSQL-specific under `db/migration/postgresql/`, covering:
 - Base schema (`message_task`, `subscription`, `chat_config`, `message_entity`)
 - `users` / `chats` tables
 - `bot_usage_log` table
@@ -326,12 +334,11 @@ Order in `botConfig.xml` is critical (first match wins). Top-level registration 
 ## Test Coverage
 
 17 test files covering:
-- Scheduler parsers (SpecificTimeParser, ShiftTimeParser)
-- Message handlers (repeater, counter, choice maker, subscription, help)
-- Utilities (preprocessors, StringMatchRule, SequenceMatcher, MilestoneHelper)
-- Phonetic song matching (DoubleMetaphone)
-- Word splitting
-- Framework: JUnit + Mockito + JMockit
+- Scheduler parsers (SpecificTimeParser, ShiftTimeParser) and notify handlers
+- Message handlers (repeater, choice maker, toast, update info provider)
+- Utilities (preprocessors, StringMatchRule, SequenceMatcher, MilestoneHelper, SizedItemsContainer)
+- Phonetic song matching (DoubleMetaphone) and word splitting
+- Framework: JUnit + Mockito (JMockit excluded — conflicts with Mockito on JDK 21+)
 
 ## Risk Areas
 

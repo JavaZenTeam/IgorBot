@@ -8,8 +8,6 @@ This repository is structured so both humans and AI agents can onboard quickly:
 
 - Project-level agent guidance: `AGENTS.md`
 - Deep architecture and runbooks: `docs/`
-- Cursor-specific behavior: `.cursor/rules/`
-- GitHub Copilot-specific behavior: `.github/copilot-instructions.md` and `.github/instructions/`
 
 ## Source of Truth
 
@@ -22,7 +20,7 @@ When documentation and code disagree, trust these files:
 ## Tech Stack
 
 - Java 21
-- Spring Boot 3.5.9
+- Spring Boot 3.5.13
 - Maven build
 - Spring Data JPA + Flyway
 - PostgreSQL (production), H2 dependency available

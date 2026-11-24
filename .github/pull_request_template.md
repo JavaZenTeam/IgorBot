@@ -11,7 +11,7 @@
 
 ## AI-assist notes
 
-- [ ] I used repository instructions (`AGENTS.md`, `.cursor/rules`, or Copilot instructions)
+- [ ] I used repository instructions (`AGENTS.md`)
 - [ ] I updated documentation for changed behavior/commands
 - [ ] No secrets or environment-specific credentials were committed
 

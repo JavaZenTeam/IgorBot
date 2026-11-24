@@ -31,11 +31,20 @@ If older docs conflict with these files, treat docs as stale and update them in 
 
 1. Keep changes focused; avoid broad refactors unless explicitly requested.
 2. Do not modify secrets, credentials, or token values in tracked files.
-3. Do not edit DB migrations retroactively. Add new Flyway migration files instead.
+3. Do not edit DB migrations retroactively. Add new Flyway migration files instead. Keep `mvn -B -ntp clean package` green — the JPA metamodel is generated during compilation and a stale one breaks the build.
 4. Preserve handler ordering semantics from `botConfig.xml` unless the task explicitly requires reordering.
 5. When changing behavior, update related docs in `docs/`.
 
+## Code Conventions
+
+- Keep business logic in services; controllers stay thin.
+- Keep method and constructor signatures stable when they are referenced from `spring/*.xml` wiring.
+- Prefer `application.yml` and existing config classes over ad-hoc constants.
+- Avoid production-only assumptions unless the task requires profile-specific behavior.
+
 ## Trusted Commands
+
+**Prerequisite:** `JAVA_HOME` must point to JDK 21 (e.g. `C:\Program Files\Java\jdk-21.0.1`). The build will fail with a JRE.
 
 Run from repository root.
 

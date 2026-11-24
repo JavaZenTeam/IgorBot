@@ -4,3 +4,8 @@
 /src/main/resources/config.properties
 /src/main/webapp/WEB-INF/hibernate.properties
 /src/main/webapp/WEB-INF/jdbc.properties
+# Eclipse
+/.classpath
+/.factorypath
+/.project
+/.settings/
