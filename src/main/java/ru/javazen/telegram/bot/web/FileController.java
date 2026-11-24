@@ -5,12 +5,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.protocol.HttpContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +23,7 @@ import java.io.IOException;
 public class FileController {
     private DefaultAbsSender bot;
     private HttpClient telegramHttpClient;
+    private DefaultBotOptions options;
 
     @GetMapping("/file/{fileId}")
     public void download(@PathVariable("fileId") String fileId, HttpServletResponse servletResponse) throws TelegramApiException, IOException {
@@ -29,7 +32,8 @@ public class FileController {
         File file = bot.execute(method);
         String fileUrl = file.getFileUrl(bot.getBotToken());
 
-        HttpResponse response = telegramHttpClient.execute(new HttpGet(fileUrl));
+        HttpContext context = options.getHttpContext();
+        HttpResponse response = telegramHttpClient.execute(new HttpGet(fileUrl), context);
 
         IOUtils.copy(response.getEntity().getContent(), servletResponse.getOutputStream());
     }

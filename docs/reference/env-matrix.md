@@ -9,7 +9,7 @@ The application binds variables from `src/main/resources/application.yml`.
 | `IGOR_BOT_TOKEN` | Yes | all | Telegram bot token. |
 | `BASE_URL` | No | all | Base URL used in bot links. |
 | `IGOR_BOT_SUPPORT_CHAT` | No | all | Support chat identifier. |
-| `PROXY_URL` | No | all | HTTP proxy URL for outbound calls. |
+| `PROXY_URL` | No | all | Proxy URL for Telegram API calls. Supports `http://`, `https://`, `socks://`, `socks5://`. Credentials may be embedded: `http://user:pass@host:port`. |
 | `POLLY_ACCESS_KEY` | Yes (if `say-text`) | say-text | AWS Polly access key. |
 | `POLLY_SECRET_KEY` | Yes (if `say-text`) | say-text | AWS Polly secret key. |
 | `FILE_SERVICE_URL` | Yes (if `say-text`) | say-text | External file service URL. |

@@ -12,7 +12,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.junidecode.Junidecode;
 import org.apache.commons.codec.language.DoubleMetaphone;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -40,6 +45,7 @@ import ru.javazen.telegram.bot.util.comparator.RandomComparator;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
@@ -119,6 +125,31 @@ public class AppConfig {
     public DefaultBotOptions proxyBotOptions(
             @Value("${http.proxy.url:}") String proxyUrl) throws MalformedURLException {
         DefaultBotOptions botOptions = new DefaultBotOptions();
+        if (proxyUrl != null && !proxyUrl.isBlank()) {
+            URL url = new URL(proxyUrl);
+            String protocol = url.getProtocol();
+            if ("socks".equalsIgnoreCase(protocol) || "socks5".equalsIgnoreCase(protocol)) {
+                botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
+            } else {
+                botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
+            }
+            botOptions.setProxyHost(url.getHost());
+            int port = url.getPort();
+            if (port == -1) {
+                port = "https".equalsIgnoreCase(protocol) ? 443 : 80;
+            }
+            botOptions.setProxyPort(port);
+            String userInfo = url.getUserInfo();
+            if (userInfo != null && !userInfo.isEmpty()) {
+                String[] parts = userInfo.split(":", 2);
+                CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(
+                        new AuthScope(url.getHost(), port),
+                        new UsernamePasswordCredentials(parts[0], parts.length > 1 ? parts[1] : "")
+                );
+                ((HttpClientContext) botOptions.getHttpContext()).setCredentialsProvider(credsProvider);
+            }
+        }
         return botOptions;
     }
 
